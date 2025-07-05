@@ -1,0 +1,42 @@
+[33mcommit b562f81be9314685b5c5368622c825a8f7d3f93f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdev-pablo[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/dev-pablo[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Merge: 015c33c 67ffba6
+Author: Michał Grabowski <92119683+Robelek@users.noreply.github.com>
+Date:   Sat Jul 5 12:04:37 2025 +0200
+
+    Merge pull request #1 from DexuCom/backend-dev
+    
+    Initial commit:
+
+[33mcommit 67ffba6b205aae323c5abe3451972fbd0daa4867[m[33m ([m[1;31morigin/backend-dev[m[33m)[m
+Author: Robeleczek <robeleczek@gmail.com>
+Date:   Sat Jul 5 12:02:17 2025 +0200
+
+    Initial commit:
+    - chore(gateway-app): created the gateway-app
+    - chore(gateway-app): added a dockerfile for the gateway-app
+    
+    - chore(project): added a simple docker-compose.yaml
+
+[33mcommit 015c33c40c8c20cf92af342bc79c64cc19a5faf0[m
+Author: Dexu <118669962+DexuCom@users.noreply.github.com>
+Date:   Mon Mar 31 17:42:48 2025 +0200
+
+    Add files via upload
+
+[33mcommit fcb9420a6d2d596a5f250c92a148bd4514ef981c[m
+Author: Dexu <118669962+DexuCom@users.noreply.github.com>
+Date:   Mon Mar 31 17:42:18 2025 +0200
+
+    Rename RPI_Organizacja_i_infrastruktura_projektu.pdf to Dokumenty/RPI_Organizacja_i_infrastruktura_projektu.pdf
+
+[33mcommit c3cbb42fac7a8df9a6e18acd8809d0b3a7973c1b[m
+Author: Dexu <118669962+DexuCom@users.noreply.github.com>
+Date:   Wed Mar 19 14:51:58 2025 +0100
+
+    Dodanie dokumentu organizacji projektu
+
+[33mcommit 8a3f5106ff97c945986580d091d622340b8efca8[m
+Author: Dexu <118669962+DexuCom@users.noreply.github.com>
+Date:   Sat Mar 15 12:37:29 2025 +0100
+
+    Initial commit
