@@ -11,6 +11,18 @@ services:
             - scoring-model-network
             - backend-network
             - webscraper-network
+        
+        environment:
+            - WEB_API_URL=http://web-api:8081
+
+    web-api:
+        build: Backend\web-api
+        container_name: web-api
+        restart: unless-stopped
+        networks:
+            - backend-network
+        
+
 
 networks:
     scoring-model-network:
