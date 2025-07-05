@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+    gateway-app:
+        build: Backend\gateway-app
+        container_name: gateway-app
+        ports:
+            - "8080:8080"
+        restart: unless-stopped
+        networks:
+            - scoring-model-network
+            - backend-network
+            - webscraper-network
+
+networks:
+    scoring-model-network:
+        driver: bridge
+    
+    backend-network:
+        driver: bridge
+    
+    webscraper-network:
+        driver: bridge
