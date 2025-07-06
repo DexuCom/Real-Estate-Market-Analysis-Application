@@ -16,7 +16,7 @@ def scrape_prices_and_streets(base_url, pages=2):
         response.encoding = "utf-8"
 
         if response.status_code != 200:
-            print(f"⚠️ Error downloading page {page}")
+            print(f"Error downloading page {page}")
             continue
 
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -65,4 +65,4 @@ data = scrape_prices_and_streets(BASE_URL)
 
 df = pd.DataFrame(data)
 df.to_csv("morizon_data.csv", index=False, encoding="utf-8-sig")
-print("✅ Saved to morizon_data.csv")
+print("Saved to morizon_data.csv")

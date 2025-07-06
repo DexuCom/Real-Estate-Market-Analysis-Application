@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Parkinsans:wght@300..800&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 
+html {
+    font-size: 16px;
+}
+
 body {
     margin: 0;
     font-family: 'Outfit', Arial, sans-serif;
@@ -10,47 +14,69 @@ body {
     background-repeat: no-repeat;
     background-attachment: fixed;
     color: #fff;
-    font-size: 1.1rem;
+    font-size: 1.0rem;
 }
 
 .header {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    padding: 20px 20%;
+    padding: 1.25rem 0;
     box-sizing: border-box;
     width: 100%;
-    background: rgba(252, 252, 252, 0.05);
+    background: none;
     position: relative;
     z-index: 10;
     backdrop-filter: blur(2px);
 }
 
+.menu-bg.header-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2.5rem;
+    width: 100%;
+    max-width: 1400px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 0.9rem;
+    padding: 0.6rem 1.0rem;
+    box-shadow: 0 0.1rem 1.2rem 0 rgba(0, 0, 0, 0.02);
+}
+
 .logo-container {
     flex-grow: 1;
     text-align: center;
+    margin-left: 4.0rem;
 }
 
 .logo {
-    max-width: 8vw;
+    max-width: 9rem;
     height: auto;
     display: inline-block;
     filter: invert(1);
+    transition: filter 0.3s, transform 0.3s;
+}
+
+.logo:hover {
+    filter: invert(0.85);
+    transform: scale(1.06);
 }
 
 .left-nav,
 .right-nav {
     display: flex;
-    gap: 20px;
+    gap: 1.25rem;
 }
 
 .left-nav a,
 .right-nav a {
     text-decoration: none;
-    color: #cecece;
-    padding: 5px 10px;
-    border-radius: 5px;
+    color: #d4d4d4;
+    padding: 0.3125rem 0.625rem;
+    border-radius: 0.3125rem;
     transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
 }
 
 .left-nav a:hover,
@@ -58,18 +84,35 @@ body {
     background-color: rgba(255, 255, 255, 0.5);
 }
 
+.right-nav .material-icons {
+    font-size: 1.1em;
+    margin-right: 0.3em;
+    vertical-align: middle;
+}
+
+.left-nav a {
+    display: flex;
+    align-items: center;
+}
+
+.left-nav .material-icons {
+    font-size: 1.1em;
+    margin-right: 0.3em;
+    vertical-align: middle;
+}
+
 .content {
-    margin: 20px 20%;
-    padding: 20px;
+    margin: 1.25rem 20%;
+    padding: 1.25rem;
 }
 
 .right-nav a:last-child {
     background: #fff;
     color: #111 !important;
-    border-radius: 50px;
-    padding: 5px 18px;
+    border-radius: 0.6rem;
+    padding: 0.3125rem 1.125rem;
     font-weight: 600;
-    border: 2px solid #fff;
+    border: 0.1rem solid #fff;
     transition: background 0.3s, color 0.3s;
 }
 
@@ -77,6 +120,31 @@ body {
     background: #eee;
     color: #111;
     border-color: #eee;
+}
+
+.right-nav a:nth-child(1) {
+    border: 0.01rem solid #aaa;
+    border-radius: 0.6rem;
+    background: transparent;
+    color: #d4d4d4;
+    padding: 0.3125rem 1.125rem;
+    transition: border-color 0.3s, background 0.3s, color 0.3s;
+}
+
+.right-nav a:nth-child(1):hover {
+    border-color: #fff;
+    background: rgba(255, 255, 255, 0.07);
+    color: #fff;
+}
+
+.menu-bg {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 1.2rem;
+    padding: 0.4rem 1.5rem;
+    box-shadow: 0 0.1rem 1.2rem 0 rgba(0, 0, 0, 0.07);
 }
 
 .hero-section {
@@ -89,14 +157,14 @@ body {
     font-size: 3.5rem;
     font-weight: 700;
     margin-bottom: 1.5vw;
-    letter-spacing: 1px;
+    letter-spacing: 0.0625rem;
 }
 
 .hero-desc {
     color: #b0b0b0;
     font-size: 1.2rem;
     font-weight: 300;
-    max-width: 705px;
+    max-width: 44.0625rem;
     margin: 0 auto;
     line-height: 1.6;
     text-align: justify;
@@ -109,11 +177,11 @@ body {
     background: rgba(92, 92, 92, 0.5);
     color: #fff;
     font-family: 'Outfit', Arial, sans-serif;
-    font-size: 1.1rem;
+    font-size: 1.0rem;
     font-weight: 400;
-    border: 2px solid #858585;
-    border-radius: 50px;
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.10);
+    border: 0.1rem solid #858585;
+    border-radius: 0.7rem;
+    box-shadow: 0 0.125rem 0.75rem 0 rgba(0, 0, 0, 0.10);
     text-decoration: none;
     transition: background 0.2s, color 0.2s, box-shadow 0.2s, border-color 0.2s;
     cursor: pointer;
@@ -123,5 +191,20 @@ body {
     background: rgba(180, 180, 180, 0.3);
     color: #fff;
     border-color: #fff;
-    box-shadow: 0 4px 18px 0 rgba(0, 0, 0, 0.13);
+    box-shadow: 0 0.25rem 1.125rem 0 rgba(0, 0, 0, 0.13);
+}
+
+.hero-image-container {
+    margin-top: 2.5rem;
+    display: flex;
+    justify-content: center;
+}
+
+.hero-image {
+    width: 100%;
+    max-width: 400rem;
+    height: auto;
+    border-radius: 1.5rem;
+    box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.18);
+    object-fit: cover;
 }

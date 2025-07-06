@@ -4,23 +4,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Strona Startowa</title>
+    <title>EstateScout </title>
+    <link rel="icon" type="image/png" href="icon.png">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 
 <body>
     <div class="header">
-        <div class="left-nav">
-            <a href="#">Mapa ofert</a>
-            <a href="#">O nas</a>
-        </div>
-        <div class="logo-container">
-            <img src="logo.png" alt="Logo Twojej Firmy" class="logo">
-        </div>
-        <div class="right-nav">
-            <a href="#">Zaloguj</a>
-            <a href="#">Stwórz konto</a>
+        <div class="menu-bg header-nav">
+            <div class="left-nav">
+                <a href="#">
+                    <span class="material-icons">location_on</span>
+                    <span>Mapa ofert</span>
+                </a>
+                <a href="#">O nas</a>
+            </div>
+            <div class="logo-container">
+                <img src="logo.png" alt="Logo Twojej Firmy" class="logo">
+            </div>
+            <div class="right-nav">
+                <a href="#">
+                    <span class="material-icons">person</span>
+                    <span>Zaloguj</span>
+                </a>
+                <a href="#">Stwórz konto</a>
+            </div>
         </div>
     </div>
     <div class="content">
@@ -28,13 +37,18 @@
             <div class="hero-title">Znajdź nieruchomość <br>dopasowaną dla Ciebie</div>
             <div class="hero-desc">
                 Przeglądaj mapy cieplne cen nieruchomości i korzystaj z inteligentnego modelu scoringowego. Wszystko w
-                jednym miejscu, skutecznie i wygodnie. Odkryj nowe możliwości analizy rynku nieruchomości ze wsparciem narzędzi sztucznej inteligencji.
+                jednym miejscu, skutecznie i wygodnie. Odkryj nowe możliwości analizy rynku nieruchomości ze wsparciem
+                narzędzi sztucznej inteligencji.
             </div>
 
             <a href="#" class="hero-btn">
-                <span class="material-icons" style="vertical-align: middle; font-size: 1.3em; margin-right: 0.5em;">approval</span>
+                <span class="material-icons"
+                    style="vertical-align: middle; font-size: 1.3em; margin-right: 0.5em;">approval</span>
                 Przejdź do mapy
             </a>
+            <div class="hero-image-container">
+                <img src="heatmap.png" alt="Mapa nieruchomości" class="hero-image">
+            </div>
         </div>
     </div>
 </body>
