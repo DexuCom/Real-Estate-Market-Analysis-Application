@@ -4,9 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EstateScout </title>
+    <title>EstateScout</title>
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="components/home.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 
@@ -14,7 +15,11 @@
     <div class="header">
         <div class="menu-bg header-nav">
             <div class="left-nav">
-                <a href="real_estate_map.html">
+                <a href="#" onclick="showHome(event)">
+                    <span class="material-icons">home</span>
+                    <span>Strona główna</span>
+                </a>
+                <a href="#" onclick="showMap(event)">
                     <span class="material-icons">location_on</span>
                     <span>Mapa ofert</span>
                 </a>
@@ -32,25 +37,37 @@
             </div>
         </div>
     </div>
-    <div class="content">
-        <div class="hero-section">
-            <div class="hero-title">Znajdź nieruchomość <br>dopasowaną dla Ciebie</div>
-            <div class="hero-desc">
-                Przeglądaj mapy cieplne cen nieruchomości i korzystaj z inteligentnego modelu scoringowego. Wszystko w
-                jednym miejscu, skutecznie i wygodnie. Odkryj nowe możliwości analizy rynku nieruchomości ze wsparciem
-                narzędzi sztucznej inteligencji.
-            </div>
 
-            <a href="real_estate_map.html" class="hero-btn">
-                <span class="material-icons"
-                    style="vertical-align: middle; font-size: 1.3em; margin-right: 0.5em;">approval</span>
-                Przejdź do mapy
-            </a>
-            <div class="hero-image-container">
-                <img src="heatmap.png" alt="Mapa nieruchomości" class="hero-image">
-            </div>
-        </div>
+    <div id="mapContainer" class="map-container" style="display: none;">
+        <iframe id="mapFrame" src="real_estate_map.html" frameborder="0"></iframe>
     </div>
+    <div id="home-placeholder"></div>
 </body>
+
+<script>
+    fetch('components/home.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('home-placeholder').innerHTML = data;
+        });
+
+    function showMap(event) {
+        event.preventDefault();
+        const mapContainer = document.getElementById('mapContainer');
+        const homeContainer = document.getElementById('home-placeholder');
+
+        mapContainer.style.display = 'block';
+        homeContainer.style.display = 'none';
+    }
+
+    function showHome(event) {
+        event.preventDefault();
+        const mapContainer = document.getElementById('mapContainer');
+        const homeContainer = document.getElementById('home-placeholder');
+
+        mapContainer.style.display = 'none';
+        homeContainer.style.display = 'block';
+    }
+</script>
 
 </html>

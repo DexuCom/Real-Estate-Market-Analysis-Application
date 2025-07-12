@@ -14,7 +14,7 @@ body {
     background-repeat: no-repeat;
     background-attachment: fixed;
     color: #fff;
-    font-size: 1.0rem;
+    font-size: 1.2rem;
 }
 
 .header {
@@ -25,8 +25,11 @@ body {
     box-sizing: border-box;
     width: 100%;
     background: none;
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
     z-index: 10;
+    width: 100vw;
     backdrop-filter: blur(2px);
 }
 
@@ -34,7 +37,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 2.5rem;
+    position: relative;
+    gap: 0rem;
     width: 100%;
     max-width: 1400px;
     background: rgba(255, 255, 255, 0.03);
@@ -44,13 +48,17 @@ body {
 }
 
 .logo-container {
-    flex-grow: 1;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
     text-align: center;
-    margin-left: 4.0rem;
+    margin-left: 0;
+    flex-grow: unset;
+    z-index: 1;
 }
 
 .logo {
-    max-width: 9rem;
+    max-width: 10.5rem;
     height: auto;
     display: inline-block;
     filter: invert(1);
@@ -85,7 +93,7 @@ body {
 }
 
 .right-nav .material-icons {
-    font-size: 1.1em;
+    font-size: 1.2em;
     margin-right: 0.3em;
     vertical-align: middle;
 }
@@ -96,7 +104,7 @@ body {
 }
 
 .left-nav .material-icons {
-    font-size: 1.1em;
+    font-size: 1.2em;
     margin-right: 0.3em;
     vertical-align: middle;
 }
@@ -177,7 +185,7 @@ body {
     background: rgba(92, 92, 92, 0.5);
     color: #fff;
     font-family: 'Outfit', Arial, sans-serif;
-    font-size: 1.0rem;
+    font-size: 1.2rem;
     font-weight: 400;
     border: 0.1rem solid #858585;
     border-radius: 0.7rem;
@@ -207,4 +215,48 @@ body {
     border-radius: 1.5rem;
     box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.18);
     object-fit: cover;
+}
+
+.map-container {
+    position: fixed;
+    top: 6rem;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    border-radius: 0;
+    margin: 0;
+    background: rgba(255, 255, 255, 0.03);
+    box-shadow: none;
+}
+
+#map {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+.map-container body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.map-container html {
+    overflow: hidden;
+}
+
+.map-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 6rem);
+    border: none;
+    overflow: hidden;
+    scrollbar-width: none;
+}
+
+.map-container iframe::-webkit-scrollbar {
+    display: none;
 }
