@@ -21,7 +21,25 @@ services:
         restart: unless-stopped
         networks:
             - backend-network
+        environment:
+            - POSTGRES_USER=${POSTGRES_USER}
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+            - POSTGRES_DB=${POSTGRES_DB}
         
+    postgres_db:
+        image: postgres:16.3-alpine
+        container_name: postgres_db
+        restart: unless-stopped
+        environment:
+            - POSTGRES_USER=${POSTGRES_USER}
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+            - POSTGRES_DB=${POSTGRES_DB}
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        networks:
+            - backend-network
+        ports:
+            - "5432:5432"
 
 
 networks:
@@ -33,3 +51,6 @@ networks:
     
     webscraper-network:
         driver: bridge
+
+volumes:
+    postgres_data:
