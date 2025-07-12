@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+
 public record UserRegistrationRequestDTO(
   @NotBlank(message="Nazwa użytkownika nie może być pusta!")
   @Size(min=3, max=40, message="Nazwa użytkownika musi mieć od 3 do 40 znaków")
