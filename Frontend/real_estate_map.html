@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mapa ofert nieruchomości</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 100vh;
+            width: 100vw;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script>
+        var map = L.map('map').setView([54.37, 18.63], 11);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        fetch('../ScraperOutput/morizon_data.csv')
+            .then(response => response.text())
+            .then(csvText => {
+                Papa.parse(csvText, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function (results) {
+                        results.data.forEach(function (row) {
+                            if (row.coords) {
+                                const [lat, lng] = row.coords.split(',').map(coord => parseFloat(coord));
+                                if (!isNaN(lat) && !isNaN(lng)) {
+                                    const popupContent = `
+                                        <b>Ulica:</b> ${row.street}<br>
+                                        <b>Cena:</b> ${row.price_pln} PLN<br>
+                                        <b>Powierzchnia:</b> ${row.size_m2}<br>
+                                        <b>Pokoje:</b> ${row.rooms}<br>
+                                        <b>Piętro:</b> ${row.floor}<br>
+                                        <b>Rok budowy:</b> ${row.year_built}<br>
+                                        <a href="${row.detail_url}" target="_blank">Zobacz ofertę</a>
+                                    `;
+                                    L.marker([lat, lng])
+                                        .addTo(map)
+                                        .bindPopup(popupContent);
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+    </script>
+</body>
+
+</html>
