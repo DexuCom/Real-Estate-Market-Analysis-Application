@@ -1,12 +1,12 @@
-package com.rema.web_api.user.service;
+package com.rema.web_api.user;
 
+import com.rema.web_api.enums.Role;
 import com.rema.web_api.user.dto.UserRegistrationRequestDTO;
-import com.rema.web_api.user.model.User;
-import com.rema.web_api.user.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -36,10 +36,16 @@ public class UserService {
                 .username(registerRequest.username())
                 .email(registerRequest.email())
                 .passwordHash(passwordEncoder.encode(registerRequest.password()))
+                .role(Role.USER)
                 .build();
 
 
         return userRepository.save(user);
+    }
+
+    public Optional<User> getUserById(UUID id)
+    {
+        return userRepository.findById(id);
     }
 
 }
