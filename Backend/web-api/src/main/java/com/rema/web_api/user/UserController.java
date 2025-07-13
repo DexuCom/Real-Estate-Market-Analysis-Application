@@ -1,10 +1,14 @@
 package com.rema.web_api.user;
 
 import com.rema.web_api.user.dto.UserDTO;
+import com.rema.web_api.user.dto.UserJwtDTO;
+import com.rema.web_api.user.dto.UserLoginRequestDTO;
 import com.rema.web_api.user.dto.UserRegistrationRequestDTO;
 import com.rema.web_api.user.User;
 import com.rema.web_api.user.UserService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,5 +61,22 @@ public class UserController {
         }
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<UserJwtDTO> loginUser(@Valid @RequestBody UserLoginRequestDTO userLoginRequestDTO)
+    {
+        try
+        {
+            String jwtToken = userService.loginUser(userLoginRequestDTO);
+            UserJwtDTO userJwtDTO = new UserJwtDTO(jwtToken);
+
+            return ResponseEntity.ok(userJwtDTO);
+        }
+        catch(IllegalStateException e)
+        {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(null);
+        }
+    }
 
 }
