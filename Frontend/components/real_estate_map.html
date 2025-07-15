@@ -9,36 +9,7 @@
     <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/leaflet-extra-markers@1.2.1/dist/css/leaflet.extra-markers.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <style>
-        #map {
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
-
-        html {
-            overflow: hidden;
-        }
-
-        .custom-home-icon {
-            background-color: #3f3172;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 18px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-        }
-    </style>
+    <link rel="stylesheet" href="real_estate_map.css">
 </head>
 
 <body>
@@ -54,16 +25,30 @@
             attribution: '© OpenStreetMap'
         }).addTo(map);
 
-        var customIcon = L.icon({
-            iconUrl: 'marker-icon.png',
-            shadowUrl: 'marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        });
+        // Funkcja do obliczenia ceny za metr kwadratowy
+        function calculatePricePerSqm(price, size) {
+            const priceNum = parseFloat(price.replace(/[^\d]/g, ''));
+            const sizeNum = parseFloat(size.replace(/[^\d]/g, ''));
+            return sizeNum > 0 ? priceNum / sizeNum : 0;
+        }
 
-        fetch('../ScraperOutput/morizon_data.csv')
+        // Funkcja do określenia koloru na podstawie ceny za m²
+        function getColorByPrice(pricePerSqm) {
+            // Skala kolorów na podstawie analizy danych:
+            // Zielony: < 8000 PLN/m² (tanie)
+            // Żółty: 8000-15000 PLN/m² (średnie)
+            // Czerwony: > 15000 PLN/m² (drogie)
+
+            if (pricePerSqm < 8000) {
+                return '#4CAF50'; // Zielony
+            } else if (pricePerSqm < 15000) {
+                return '#FFC107'; // Żółty
+            } else {
+                return '#F44336'; // Czerwony
+            }
+        }
+
+        fetch('../../ScraperOutput/morizon_data.csv')
             .then(response => response.text())
             .then(csvText => {
                 Papa.parse(csvText, {
@@ -74,22 +59,38 @@
                             if (row.coords) {
                                 const [lat, lng] = row.coords.split(',').map(coord => parseFloat(coord));
                                 if (!isNaN(lat) && !isNaN(lng)) {
+                                    const pricePerSqm = calculatePricePerSqm(row.price_pln, row.size_m2);
+                                    const iconColor = getColorByPrice(pricePerSqm);
+
                                     const popupContent = `
                                         <b>Ulica:</b> ${row.street}<br>
                                         <b>Cena:</b> ${row.price_pln} PLN<br>
                                         <b>Powierzchnia:</b> ${row.size_m2}<br>
+                                        <b>Cena za m²:</b> ${Math.round(pricePerSqm).toLocaleString()} PLN/m²<br>
                                         <b>Pokoje:</b> ${row.rooms}<br>
                                         <b>Piętro:</b> ${row.floor}<br>
                                         <b>Rok budowy:</b> ${row.year_built}<br>
                                         <a href="${row.detail_url}" target="_blank">Zobacz ofertę</a>
                                     `;
+
                                     var homeIcon = L.divIcon({
-                                        className: 'custom-home-icon',
+                                        className: `custom-home-icon ${getPriceClass(pricePerSqm)}`,
                                         html: '<span class="material-icons">home</span>',
                                         iconSize: [30, 30],
                                         iconAnchor: [15, 15],
                                         popupAnchor: [0, -15]
                                     });
+
+                                    // Dodaj funkcję do określenia klasy CSS
+                                    function getPriceClass(pricePerSqm) {
+                                        if (pricePerSqm < 8000) {
+                                            return 'price-low';
+                                        } else if (pricePerSqm < 15000) {
+                                            return 'price-medium';
+                                        } else {
+                                            return 'price-high';
+                                        }
+                                    }
 
                                     L.marker([lat, lng], { icon: homeIcon }).addTo(map).bindPopup(popupContent);
                                 }

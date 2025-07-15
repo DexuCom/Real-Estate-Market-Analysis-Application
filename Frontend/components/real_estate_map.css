@@ -1,0 +1,82 @@
+#map {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+html {
+    overflow: hidden;
+}
+
+.custom-home-icon {
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    border: 2px solid white;
+}
+
+.map-container {
+    position: fixed;
+    top: 6rem;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    border-radius: 0;
+    margin: 0;
+    background: rgba(255, 255, 255, 0.03);
+    box-shadow: none;
+}
+
+.map-container body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.map-container html {
+    overflow: hidden;
+}
+
+.map-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 6rem);
+    border: none;
+    overflow: hidden;
+    scrollbar-width: none;
+}
+
+.map-container iframe::-webkit-scrollbar {
+    display: none;
+}
+
+/* Klasy dla różnych zakresów cenowych */
+.price-low {
+    background-color: #4CAF50;
+    /* Zielony - tanie */
+}
+
+.price-medium {
+    background-color: #FFC107;
+    /* Żółty - średnie */
+}
+
+.price-high {
+    background-color: #F44336;
+    /* Czerwony - drogie */
+}

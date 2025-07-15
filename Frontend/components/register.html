@@ -1,0 +1,38 @@
+<link rel="stylesheet" href="components/register.css">
+<div class="register-container">
+    <div class="register-form">
+        <h2 class="register-title">Rejestracja</h2>
+        <p class="register-subtitle">Utwórz nowe konto aby uzyskać dostęp do wszystkich funkcji.</p>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Hasło</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Powtórz hasło</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
+            </div>
+
+            <div class="form-checkbox">
+                <input type="checkbox" id="terms" name="terms" required>
+                <label for="terms">Akceptuję <a href="#">regulamin</a> i <a href="#">politykę prywatności</a></label>
+            </div>
+
+            <button type="submit" class="register-btn">
+                Zarejestruj się
+            </button>
+        </form>
+
+        <div class="register-footer">
+            Masz już konto? <a href="#" onclick="showLogin(event)">Zaloguj się</a> | <a href="#"
+                onclick="showHome(event)">Powrót do strony głównej</a>
+        </div>
+    </div>
+</div>

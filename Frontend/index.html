@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EstateScout</title>
-    <link rel="icon" type="image/png" href="icon.png">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href="assets/icon.png">
+    <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="components/home.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
@@ -26,22 +26,24 @@
                 <a href="#">O nas</a>
             </div>
             <div class="logo-container">
-                <img src="logo.png" alt="Logo Twojej Firmy" class="logo">
+                <img src="assets/logo.png" alt="Logo Twojej Firmy" class="logo">
             </div>
             <div class="right-nav">
-                <a href="#">
+                <a href="#" onclick="showLogin(event)">
                     <span class="material-icons">person</span>
                     <span>Zaloguj</span>
                 </a>
-                <a href="#">Stwórz konto</a>
+                <a href="#" onclick="showRegister(event)">Stwórz konto</a>
             </div>
         </div>
     </div>
 
     <div id="mapContainer" class="map-container" style="display: none;">
-        <iframe id="mapFrame" src="real_estate_map.html" frameborder="0"></iframe>
+        <iframe id="mapFrame" src="components/real_estate_map.html" frameborder="0"></iframe>
     </div>
     <div id="home-placeholder"></div>
+    <div id="login-placeholder" style="display: none;"></div>
+    <div id="register-placeholder" style="display: none;"></div>
 </body>
 
 <script>
@@ -53,20 +55,51 @@
 
     function showMap(event) {
         event.preventDefault();
-        const mapContainer = document.getElementById('mapContainer');
-        const homeContainer = document.getElementById('home-placeholder');
-
-        mapContainer.style.display = 'block';
-        homeContainer.style.display = 'none';
+        hideAllContainers();
+        document.getElementById('mapContainer').style.display = 'block';
     }
 
     function showHome(event) {
         event.preventDefault();
-        const mapContainer = document.getElementById('mapContainer');
-        const homeContainer = document.getElementById('home-placeholder');
+        hideAllContainers();
+        document.getElementById('home-placeholder').style.display = 'block';
+    }
 
-        mapContainer.style.display = 'none';
-        homeContainer.style.display = 'block';
+    function showLogin(event) {
+        event.preventDefault();
+        hideAllContainers();
+        const loginContainer = document.getElementById('login-placeholder');
+        loginContainer.style.display = 'block';
+
+        if (!loginContainer.innerHTML) {
+            fetch('components/login.html')
+                .then(response => response.text())
+                .then(data => {
+                    loginContainer.innerHTML = data;
+                });
+        }
+    }
+
+    function showRegister(event) {
+        event.preventDefault();
+        hideAllContainers();
+        const registerContainer = document.getElementById('register-placeholder');
+        registerContainer.style.display = 'block';
+
+        if (!registerContainer.innerHTML) {
+            fetch('components/register.html')
+                .then(response => response.text())
+                .then(data => {
+                    registerContainer.innerHTML = data;
+                });
+        }
+    }
+
+    function hideAllContainers() {
+        document.getElementById('mapContainer').style.display = 'none';
+        document.getElementById('home-placeholder').style.display = 'none';
+        document.getElementById('login-placeholder').style.display = 'none';
+        document.getElementById('register-placeholder').style.display = 'none';
     }
 </script>
 
