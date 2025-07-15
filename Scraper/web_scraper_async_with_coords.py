@@ -141,7 +141,7 @@ if __name__ == "__main__":
     os.makedirs(output_dir, exist_ok=True)
     
     BASE_URL = "https://www.morizon.pl/mieszkania/gdansk/?ps%5Blocation%5D%5Bmap%5D=1"
-    data = asyncio.run(scrape_prices_and_streets(BASE_URL, pages=3))
+    data = asyncio.run(scrape_prices_and_streets(BASE_URL, pages=10))
 
     output_file = os.path.join(output_dir, "morizon_data.csv")
     df = pd.DataFrame(data)

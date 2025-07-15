@@ -14,6 +14,16 @@
 
 <body>
     <div id="map"></div>
+    <div class="map-style-selector">
+        <select id="styleSelect">
+            <option value="openstreetmap">OpenStreetMap</option>
+            <option value="cartodb">CartoDB Positron</option>
+            <option value="cartodb-dark">CartoDB Dark</option>
+            <option value="stamen-terrain">Stamen Terrain</option>
+            <option value="stamen-toner">Stamen Toner</option>
+            <option value="esri-satellite">ESRI Satellite</option>
+        </select>
+    </div>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <script
@@ -21,30 +31,77 @@
     <script>
         var map = L.map('map').setView([54.37, 18.63], 11);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
+        var tileLayers = {
+            'openstreetmap': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }),
+            'cartodb': L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '© OpenStreetMap © CartoDB'
+            }),
+            'cartodb-dark': L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '© OpenStreetMap © CartoDB'
+            }),
+            'stamen-terrain': L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png', {
+                attribution: 'Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap'
+            }),
+            'stamen-toner': L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}{r}.png', {
+                attribution: 'Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap'
+            }),
+            'esri-satellite': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles © Esri — Source: Esri, Maxar, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AeroGRID, IGN, and the GIS User Community'
+            })
+        };
 
-        // Funkcja do obliczenia ceny za metr kwadratowy
+        var currentLayer = tileLayers['openstreetmap'];
+        currentLayer.addTo(map);
+
+        document.getElementById('styleSelect').addEventListener('change', function(e) {
+            map.removeLayer(currentLayer);
+            currentLayer = tileLayers[e.target.value];
+            currentLayer.addTo(map);
+        });
+
         function calculatePricePerSqm(price, size) {
             const priceNum = parseFloat(price.replace(/[^\d]/g, ''));
             const sizeNum = parseFloat(size.replace(/[^\d]/g, ''));
             return sizeNum > 0 ? priceNum / sizeNum : 0;
         }
 
-        // Funkcja do określenia koloru na podstawie ceny za m²
-        function getColorByPrice(pricePerSqm) {
-            // Skala kolorów na podstawie analizy danych:
-            // Zielony: < 8000 PLN/m² (tanie)
-            // Żółty: 8000-15000 PLN/m² (średnie)
-            // Czerwony: > 15000 PLN/m² (drogie)
+        function interpolateColor(color1, color2, factor) {
+            const c1 = hexToRgb(color1);
+            const c2 = hexToRgb(color2);
+            
+            const r = Math.round(c1.r + (c2.r - c1.r) * factor);
+            const g = Math.round(c1.g + (c2.g - c1.g) * factor);
+            const b = Math.round(c1.b + (c2.b - c1.b) * factor);
+            
+            return `rgb(${r}, ${g}, ${b})`;
+        }
 
-            if (pricePerSqm < 8000) {
-                return '#4CAF50'; // Zielony
-            } else if (pricePerSqm < 15000) {
-                return '#FFC107'; // Żółty
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        function getColorByPrice(pricePerSqm) {
+            const minPrice = 5000;
+            const maxPrice = 20000;
+            
+            let normalizedPrice = (pricePerSqm - minPrice) / (maxPrice - minPrice);
+            normalizedPrice = Math.max(0, Math.min(1, normalizedPrice));
+            
+            const greenColor = '#4CAF50';
+            const yellowColor = '#FFC107';
+            const redColor = '#F44336';
+            
+            if (normalizedPrice < 0.5) {
+                return interpolateColor(greenColor, yellowColor, normalizedPrice * 2);
             } else {
-                return '#F44336'; // Czerwony
+                return interpolateColor(yellowColor, redColor, (normalizedPrice - 0.5) * 2);
             }
         }
 
@@ -61,7 +118,7 @@
                                 if (!isNaN(lat) && !isNaN(lng)) {
                                     const pricePerSqm = calculatePricePerSqm(row.price_pln, row.size_m2);
                                     const iconColor = getColorByPrice(pricePerSqm);
-
+                                    
                                     const popupContent = `
                                         <b>Ulica:</b> ${row.street}<br>
                                         <b>Cena:</b> ${row.price_pln} PLN<br>
@@ -72,27 +129,23 @@
                                         <b>Rok budowy:</b> ${row.year_built}<br>
                                         <a href="${row.detail_url}" target="_blank">Zobacz ofertę</a>
                                     `;
-
-                                    var homeIcon = L.divIcon({
-                                        className: `custom-home-icon ${getPriceClass(pricePerSqm)}`,
+                                    
+                                    const homeIcon = L.divIcon({
+                                        className: 'custom-home-icon',
                                         html: '<span class="material-icons">home</span>',
                                         iconSize: [30, 30],
                                         iconAnchor: [15, 15],
                                         popupAnchor: [0, -15]
                                     });
 
-                                    // Dodaj funkcję do określenia klasy CSS
-                                    function getPriceClass(pricePerSqm) {
-                                        if (pricePerSqm < 8000) {
-                                            return 'price-low';
-                                        } else if (pricePerSqm < 15000) {
-                                            return 'price-medium';
-                                        } else {
-                                            return 'price-high';
+                                    const marker = L.marker([lat, lng], { icon: homeIcon }).addTo(map).bindPopup(popupContent);
+                                    
+                                    setTimeout(() => {
+                                        const iconElement = marker.getElement();
+                                        if (iconElement) {
+                                            iconElement.style.backgroundColor = iconColor;
                                         }
-                                    }
-
-                                    L.marker([lat, lng], { icon: homeIcon }).addTo(map).bindPopup(popupContent);
+                                    }, 100);
                                 }
                             }
                         });
