@@ -86,18 +86,14 @@ html {
     display: none;
 }
 
-/* Klasy dla różnych zakresów cenowych */
 .price-low {
     background-color: #4CAF50;
-    /* Zielony - tanie */
 }
 
 .price-medium {
     background-color: #FFC107;
-    /* Żółty - średnie */
 }
 
 .price-high {
     background-color: #F44336;
-    /* Czerwony - drogie */
 }

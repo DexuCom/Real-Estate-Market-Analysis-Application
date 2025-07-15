@@ -55,7 +55,7 @@
         var currentLayer = tileLayers['openstreetmap'];
         currentLayer.addTo(map);
 
-        document.getElementById('styleSelect').addEventListener('change', function(e) {
+        document.getElementById('styleSelect').addEventListener('change', function (e) {
             map.removeLayer(currentLayer);
             currentLayer = tileLayers[e.target.value];
             currentLayer.addTo(map);
@@ -70,11 +70,11 @@
         function interpolateColor(color1, color2, factor) {
             const c1 = hexToRgb(color1);
             const c2 = hexToRgb(color2);
-            
+
             const r = Math.round(c1.r + (c2.r - c1.r) * factor);
             const g = Math.round(c1.g + (c2.g - c1.g) * factor);
             const b = Math.round(c1.b + (c2.b - c1.b) * factor);
-            
+
             return `rgb(${r}, ${g}, ${b})`;
         }
 
@@ -90,14 +90,14 @@
         function getColorByPrice(pricePerSqm) {
             const minPrice = 5000;
             const maxPrice = 20000;
-            
+
             let normalizedPrice = (pricePerSqm - minPrice) / (maxPrice - minPrice);
             normalizedPrice = Math.max(0, Math.min(1, normalizedPrice));
-            
+
             const greenColor = '#4CAF50';
             const yellowColor = '#FFC107';
             const redColor = '#F44336';
-            
+
             if (normalizedPrice < 0.5) {
                 return interpolateColor(greenColor, yellowColor, normalizedPrice * 2);
             } else {
@@ -118,7 +118,7 @@
                                 if (!isNaN(lat) && !isNaN(lng)) {
                                     const pricePerSqm = calculatePricePerSqm(row.price_pln, row.size_m2);
                                     const iconColor = getColorByPrice(pricePerSqm);
-                                    
+
                                     const popupContent = `
                                         <b>Ulica:</b> ${row.street}<br>
                                         <b>Cena:</b> ${row.price_pln} PLN<br>
@@ -129,7 +129,7 @@
                                         <b>Rok budowy:</b> ${row.year_built}<br>
                                         <a href="${row.detail_url}" target="_blank">Zobacz ofertę</a>
                                     `;
-                                    
+
                                     const homeIcon = L.divIcon({
                                         className: 'custom-home-icon',
                                         html: '<span class="material-icons">home</span>',
@@ -139,7 +139,7 @@
                                     });
 
                                     const marker = L.marker([lat, lng], { icon: homeIcon }).addTo(map).bindPopup(popupContent);
-                                    
+
                                     setTimeout(() => {
                                         const iconElement = marker.getElement();
                                         if (iconElement) {
