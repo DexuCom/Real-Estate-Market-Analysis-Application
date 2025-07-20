@@ -1,9 +1,6 @@
 package com.rema.web_api.user;
 
-import com.rema.web_api.user.dto.UserDTO;
-import com.rema.web_api.user.dto.UserJwtDTO;
-import com.rema.web_api.user.dto.UserLoginRequestDTO;
-import com.rema.web_api.user.dto.UserRegistrationRequestDTO;
+import com.rema.web_api.user.dto.*;
 import com.rema.web_api.user.User;
 import com.rema.web_api.user.UserService;
 import jakarta.validation.Valid;
@@ -46,7 +43,7 @@ public class UserController {
 
 
     @PostMapping("")
-    public ResponseEntity<String> registerUser(@Valid @RequestBody UserRegistrationRequestDTO registerUserDTO)
+    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegistrationRequestDTO registerUserDTO)
     {
         try
         {
@@ -55,14 +52,16 @@ public class UserController {
         }
         catch (IllegalStateException e)
         {
+            ErrorDTO errorDTO = new ErrorDTO(e.getMessage(), HttpStatus.BAD_REQUEST.value());
+
             return ResponseEntity.
                     badRequest()
-                    .body(e.getMessage());
+                    .body(errorDTO);
         }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserJwtDTO> loginUser(@Valid @RequestBody UserLoginRequestDTO userLoginRequestDTO)
+    public ResponseEntity<?> loginUser(@Valid @RequestBody UserLoginRequestDTO userLoginRequestDTO)
     {
         try
         {
@@ -73,9 +72,11 @@ public class UserController {
         }
         catch(IllegalStateException e)
         {
+            ErrorDTO errorDTO = new ErrorDTO(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
+
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
-                    .body(null);
+                    .body(errorDTO);
         }
     }
 

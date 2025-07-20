@@ -34,7 +34,7 @@ public class JWTService {
                 .setSubject(user.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + this.jwtExpirationTime))
-                .signWith(getRealKey(), SignatureAlgorithm.RS256)
+                .signWith(getRealKey(), SignatureAlgorithm.HS256)
                 .compact();
 
     }
@@ -85,7 +85,7 @@ public class JWTService {
     private Key getRealKey()
     {
         byte[] bytes = Decoders.BASE64.decode(key);
-        return Keys.secretKeyFor(SignatureAlgorithm.RS256);
+        return Keys.hmacShaKeyFor(bytes);
     }
 
 

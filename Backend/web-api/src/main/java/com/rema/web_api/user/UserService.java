@@ -31,7 +31,7 @@ public class UserService {
         {
             throw new IllegalStateException("Użytkownik o takiej nazwie już istnieje!");
         }
-        if(userRepository.findByEmail(registerRequest.username()).isPresent())
+        if(userRepository.findByEmail(registerRequest.email()).isPresent())
         {
             throw new IllegalStateException("Użytkownik o takim emailu już istnieje!");
         }
