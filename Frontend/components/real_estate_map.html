@@ -14,6 +14,119 @@
 
 <body>
     <div id="map"></div>
+
+    <div class="filter-button-container">
+        <button id="filterButton" class="filter-button">
+            <span>Schowaj filtry</span>
+            <i class="material-icons">keyboard_arrow_up</i>
+        </button>
+    </div>
+
+    <div id="filterPanel" class="filter-panel active">
+        <div class="filter-content">
+            <div class="filter-section">
+                <label class="filter-label">Typ nieruchomości</label>
+                <div class="filter-row">
+                    <select class="filter-select">
+                        <option value="mieszkanie">Mieszkanie</option>
+                        <option value="dom">Dom</option>
+                        <option value="dzialka">Działka</option>
+                    </select>
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="lowerPrices" class="filter-checkbox">
+                        <label for="lowerPrices">Polecane przez Model Scoringowy</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-row">
+                    <div class="slider-group">
+                        <label class="filter-label">Liczba pokoi</label>
+                        <div class="slider-container">
+                            <span class="slider-label">Dowolna</span>
+                            <input type="range" class="filter-slider" min="1" max="10" value="1">
+                            <span class="slider-label">Dowolna</span>
+                        </div>
+                    </div>
+                    <div class="slider-group">
+                        <label class="filter-label">Powierzchnia</label>
+                        <div class="slider-container">
+                            <span class="slider-label">Dowolna</span>
+                            <input type="range" class="filter-slider" min="20" max="200" value="20">
+                            <span class="slider-label">Dowolna</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-row">
+                    <div class="slider-group">
+                        <label class="filter-label">Cena</label>
+                        <div class="slider-container">
+                            <span class="slider-label">Dowolna</span>
+                            <input type="range" class="filter-slider" min="100000" max="5000000" value="100000">
+                            <span class="slider-label">Dowolna</span>
+                        </div>
+                    </div>
+                    <div class="slider-group">
+                        <label class="filter-label">Cena za m²</label>
+                        <div class="slider-container">
+                            <span class="slider-label">Dowolna</span>
+                            <input type="range" class="filter-slider" min="3000" max="25000" value="3000">
+                            <span class="slider-label">Dowolna</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-row">
+                    <div class="select-group">
+                        <label class="filter-label">Rynek</label>
+                        <select class="filter-select">
+                            <option value="dowolny">Dowolny</option>
+                            <option value="pierwotny">Pierwotny</option>
+                            <option value="wtorny">Wtórny</option>
+                        </select>
+                    </div>
+                    <div class="select-group">
+                        <label class="filter-label">Dodatkowe opcje</label>
+                        <select class="filter-select">
+                            <option value="">Np. ogródek, garaż...</option>
+                            <option value="ogrodek">Ogródek</option>
+                            <option value="garaz">Garaż</option>
+                            <option value="balkon">Balkon</option>
+                            <option value="taras">Taras</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-row">
+                    <div class="slider-group">
+                        <label class="filter-label">Rok budowy</label>
+                        <div class="slider-container">
+                            <span class="slider-label">Dowolna</span>
+                            <input type="range" class="filter-slider" min="1950" max="2024" value="1950">
+                            <span class="slider-label">Dowolna</span>
+                        </div>
+                    </div>
+                    <div class="slider-group">
+                        <label class="filter-label">Piętro</label>
+                        <div class="slider-container">
+                            <span class="slider-label">Dowolna</span>
+                            <input type="range" class="filter-slider" min="0" max="20" value="0">
+                            <span class="slider-label">Dowolna</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="map-style-selector">
         <select id="styleSelect">
             <option value="openstreetmap">OpenStreetMap</option>
@@ -23,6 +136,38 @@
             <option value="stamen-toner">Stamen Toner</option>
             <option value="esri-satellite">ESRI Satellite</option>
         </select>
+    </div>
+
+    <div id="propertyPanel" class="property-panel">
+        <button id="closePanel" class="close-btn">&times;</button>
+        <div class="property-content">
+            <div id="propertyImage" class="property-image"></div>
+            <div class="property-info">
+                <div class="property-location">
+                    <p id="propertyStreet">Olsztyńska</p>
+                </div>
+                <div class="property-price">
+                    <div class="current-price">
+                        <span id="currentPrice">2 200 000 zł</span>
+                    </div>
+                </div>
+                <div class="property-details">
+                    <div class="detail-item">
+                        <span id="propertySize">105 m²</span>
+                        <span id="propertyRooms">4 pokoje</span>
+                        <span id="propertyFloor">piętro 1/2</span>
+                        <span id="propertyYear">2011</span>
+                    </div>
+                </div>
+                <div class="price-per-sqm">
+                    <span>Cena za m²</span>
+                    <span id="pricePerSqm">20 952 zł / m²</span>
+                </div>
+                <div class="property-actions">
+                    <button id="viewOffer" class="view-offer-btn">Zobacz ofertę</button>
+                </div>
+            </div>
+        </div>
     </div>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -105,7 +250,7 @@
             }
         }
 
-        fetch('../../ScraperOutput/morizon_data.csv')
+        fetch('../../ScraperOutput/Gdańsk-morizon.csv')
             .then(response => response.text())
             .then(csvText => {
                 Papa.parse(csvText, {
@@ -119,17 +264,6 @@
                                     const pricePerSqm = calculatePricePerSqm(row.price_pln, row.size_m2);
                                     const iconColor = getColorByPrice(pricePerSqm);
 
-                                    const popupContent = `
-                                        <b>Ulica:</b> ${row.street}<br>
-                                        <b>Cena:</b> ${row.price_pln} PLN<br>
-                                        <b>Powierzchnia:</b> ${row.size_m2}<br>
-                                        <b>Cena za m²:</b> ${Math.round(pricePerSqm).toLocaleString()} PLN/m²<br>
-                                        <b>Pokoje:</b> ${row.rooms}<br>
-                                        <b>Piętro:</b> ${row.floor}<br>
-                                        <b>Rok budowy:</b> ${row.year_built}<br>
-                                        <a href="${row.detail_url}" target="_blank">Zobacz ofertę</a>
-                                    `;
-
                                     const homeIcon = L.divIcon({
                                         className: 'custom-home-icon',
                                         html: '<span class="material-icons">home</span>',
@@ -138,7 +272,11 @@
                                         popupAnchor: [0, -15]
                                     });
 
-                                    const marker = L.marker([lat, lng], { icon: homeIcon }).addTo(map).bindPopup(popupContent);
+                                    const marker = L.marker([lat, lng], { icon: homeIcon }).addTo(map);
+
+                                    marker.on('click', function () {
+                                        showPropertyPanel(row, pricePerSqm);
+                                    });
 
                                     setTimeout(() => {
                                         const iconElement = marker.getElement();
@@ -152,6 +290,53 @@
                     }
                 });
             });
+
+        function showPropertyPanel(row, pricePerSqm) {
+            const panel = document.getElementById('propertyPanel');
+
+            document.getElementById('propertyStreet').textContent = row.street;
+            document.getElementById('currentPrice').textContent = row.price_pln + ' PLN';
+            document.getElementById('propertySize').textContent = row.size_m2;
+            document.getElementById('propertyRooms').textContent = row.rooms;
+            document.getElementById('propertyFloor').textContent = row.floor;
+            document.getElementById('propertyYear').textContent = row.year_built;
+            document.getElementById('pricePerSqm').textContent = Math.round(pricePerSqm).toLocaleString() + ' zł / m²';
+
+            const imageDiv = document.getElementById('propertyImage');
+            if (row.image_url) {
+                imageDiv.innerHTML = `<img src="${row.image_url}" alt="Zdjęcie mieszkania">`;
+            } else {
+                imageDiv.innerHTML = '<div style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #666; font-family: \'Outfit\', Arial, sans-serif;">Brak zdjęcia</div>';
+            }
+
+            document.getElementById('viewOffer').onclick = function () {
+                window.open(row.detail_url, '_blank');
+            };
+
+            panel.classList.add('active');
+        }
+
+        document.getElementById('closePanel').addEventListener('click', function () {
+            const panel = document.getElementById('propertyPanel');
+            panel.classList.remove('active');
+        });
+
+        document.getElementById('filterButton').addEventListener('click', function () {
+            const button = this;
+            const span = button.querySelector('span');
+            const icon = button.querySelector('.material-icons');
+            const filterPanel = document.getElementById('filterPanel');
+
+            if (span.textContent === 'Schowaj filtry') {
+                span.textContent = 'Pokaż filtry';
+                icon.textContent = 'keyboard_arrow_down';
+                filterPanel.classList.remove('active');
+            } else {
+                span.textContent = 'Schowaj filtry';
+                icon.textContent = 'keyboard_arrow_up';
+                filterPanel.classList.add('active');
+            }
+        });
     </script>
 </body>
 
