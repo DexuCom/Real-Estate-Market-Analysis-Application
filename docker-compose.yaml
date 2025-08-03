@@ -14,6 +14,7 @@ services:
         
         environment:
             - WEB_API_URL=http://web-api:8081
+            - WATCH_LIST_URL=http://watch_list:8082
 
     web-api:
         build: Backend\web-api
@@ -29,7 +30,7 @@ services:
             - JWT_EXPIRATION=${JWT_EXPIRATION}
         
     watch_list:
-        build: Backend\watch-list
+        build: Backend\watch_list
         container_name: watch_list
         restart: unless-stopped
         networks:
@@ -40,7 +41,7 @@ services:
             - POSTGRES_DB=${POSTGRES_DB}
             - JWT_KEY=${JWT_KEY}
             - JWT_EXPIRATION=${JWT_EXPIRATION}
-            
+
     postgres_db:
         image: postgres:16.3-alpine
         container_name: postgres_db

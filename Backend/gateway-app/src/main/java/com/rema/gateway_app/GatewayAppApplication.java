@@ -16,8 +16,8 @@ public class GatewayAppApplication {
 	@Value("${urls.web-api}")
 	private String webApiURL;
 
-	@Value("${urls.watch-list}")
-	private String watchListURL;
+	//@Value("${urls.watch-list}")
+	//private String watchListURL;
 
 	public static void main(String[] args) {
 		SpringApplication.run(GatewayAppApplication.class, args);
@@ -35,14 +35,14 @@ public class GatewayAppApplication {
 				)
 
 				.route("webapi-route", r -> r
-						.path("/api/**")
+						.path("/api/users/**")
 						.uri(webApiURL)
 				)
 
-				.route("watch-list-route", r -> r
-						.path("/api/**")
-						.uri(watchListURL)
-				)
+				//.route("watch-list-route", r -> r
+				//		.path("/api/watchLists/**")
+				//		.uri(watchListURL)
+				//)
 
 
 				.build();
