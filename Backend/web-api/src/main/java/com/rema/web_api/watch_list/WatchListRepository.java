@@ -1,7 +1,5 @@
-package com.rema.watch_list.repository;
+package com.rema.web_api.watch_list;
 
-import com.rema.watch_list.model.WatchList;
-import com.rema.watch_list.model.WatchListId;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

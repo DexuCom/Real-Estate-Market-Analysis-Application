@@ -1,4 +1,4 @@
-package com.rema.watch_list.model.dto;
+package com.rema.web_api.watch_list.dto;
 
 import lombok.Getter;
 import lombok.Setter;

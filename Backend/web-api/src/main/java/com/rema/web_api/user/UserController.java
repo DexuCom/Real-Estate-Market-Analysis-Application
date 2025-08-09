@@ -1,11 +1,9 @@
 package com.rema.web_api.user;
 
+import com.rema.web_api.global.dto.ErrorDTO;
 import com.rema.web_api.user.dto.*;
-import com.rema.web_api.user.User;
-import com.rema.web_api.user.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

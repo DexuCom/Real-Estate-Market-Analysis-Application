@@ -1,7 +1,6 @@
-package com.rema.watch_list.model.dto;
+package com.rema.web_api.global.dto;
 
 public record ErrorDTO (
         String message,
         int status
 ){ }
-

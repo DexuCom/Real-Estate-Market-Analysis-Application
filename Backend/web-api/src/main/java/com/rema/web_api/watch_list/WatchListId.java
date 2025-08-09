@@ -1,9 +1,8 @@
-package com.rema.watch_list.model;
+package com.rema.web_api.watch_list;
 
 import jakarta.persistence.Embeddable;
 import lombok.*;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.UUID;
 

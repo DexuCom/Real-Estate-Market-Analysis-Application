@@ -1,6 +1,6 @@
 package com.rema.web_api.global;
 
-import com.rema.web_api.user.dto.ErrorDTO;
+import com.rema.web_api.global.dto.ErrorDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

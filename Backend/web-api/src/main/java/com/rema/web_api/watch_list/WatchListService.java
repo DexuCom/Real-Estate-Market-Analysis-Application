@@ -1,8 +1,5 @@
-package com.rema.watch_list.service;
+package com.rema.web_api.watch_list;
 
-import com.rema.watch_list.model.WatchList;
-import com.rema.watch_list.model.WatchListId;
-import com.rema.watch_list.repository.WatchListRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

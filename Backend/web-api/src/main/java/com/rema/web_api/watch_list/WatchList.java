@@ -1,4 +1,4 @@
-package com.rema.watch_list.model;
+package com.rema.web_api.watch_list;
 
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;

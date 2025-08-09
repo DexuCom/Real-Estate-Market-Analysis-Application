@@ -1,9 +1,7 @@
-package com.rema.watch_list.controller;
+package com.rema.web_api.watch_list;
 
-import com.rema.watch_list.model.WatchList;
-import com.rema.watch_list.model.dto.ErrorDTO;
-import com.rema.watch_list.model.dto.WatchListDTO;
-import com.rema.watch_list.service.WatchListService;
+import com.rema.web_api.global.dto.ErrorDTO;
+import com.rema.web_api.watch_list.dto.WatchListDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
