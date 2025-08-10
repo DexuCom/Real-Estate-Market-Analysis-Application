@@ -1,1 +1,7 @@
-price_divs
+            item["Domofon"] = parse_boolean_feature(detail_soup, DOMOFON_RE)
+            item["Piwnica"] = parse_boolean_feature(detail_soup, PIWNICA_RE)
+            item["Meble"] = parse_boolean_feature(detail_soup, MEBLE_RE)
+            item["Winda"] = parse_boolean_feature(detail_soup, WINDA_RE)
+            item["Miejsce postojowe"] = parse_boolean_feature(detail_soup, MIEJSCE_POSTOJOWE_RE)
+            item["Obiekt zamknięty"] = parse_boolean_feature(detail_soup, OBIEKT_ZAMKNIETY_RE)
+            item["Miejsce postojowe (garaż)"] = parse_boolean_feature(detail_soup, MIEJSCE_POSTOJOWE_GARAZ_RE)

@@ -1,4 +1,5 @@
 import asyncio
+from pydoc import text
 import aiohttp
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -6,10 +7,18 @@ import time
 import json
 import lxml
 import os
+import re
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
 }
+
+DOMOFON_RE = re.compile(r"\bdomofon\b", re.IGNORECASE)
+PIWNICA_RE = re.compile(r"\bpiwnica\b", re.IGNORECASE)
+MEBLE_RE = re.compile(r"\bmeble\b", re.IGNORECASE)
+WINDA_RE = re.compile(r"\bwinda\b", re.IGNORECASE)
+MIEJSCE_POSTOJOWE_RE = re.compile(r"miejsce\s+postojowe", re.IGNORECASE)
+OBIEKT_ZAMKNIETY_RE = re.compile(r"\bobiekt zamknięty\b", re.IGNORECASE)
 
 async def fetch(session, url):
     async with session.get(url, headers=HEADERS) as response:
@@ -46,7 +55,6 @@ def parse_page(html):
         floor = parts[2].strip() if len(parts) > 2 else None
         property_infos.append((size, rooms, floor))
 
-    # Extract image links from image divs
     image_links = []
     for div in image_divs:
         img = div.find("img")
@@ -73,20 +81,80 @@ def parse_page(html):
 
     return results
 
-def parse_year_built(html):
-    soup = BeautifulSoup(html, 'lxml')
-    span = soup.find("span", string="Rok budowy")
+
+def parse_detail_value(soup: BeautifulSoup, label_text: str):
+    span = soup.find("span", string=label_text)
     if span:
         parent_div = span.find_parent("div", class_="iT04N1")
         if parent_div:
             value_div = parent_div.find("div", class_="YSTCwm M3ijI0")
             if value_div:
-                year_div = value_div.find("div", attrs={"data-cy": "itemValue"})
-                if year_div:
-                    year_text = year_div.get_text(strip=True)
-                    if year_text.isdigit():
-                        return int(year_text)
-    return -1
+                val_div = value_div.find("div", attrs={"data-cy": "itemValue"})
+                if val_div:
+                    return val_div.get_text(strip=True)
+    return None
+
+
+def parse_year_built(soup: BeautifulSoup):
+    text = parse_detail_value(soup, "Rok budowy")
+    return int(text) if text and text.isdigit() else -1
+
+
+def parse_market(soup: BeautifulSoup):
+    text = parse_detail_value(soup, "Rynek")
+    return text.strip().lower() if text else ""
+
+
+def parse_heating(soup: BeautifulSoup):
+    text = parse_detail_value(soup, "Ogrzewanie")
+    return text if text else "-1"
+
+def parse_balcony(soup: BeautifulSoup) -> int:
+    text = parse_detail_value(soup, "Balkon")
+    if not text:
+        return 0
+    t = text.strip().lower()
+    if t == "tak":
+        return 1
+    if t == "nie":
+        return 0
+    return 0
+
+
+def parse_terrace(soup: BeautifulSoup) -> int:
+    text = parse_detail_value(soup, "Taras")
+    if not text:
+        return 0
+    t = text.strip().lower()
+    if t == "tak":
+        return 1
+    if t == "nie":
+        return 0
+    return 0
+
+
+def parse_garden(soup: BeautifulSoup) -> int:
+    text = parse_detail_value(soup, "Ogród")
+    if not text:
+        return 0
+    t = text.strip().lower()
+    if t == "tak":
+        return 1
+    if t == "nie":
+        return 0
+    return 0
+
+def parse_total_floors(soup: BeautifulSoup) -> int:
+    text = parse_detail_value(soup, "Liczba pięter")
+    if not text:
+        return -1
+    m = re.search(r"\d+", text)
+    return int(m.group(0)) if m else -1
+
+
+def parse_boolean_feature(soup: BeautifulSoup, pattern: re.Pattern) -> int:
+    page_text = soup.get_text(separator=" ", strip=True)
+    return 1 if pattern.search(page_text) else 0
 
 def parse_coords(html):
     soup = BeautifulSoup(html, 'lxml')
@@ -129,10 +197,27 @@ async def scrape_prices_and_streets(base_url, pages=1):
         total_offers = len(results)
         for i, (item, detail_html) in enumerate(zip(results, detail_htmls), start=1):
             progress = (i / total_offers) * 100
-            if i % max(1, total_offers // 10) == 0 or i == total_offers:  # Pokazuj co 10% lub ostatni
+            if i % max(1, total_offers // 10) == 0 or i == total_offers:
                 print(f"Fetching year built: {i}/{total_offers} ({progress:.1f}%)")
-            year_built = parse_year_built(detail_html)
+            detail_soup = BeautifulSoup(detail_html, 'lxml')
+            year_built = parse_year_built(detail_soup)
             item["year_built"] = year_built
+            market = parse_market(detail_soup)
+            item["market"] = market
+            heating = parse_heating(detail_soup)
+            item["heating"] = heating
+            total_floors = parse_total_floors(detail_soup)
+            item["total_floors"] = total_floors
+            item["Intercom"] = parse_boolean_feature(detail_soup, DOMOFON_RE)
+            item["Basement"] = parse_boolean_feature(detail_soup, PIWNICA_RE)
+            item["Furnished"] = parse_boolean_feature(detail_soup, MEBLE_RE)
+            item["Elevator"] = parse_boolean_feature(detail_soup, WINDA_RE)
+            item["Parking space"] = parse_boolean_feature(detail_soup, MIEJSCE_POSTOJOWE_RE)
+            item["Gated property"] = parse_boolean_feature(detail_soup, OBIEKT_ZAMKNIETY_RE)
+            item["balcony"] = parse_balcony(detail_soup)
+            item["terrace"] = parse_terrace(detail_soup)
+            item["garden"] = parse_garden(detail_soup)
+
 
         print("Fetching coordinates for each offer...")
         coords_tasks = [fetch(session, item["detail_url"] + "/analiza") for item in results]
@@ -140,7 +225,7 @@ async def scrape_prices_and_streets(base_url, pages=1):
 
         for i, (item, coords_html) in enumerate(zip(results, coords_htmls), start=1):
             progress = (i / total_offers) * 100
-            if i % max(1, total_offers // 10) == 0 or i == total_offers:  # Pokazuj co 10% lub ostatni
+            if i % max(1, total_offers // 10) == 0 or i == total_offers:
                 print(f"Fetching coordinates: {i}/{total_offers} ({progress:.1f}%)")
             coords = parse_coords(coords_html)
             item["coords"] = coords if coords else ""
@@ -177,3 +262,4 @@ if __name__ == "__main__":
     df = pd.DataFrame(data)
     df.to_csv(output_file, index=False, encoding="utf-8-sig")
     print(f"Data saved to {output_file}")
+
