@@ -9,6 +9,6 @@ import java.util.UUID;
 @Setter
 public class WatchListDTO {
     private UUID userId;
-    private UUID offerId;
+    private String offerId;
     private String addedAt;
 }

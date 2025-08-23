@@ -19,7 +19,7 @@ public class WatchListController {
     private WatchListService service;
 
     @PostMapping("/add")
-    public ResponseEntity<?> addToWatchlist(@RequestParam UUID userId, @RequestParam UUID offerId) {
+    public ResponseEntity<?> addToWatchlist(@RequestParam UUID userId, @RequestParam String offerId) {
         try {
 
             WatchList watchList = service.addWatchList(userId, offerId);
@@ -37,7 +37,7 @@ public class WatchListController {
     }
 
     @DeleteMapping("/remove")
-    public ResponseEntity<?> deleteFromWatchList(@RequestParam UUID userId, @RequestParam UUID offerId) {
+    public ResponseEntity<?> deleteFromWatchList(@RequestParam UUID userId, @RequestParam String offerId) {
         try {
 
             service.deleteFromWatchList(userId, offerId);

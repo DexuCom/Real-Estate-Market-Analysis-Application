@@ -15,5 +15,5 @@ import java.util.UUID;
 public class WatchListId implements Serializable {
 
     private UUID userId;
-    private UUID offerId;
+    private String offerId;
 }

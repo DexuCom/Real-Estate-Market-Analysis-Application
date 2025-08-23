@@ -8,6 +8,6 @@ import java.util.UUID;
 
 public interface WatchListRepository extends JpaRepository<WatchList, WatchListId> {
     List<WatchList> findByIdUserId(UUID userId);
-    List<WatchList> findByIdOfferId(UUID offerId);
-    Optional<WatchList> findByIdUserIdAndIdOfferId(UUID userId, UUID offerId);
+    List<WatchList> findByIdOfferId(String offerId);
+    Optional<WatchList> findByIdUserIdAndIdOfferId(UUID userId, String offerId);
 }

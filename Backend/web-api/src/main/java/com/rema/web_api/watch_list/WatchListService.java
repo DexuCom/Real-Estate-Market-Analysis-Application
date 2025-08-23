@@ -15,7 +15,7 @@ public class WatchListService {
         this.watchListRepository = _watchListRepository;
     }
 
-    public WatchList addWatchList(UUID userId, UUID offerId) {
+    public WatchList addWatchList(UUID userId, String offerId) {
 
         WatchListId id = new WatchListId(userId, offerId);
 
@@ -31,7 +31,7 @@ public class WatchListService {
         return watchListRepository.save(watchList);
     }
 
-    public void deleteFromWatchList(UUID userId, UUID offerId) {
+    public void deleteFromWatchList(UUID userId, String offerId) {
 
         WatchListId id = new WatchListId(userId, offerId);
 
