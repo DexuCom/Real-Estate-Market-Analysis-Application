@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mapa ofert nieruchomości</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/leaflet-extra-markers@1.2.1/dist/css/leaflet.extra-markers.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="real_estate_map.css">
+</head>
+
+<body>
+    <div id="map"></div>
+
+    <div class="filter-button-container">
+        <button id="filterButton" class="filter-button">
+            <span>Schowaj filtry</span>
+            <i class="material-icons">keyboard_arrow_up</i>
+        </button>
+    </div>
+
+    <div id="filterPanel" class="filter-panel active">
+        <div class="filter-content">
+            <div class="filter-section">
+                <label class="filter-label">Typ nieruchomości</label>
+                <div class="filter-row">
+                    <select class="filter-select">
+                        <option value="mieszkanie">Mieszkanie</option>
+                        <option value="dom">Dom</option>
+                        <option value="dzialka">Działka</option>
+                    </select>
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="lowerPrices" class="filter-checkbox">
+                        <label for="lowerPrices">Polecane przez Model Scoringowy</label>
+                        <i class="material-icons">diamond</i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-row">
+                    <div class="slider-group">
+                        <label class="filter-label">Liczba pokoi</label>
+                        <div class="slider-container">
+                            <span class="slider-label">Dowolna</span>
+                            <input type="range" class="filter-slider" min="1" max="10" value="1">
+                            <span class="slider-label">Dowolna</span>
+                        </div>
+                    </div>
+                    <div class="slider-group">
+                        <label class="filter-label">Powierzchnia</label>
+                        <div class="slider-container">
+                            <span class="slider-label">Dowolna</span>
+                            <input type="range" class="filter-slider" min="20" max="200" value="20">
+                            <span class="slider-label">Dowolna</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-row">
+                    <div class="slider-group">
+                        <label class="filter-label">Cena</label>
+                        <div class="slider-container">
+                            <span class="slider-label">Dowolna</span>
+                            <input type="range" class="filter-slider" min="100000" max="5000000" value="100000">
+                            <span class="slider-label">Dowolna</span>
+                        </div>
+                    </div>
+                    <div class="slider-group">
+                        <label class="filter-label">Cena za m²</label>
+                        <div class="slider-container">
+                            <span class="slider-label">Dowolna</span>
+                            <input type="range" class="filter-slider" min="3000" max="25000" value="3000">
+                            <span class="slider-label">Dowolna</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-row">
+                    <div class="select-group">
+                        <label class="filter-label">Rynek</label>
+                        <select class="filter-select">
+                            <option value="dowolny">Dowolny</option>
+                            <option value="pierwotny">Pierwotny</option>
+                            <option value="wtorny">Wtórny</option>
+                        </select>
+                    </div>
+                    <div class="select-group">
+                        <label class="filter-label">Dodatkowe opcje</label>
+                        <select class="filter-select">
+                            <option value="">Np. ogródek, garaż...</option>
+                            <option value="ogrodek">Ogródek</option>
+                            <option value="garaz">Garaż</option>
+                            <option value="balkon">Balkon</option>
+                            <option value="taras">Taras</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-row">
+                    <div class="slider-group">
+                        <label class="filter-label">Rok budowy</label>
+                        <div class="slider-container">
+                            <span class="slider-label">Dowolna</span>
+                            <input type="range" class="filter-slider" min="1950" max="2024" value="1950">
+                            <span class="slider-label">Dowolna</span>
+                        </div>
+                    </div>
+                    <div class="slider-group">
+                        <label class="filter-label">Piętro</label>
+                        <div class="slider-container">
+                            <span class="slider-label">Dowolna</span>
+                            <input type="range" class="filter-slider" min="0" max="20" value="0">
+                            <span class="slider-label">Dowolna</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="map-style-selector">
+        <select id="styleSelect">
+            <option value="openstreetmap">OpenStreetMap</option>
+            <option value="cartodb">CartoDB Positron</option>
+            <option value="cartodb-dark">CartoDB Dark</option>
+            <option value="stamen-terrain">Stamen Terrain</option>
+            <option value="stamen-toner">Stamen Toner</option>
+            <option value="esri-satellite">ESRI Satellite</option>
+        </select>
+    </div>
+
+    <div class="heatmap-toggle">
+        <label>
+            <input type="checkbox" id="heatmapToggle">
+            Mapa ciepła cen
+            <i class="material-icons">paid</i>
+        </label>
+    </div>
+
+    <div id="propertyPanel" class="property-panel">
+        <button id="closePanel" class="close-btn">&times;</button>
+        <div class="property-content">
+            <div id="propertyImage" class="property-image"></div>
+            <div class="property-info">
+                <div class="property-location">
+                    <p id="propertyStreet">Olsztyńska</p>
+                </div>
+                <div class="property-price">
+                    <div class="current-price">
+                        <span id="currentPrice">2 200 000 zł</span>
+                    </div>
+                </div>
+                <div class="property-details">
+                    <div class="detail-item">
+                        <span id="propertySize">105 m²</span>
+                        <span id="propertyRooms">4 pokoje</span>
+                        <span id="propertyFloor">piętro 1/2</span>
+                        <span id="propertyYear">2011</span>
+                        <span id="propertyMarket">Rynek wtórny</span>
+                        <span id="propertyHeating">Gazowe</span>
+                        <span id="propertyTotalFloors">Budynek 3-piętrowy</span>
+                    </div>
+                </div>
+                <div class="property-amenities">
+                    <div class="amenities-grid" id="propertyAmenities">
+                    </div>
+                </div>
+                <div class="price-per-sqm">
+                    <span>Cena za m²</span>
+                    <span id="pricePerSqm">20 952 zł / m²</span>
+                </div>
+                <div class="property-actions">
+                    <button id="viewOffer" class="view-offer-btn">Zobacz ofertę</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/leaflet-extra-markers@1.2.1/dist/js/leaflet.extra-markers.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+    <script>
+        var map = L.map('map').setView([54.37, 18.63], 11);
+
+        var tileLayers = {
+            'openstreetmap': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }),
+            'cartodb': L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '© OpenStreetMap © CartoDB'
+            }),
+            'cartodb-dark': L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '© OpenStreetMap © CartoDB'
+            }),
+            'stamen-terrain': L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png', {
+                attribution: 'Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap'
+            }),
+            'stamen-toner': L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}{r}.png', {
+                attribution: 'Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap'
+            }),
+            'esri-satellite': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles © Esri — Source: Esri, Maxar, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AeroGRID, IGN, and the GIS User Community'
+            })
+        };
+
+        var currentLayer = tileLayers['openstreetmap'];
+        currentLayer.addTo(map);
+
+        var heatmapLayer = null;
+        var heatmapData = [];
+
+        document.getElementById('styleSelect').addEventListener('change', function (e) {
+            map.removeLayer(currentLayer);
+            currentLayer = tileLayers[e.target.value];
+            currentLayer.addTo(map);
+        });
+
+        function calculatePricePerSqm(price, size) {
+            const priceNum = parseFloat(price.replace(/[^\d]/g, ''));
+            const sizeNum = parseFloat(size.replace(/[^\d]/g, ''));
+            return sizeNum > 0 ? priceNum / sizeNum : 0;
+        }
+
+        function interpolateColor(color1, color2, factor) {
+            const c1 = hexToRgb(color1);
+            const c2 = hexToRgb(color2);
+
+            const r = Math.round(c1.r + (c2.r - c1.r) * factor);
+            const g = Math.round(c1.g + (c2.g - c1.g) * factor);
+            const b = Math.round(c1.b + (c2.b - c1.b) * factor);
+
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        function getColorByPrice(pricePerSqm) {
+            const minPrice = 5000;
+            const maxPrice = 20000;
+
+            let normalizedPrice = (pricePerSqm - minPrice) / (maxPrice - minPrice);
+            normalizedPrice = Math.max(0, Math.min(1, normalizedPrice));
+
+            const greenColor = '#4CAF50';
+            const yellowColor = '#FFC107';
+            const redColor = '#F44336';
+
+            if (normalizedPrice < 0.5) {
+                return interpolateColor(greenColor, yellowColor, normalizedPrice * 2);
+            } else {
+                return interpolateColor(yellowColor, redColor, (normalizedPrice - 0.5) * 2);
+            }
+        }
+
+        function createBackgroundHeatmapData() {
+
+            const backgroundPoints = [];
+            const bounds = map.getBounds();
+            const latRange = bounds.getNorth() - bounds.getSouth();
+            const lngRange = bounds.getEast() - bounds.getWest();
+
+            const gridSize = 25;
+            const latStep = latRange / gridSize;
+            const lngStep = lngRange / gridSize;
+
+            for (let i = 0; i <= gridSize; i++) {
+                for (let j = 0; j <= gridSize; j++) {
+                    const lat = bounds.getSouth() + (i * latStep);
+                    const lng = bounds.getWest() + (j * lngStep);
+
+                    backgroundPoints.push([lat, lng, 0.01]);
+                }
+            }
+            return backgroundPoints;
+        }
+
+        function toggleHeatmap() {
+            const isChecked = document.getElementById('heatmapToggle').checked;
+
+            if (isChecked) {
+                if (!heatmapLayer) {
+                    const backgroundData = createBackgroundHeatmapData();
+                    const combinedData = [...backgroundData, ...heatmapData];
+
+                    heatmapLayer = L.heatLayer(combinedData, {
+                        radius: 70,
+                        blur: 50,
+                        maxZoom: 15,
+                        minOpacity: 0.15,
+                        gradient: {
+                            0.0: '#4CAF50',
+                            0.1: '#4CAF50',
+                            0.3: '#66BB6A',
+                            0.5: '#FFC107',
+                            0.7: '#FF9800',
+                            1.0: '#F44336'
+                        }
+                    }).addTo(map);
+                }
+            } else {
+                if (heatmapLayer) {
+                    map.removeLayer(heatmapLayer);
+                    heatmapLayer = null;
+                }
+            }
+        }
+
+        document.getElementById('heatmapToggle').addEventListener('change', toggleHeatmap);
+
+        map.on('moveend zoomend', function () {
+            if (heatmapLayer && document.getElementById('heatmapToggle').checked) {
+                map.removeLayer(heatmapLayer);
+                heatmapLayer = null;
+                toggleHeatmap();
+            }
+        });
+
+        fetch('../../ScraperOutput/Gdańsk-morizon.csv')
+            .then(response => response.text())
+            .then(csvText => {
+                Papa.parse(csvText, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function (results) {
+                        results.data.forEach(function (row) {
+                            if (row.coords) {
+                                const [lat, lng] = row.coords.split(',').map(coord => parseFloat(coord));
+                                if (!isNaN(lat) && !isNaN(lng)) {
+                                    const pricePerSqm = calculatePricePerSqm(row.price_pln, row.size_m2);
+                                    const iconColor = getColorByPrice(pricePerSqm);
+
+                                    const minPrice = 5000;
+                                    const maxPrice = 20000;
+                                    let intensity = (pricePerSqm - minPrice) / (maxPrice - minPrice);
+                                    intensity = Math.max(0.3, Math.min(1, intensity));
+                                    heatmapData.push([lat, lng, intensity]);
+
+                                    const homeIcon = L.divIcon({
+                                        className: 'custom-home-icon',
+                                        html: '<span class="material-icons">home</span>',
+                                        iconSize: [30, 30],
+                                        iconAnchor: [15, 15],
+                                        popupAnchor: [0, -15]
+                                    });
+
+                                    const marker = L.marker([lat, lng], { icon: homeIcon }).addTo(map);
+
+                                    marker.on('click', function () {
+                                        showPropertyPanel(row, pricePerSqm);
+                                    });
+
+                                    setTimeout(() => {
+                                        const iconElement = marker.getElement();
+                                        if (iconElement) {
+                                            iconElement.style.backgroundColor = iconColor;
+                                        }
+                                    }, 100);
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+
+        async function showPropertyPanel(row, pricePerSqm) {
+            const panel = document.getElementById('propertyPanel');
+
+            document.getElementById('propertyStreet').textContent = 'Ładowanie...';
+            document.getElementById('currentPrice').textContent = 'Ładowanie...';
+            document.getElementById('propertySize').textContent = 'Ładowanie...';
+            document.getElementById('propertyRooms').textContent = 'Ładowanie...';
+            document.getElementById('propertyFloor').textContent = 'Ładowanie...';
+            document.getElementById('propertyYear').textContent = 'Ładowanie...';
+            document.getElementById('propertyMarket').textContent = 'Ładowanie...';
+            document.getElementById('propertyHeating').textContent = 'Ładowanie...';
+            document.getElementById('propertyTotalFloors').textContent = 'Ładowanie...';
+            document.getElementById('pricePerSqm').textContent = 'Ładowanie...';
+            document.getElementById('propertyAmenities').innerHTML = '<span>Ładowanie...</span>';
+
+            const imageDiv = document.getElementById('propertyImage');
+            imageDiv.innerHTML = '<div style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #666; font-family: \'Outfit\', Arial, sans-serif;">Ładowanie...</div>';
+
+            panel.classList.add('active');
+
+            try {
+                const response = await fetch(`http://localhost:8080/api/offer/show?offerId=${encodeURIComponent(row.detail_url)}`);
+                if (response.ok) {
+                    const offerDetails = await response.json();
+
+                    document.getElementById('propertyStreet').textContent = offerDetails.street || 'Brak danych';
+                    document.getElementById('currentPrice').textContent = (offerDetails.price_pln ? offerDetails.price_pln.toLocaleString() + ' PLN' : 'Brak danych');
+                    document.getElementById('propertySize').textContent = offerDetails.size_m2 || 'Brak danych';
+                    document.getElementById('propertyRooms').textContent = offerDetails.rooms || 'Brak danych';
+                    document.getElementById('propertyFloor').textContent = offerDetails.floor || 'Brak danych';
+                    document.getElementById('propertyYear').textContent = offerDetails.year_built || 'Brak danych';
+                    document.getElementById('propertyMarket').textContent = offerDetails.market ? `Rynek ${offerDetails.market}` : 'Brak danych';
+                    document.getElementById('propertyHeating').textContent = offerDetails.heating || 'Brak danych';
+                    document.getElementById('propertyTotalFloors').textContent = offerDetails.total_floors ? `Budynek ${offerDetails.total_floors}-piętrowy` : 'Brak danych';
+
+                    let apiPricePerSqm = pricePerSqm;
+                    if (offerDetails.price_pln && offerDetails.size_m2) {
+                        const sizeNum = parseFloat(offerDetails.size_m2.toString().replace(/[^\d]/g, ''));
+                        if (sizeNum > 0) {
+                            apiPricePerSqm = offerDetails.price_pln / sizeNum;
+                        }
+                    }
+                    document.getElementById('pricePerSqm').textContent = Math.round(apiPricePerSqm).toLocaleString() + ' zł / m²';
+
+                    const amenitiesContainer = document.getElementById('propertyAmenities');
+                    const amenities = [];
+
+                    if (offerDetails.intercom === 1) amenities.push('🔔 Domofon');
+                    if (offerDetails.basement === 1) amenities.push('🏠 Piwnica');
+                    if (offerDetails.furnished === 1) amenities.push('🪑 Umeblowane');
+                    if (offerDetails.elevator === 1) amenities.push('🛗 Winda');
+                    if (offerDetails.parkingSpace === 1) amenities.push('🚗 Miejsce parkingowe');
+                    if (offerDetails.gatedProperty === 1) amenities.push('🚪 Osiedle zamknięte');
+                    if (offerDetails.balcony === 1) amenities.push('🌅 Balkon');
+                    if (offerDetails.terrace === 1) amenities.push('🏞️ Taras');
+                    if (offerDetails.garden === 1) amenities.push('🌳 Ogród');
+
+                    if (amenities.length > 0) {
+                        amenitiesContainer.innerHTML = amenities.map(amenity => `<span class="amenity-item">${amenity}</span>`).join('');
+                    } else {
+                        amenitiesContainer.innerHTML = '<span>Brak dodatkowych udogodnień</span>';
+                    }
+
+                    if (offerDetails.image_url) {
+                        imageDiv.innerHTML = `<img src="${offerDetails.image_url}" alt="Zdjęcie mieszkania">`;
+                    } else {
+                        imageDiv.innerHTML = '<div style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #666; font-family: \'Outfit\', Arial, sans-serif;">Brak zdjęcia</div>';
+                    }
+
+                    document.getElementById('viewOffer').onclick = function () {
+                        window.open(row.detail_url, '_blank');
+                    };
+                } else {
+                    document.getElementById('propertyStreet').textContent = 'Błąd pobierania danych';
+                    document.getElementById('currentPrice').textContent = row.price_pln + ' PLN';
+                    document.getElementById('propertySize').textContent = row.size_m2;
+                    document.getElementById('propertyRooms').textContent = row.rooms;
+                    document.getElementById('propertyFloor').textContent = row.floor;
+                    document.getElementById('propertyYear').textContent = row.year_built;
+                    document.getElementById('propertyMarket').textContent = 'Brak danych';
+                    document.getElementById('propertyHeating').textContent = 'Brak danych';
+                    document.getElementById('propertyTotalFloors').textContent = 'Brak danych';
+                    document.getElementById('pricePerSqm').textContent = Math.round(pricePerSqm).toLocaleString() + ' zł / m²';
+                    document.getElementById('propertyAmenities').innerHTML = '<span>Brak danych</span>';
+
+                    if (row.image_url) {
+                        imageDiv.innerHTML = `<img src="${row.image_url}" alt="Zdjęcie mieszkania">`;
+                    } else {
+                        imageDiv.innerHTML = '<div style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #666; font-family: \'Outfit\', Arial, sans-serif;">Brak zdjęcia</div>';
+                    }
+
+                    document.getElementById('viewOffer').onclick = function () {
+                        window.open(row.detail_url, '_blank');
+                    };
+                }
+            } catch (error) {
+                console.error('Błąd podczas pobierania szczegółów oferty:', error);
+                document.getElementById('propertyStreet').textContent = 'Błąd połączenia';
+                document.getElementById('currentPrice').textContent = row.price_pln + ' PLN';
+                document.getElementById('propertySize').textContent = row.size_m2;
+                document.getElementById('propertyRooms').textContent = row.rooms;
+                document.getElementById('propertyFloor').textContent = row.floor;
+                document.getElementById('propertyYear').textContent = row.year_built;
+                document.getElementById('propertyMarket').textContent = 'Brak danych';
+                document.getElementById('propertyHeating').textContent = 'Brak danych';
+                document.getElementById('propertyTotalFloors').textContent = 'Brak danych';
+                document.getElementById('pricePerSqm').textContent = Math.round(pricePerSqm).toLocaleString() + ' zł / m²';
+                document.getElementById('propertyAmenities').innerHTML = '<span>Brak danych</span>';
+
+                if (row.image_url) {
+                    imageDiv.innerHTML = `<img src="${row.image_url}" alt="Zdjęcie mieszkania">`;
+                } else {
+                    imageDiv.innerHTML = '<div style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #666; font-family: \'Outfit\', Arial, sans-serif;">Brak zdjęcia</div>';
+                }
+
+                document.getElementById('viewOffer').onclick = function () {
+                    window.open(row.detail_url, '_blank');
+                };
+            }
+        }
+
+        document.getElementById('closePanel').addEventListener('click', function () {
+            const panel = document.getElementById('propertyPanel');
+            panel.classList.remove('active');
+        });
+
+        document.getElementById('filterButton').addEventListener('click', function () {
+            const button = this;
+            const span = button.querySelector('span');
+            const icon = button.querySelector('.material-icons');
+            const filterPanel = document.getElementById('filterPanel');
+
+            if (span.textContent === 'Schowaj filtry') {
+                span.textContent = 'Pokaż filtry';
+                icon.textContent = 'keyboard_arrow_down';
+                filterPanel.classList.remove('active');
+            } else {
+                span.textContent = 'Schowaj filtry';
+                icon.textContent = 'keyboard_arrow_up';
+                filterPanel.classList.add('active');
+            }
+        });
+    </script>
+</body>
+
+</html>

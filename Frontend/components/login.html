@@ -1,0 +1,32 @@
+<link rel="stylesheet" href="components/login.css">
+<div class="login-container">
+    <div class="login-form">
+        <h2 class="login-title">Logowanie</h2>
+        <p class="login-subtitle">Zaloguj się aby uzyskać dostęp do konta użytkownika.</p>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Hasło</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <div class="forgot-password">
+                <a href="#">Zapomniałem hasła</a>
+            </div>
+
+            <button type="submit" class="login-btn">
+                Zaloguj się
+            </button>
+        </form>
+
+        <div class="login-footer">
+            Nie masz konta? <a href="#" onclick="showRegister(event)">Zarejestruj się</a> | <a href="#"
+                onclick="showHome(event)">Powrót do strony głównej</a>
+        </div>
+    </div>
+</div>
