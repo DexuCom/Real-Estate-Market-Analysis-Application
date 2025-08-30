@@ -1,0 +1,9 @@
+### Show offer details
+GET http://localhost:8080/api/offer/show?offerId=https://www.morizon.pl/oferta/sprzedaz-mieszkanie-gdansk-przerobka-kryniczna-41m2-mzn2045941732
+### Show offer details
+GET http://localhost:8080/api/offer/show?offerId=https://www.morizon.pl/oferta/sprzedaz-mieszkanie-gdansk-wrzeszcz-jesionowa-67m2-mzn2046112109
+
+
+### Add offers from csv to database
+POST http://localhost:8080/api/offer/add
+

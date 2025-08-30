@@ -36,7 +36,6 @@ public class GatewayAppApplication {
 						.uri(webApiURL)
 				)
 
-
 				.build();
 	}
 
