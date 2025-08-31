@@ -181,6 +181,7 @@
                 </div>
                 <div class="property-actions">
                     <button id="viewOffer" class="view-offer-btn">Zobacz ofertę</button>
+                    <button id="addToWatchlist" class="add-watchlist-btn">Dodaj do obserwowanych</button>
                 </div>
             </div>
         </div>
@@ -383,6 +384,11 @@
         async function showPropertyPanel(row, pricePerSqm) {
             const panel = document.getElementById('propertyPanel');
 
+            const addButton = document.getElementById('addToWatchlist');
+            addButton.textContent = 'Dodaj do obserwowanych';
+            addButton.classList.remove('added');
+            addButton.disabled = false;
+
             document.getElementById('propertyStreet').textContent = 'Ładowanie...';
             document.getElementById('currentPrice').textContent = 'Ładowanie...';
             document.getElementById('propertySize').textContent = 'Ładowanie...';
@@ -452,52 +458,46 @@
                     document.getElementById('viewOffer').onclick = function () {
                         window.open(row.detail_url, '_blank');
                     };
-                } else {
-                    document.getElementById('propertyStreet').textContent = 'Błąd pobierania danych';
-                    document.getElementById('currentPrice').textContent = row.price_pln + ' PLN';
-                    document.getElementById('propertySize').textContent = row.size_m2;
-                    document.getElementById('propertyRooms').textContent = row.rooms;
-                    document.getElementById('propertyFloor').textContent = row.floor;
-                    document.getElementById('propertyYear').textContent = row.year_built;
-                    document.getElementById('propertyMarket').textContent = 'Brak danych';
-                    document.getElementById('propertyHeating').textContent = 'Brak danych';
-                    document.getElementById('propertyTotalFloors').textContent = 'Brak danych';
-                    document.getElementById('pricePerSqm').textContent = Math.round(pricePerSqm).toLocaleString() + ' zł / m²';
-                    document.getElementById('propertyAmenities').innerHTML = '<span>Brak danych</span>';
 
-                    if (row.image_url) {
-                        imageDiv.innerHTML = `<img src="${row.image_url}" alt="Zdjęcie mieszkania">`;
-                    } else {
-                        imageDiv.innerHTML = '<div style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #666; font-family: \'Outfit\', Arial, sans-serif;">Brak zdjęcia</div>';
-                    }
-
-                    document.getElementById('viewOffer').onclick = function () {
-                        window.open(row.detail_url, '_blank');
+                    document.getElementById('addToWatchlist').onclick = function () {
+                        addToWatchlist(row.detail_url);
                     };
+                } else {
+                    document.getElementById('propertyStreet').textContent = 'Błąd pobierania danych z API';
+                    document.getElementById('currentPrice').textContent = 'Błąd połączenia';
+                    document.getElementById('propertySize').textContent = 'Błąd połączenia';
+                    document.getElementById('propertyRooms').textContent = 'Błąd połączenia';
+                    document.getElementById('propertyFloor').textContent = 'Błąd połączenia';
+                    document.getElementById('propertyYear').textContent = 'Błąd połączenia';
+                    document.getElementById('propertyMarket').textContent = 'Błąd połączenia';
+                    document.getElementById('propertyHeating').textContent = 'Błąd połączenia';
+                    document.getElementById('propertyTotalFloors').textContent = 'Błąd połączenia';
+                    document.getElementById('pricePerSqm').textContent = 'Błąd połączenia';
+                    document.getElementById('propertyAmenities').innerHTML = '<span>Błąd połączenia z API</span>';
+
+                    imageDiv.innerHTML = '<div style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #666; font-family: \'Outfit\', Arial, sans-serif;">Błąd połączenia</div>';
+
+                    document.getElementById('viewOffer').onclick = null;
+                    document.getElementById('addToWatchlist').onclick = null;
                 }
             } catch (error) {
                 console.error('Błąd podczas pobierania szczegółów oferty:', error);
-                document.getElementById('propertyStreet').textContent = 'Błąd połączenia';
-                document.getElementById('currentPrice').textContent = row.price_pln + ' PLN';
-                document.getElementById('propertySize').textContent = row.size_m2;
-                document.getElementById('propertyRooms').textContent = row.rooms;
-                document.getElementById('propertyFloor').textContent = row.floor;
-                document.getElementById('propertyYear').textContent = row.year_built;
-                document.getElementById('propertyMarket').textContent = 'Brak danych';
-                document.getElementById('propertyHeating').textContent = 'Brak danych';
-                document.getElementById('propertyTotalFloors').textContent = 'Brak danych';
-                document.getElementById('pricePerSqm').textContent = Math.round(pricePerSqm).toLocaleString() + ' zł / m²';
-                document.getElementById('propertyAmenities').innerHTML = '<span>Brak danych</span>';
+                document.getElementById('propertyStreet').textContent = 'Błąd połączenia z API';
+                document.getElementById('currentPrice').textContent = 'Błąd połączenia';
+                document.getElementById('propertySize').textContent = 'Błąd połączenia';
+                document.getElementById('propertyRooms').textContent = 'Błąd połączenia';
+                document.getElementById('propertyFloor').textContent = 'Błąd połączenia';
+                document.getElementById('propertyYear').textContent = 'Błąd połączenia';
+                document.getElementById('propertyMarket').textContent = 'Błąd połączenia';
+                document.getElementById('propertyHeating').textContent = 'Błąd połączenia';
+                document.getElementById('propertyTotalFloors').textContent = 'Błąd połączenia';
+                document.getElementById('pricePerSqm').textContent = 'Błąd połączenia';
+                document.getElementById('propertyAmenities').innerHTML = '<span>Błąd połączenia z API</span>';
 
-                if (row.image_url) {
-                    imageDiv.innerHTML = `<img src="${row.image_url}" alt="Zdjęcie mieszkania">`;
-                } else {
-                    imageDiv.innerHTML = '<div style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #666; font-family: \'Outfit\', Arial, sans-serif;">Brak zdjęcia</div>';
-                }
+                imageDiv.innerHTML = '<div style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #666; font-family: \'Outfit\', Arial, sans-serif;">Błąd połączenia</div>';
 
-                document.getElementById('viewOffer').onclick = function () {
-                    window.open(row.detail_url, '_blank');
-                };
+                document.getElementById('viewOffer').onclick = null;
+                document.getElementById('addToWatchlist').onclick = null;
             }
         }
 
@@ -522,6 +522,52 @@
                 filterPanel.classList.add('active');
             }
         });
+
+        function addToWatchlist(offerId) {
+            console.log('Adding to watchlist:', offerId);
+
+            const authToken = localStorage.getItem('authToken');
+            if (!authToken) {
+                alert('Zaloguj się aby dodać ofertę do obserwowanych');
+                return;
+            }
+
+            const addButton = document.getElementById('addToWatchlist');
+            const originalText = addButton.textContent;
+
+            addButton.disabled = true;
+            addButton.textContent = 'Dodawanie...';
+
+            const userId = 'ba6e97db-1f6f-41fc-a80a-5f948f0ace8c';
+
+            const url = `http://localhost:8080/api/watchLists/add?userId=${encodeURIComponent(userId)}&offerId=${encodeURIComponent(offerId)}`;
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(async response => {
+                    let data = "";
+                    if (response.ok) {
+                        addButton.textContent = 'Dodano ✓';
+                        addButton.classList.add('added');
+                        addButton.disabled = false;
+                        console.log('Successfully added to watchlist');
+                    } else {
+                        data = await response.json();
+                        throw new Error(data.message || 'Nieznany błąd');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error adding to watchlist:', error);
+                    alert(`Błąd: ${error.message}`);
+                    addButton.textContent = originalText;
+                    addButton.disabled = false;
+                });
+
+        }
     </script>
 </body>
 

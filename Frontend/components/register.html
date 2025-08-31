@@ -6,6 +6,11 @@
 
         <form id="registerForm">
             <div class="form-group">
+                <label for="username">Nazwa użytkownika</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+
+            <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" required>
             </div>
@@ -25,9 +30,10 @@
                 <label for="terms">Akceptuję <a href="#">regulamin</a> i <a href="#">politykę prywatności</a></label>
             </div>
 
-            <button type="submit" class="register-btn">
+            <button type="button" id="registerBtn" class="register-btn">
                 Zarejestruj się
             </button>
+
         </form>
 
         <div class="register-footer">

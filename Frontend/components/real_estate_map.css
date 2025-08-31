@@ -466,6 +466,37 @@ html {
     background: #0056b3;
 }
 
+.add-watchlist-btn {
+    flex: 1;
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 600;
+    font-family: 'Outfit', Arial, sans-serif;
+    transition: background 0.2s ease;
+}
+
+.add-watchlist-btn:hover {
+    background: #059669;
+}
+
+.add-watchlist-btn:disabled {
+    background: #6b7280;
+    cursor: not-allowed;
+}
+
+.add-watchlist-btn.added {
+    background: #dc2626;
+}
+
+.add-watchlist-btn.added:hover {
+    background: #b91c1c;
+}
+
 .property-amenities {
     margin-bottom: 16px;
     padding: 12px;
