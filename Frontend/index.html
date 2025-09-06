@@ -28,12 +28,16 @@
             <div class="logo-container">
                 <img src="assets/logo.png" alt="Logo Twojej Firmy" class="logo">
             </div>
-            <div class="right-nav">
-                <a href="#" onclick="showLogin(event)">
+            <div class="right-nav" id="right-nav">
+                <a href="#" onclick="showLogin(event)" id="login-btn">
                     <span class="material-icons">person</span>
                     <span>Zaloguj</span>
                 </a>
-                <a href="#" onclick="showRegister(event)">Stwórz konto</a>
+                <a href="#" onclick="showRegister(event)" id="register-btn">Stwórz konto</a>
+                <a href="#" onclick="logout(event)" id="logout-btn" style="display: none;">
+                    <span class="material-icons">logout</span>
+                    <span>Wyloguj</span>
+                </a>
             </div>
         </div>
     </div>
@@ -48,6 +52,41 @@
 </body>
 
 <script>
+    // Initialize navigation on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        updateNavigation();
+    });
+
+    // Function to update navigation based on authentication status
+    function updateNavigation() {
+        const authToken = localStorage.getItem('authToken');
+        const loginBtn = document.getElementById('login-btn');
+        const registerBtn = document.getElementById('register-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        if (authToken) {
+            // User is logged in - show logout button, hide login/register
+            loginBtn.style.display = 'none';
+            registerBtn.style.display = 'none';
+            logoutBtn.style.display = 'block';
+        } else {
+            // User is not logged in - show login/register buttons, hide logout
+            loginBtn.style.display = 'block';
+            registerBtn.style.display = 'block';
+            logoutBtn.style.display = 'none';
+        }
+    }
+
+    // Logout function
+    function logout(event) {
+        event.preventDefault();
+        localStorage.removeItem('authToken');
+        alert('Zostałeś wylogowany');
+        updateNavigation();
+        showHome(new Event('click'));
+    }
+
+    // Load home content on page load
     fetch('components/home.html')
         .then(response => response.text())
         .then(data => {
@@ -90,6 +129,7 @@
 
         const authToken = localStorage.getItem('authToken');
         if (!authToken) {
+            updateNavigation(); // Ensure navigation reflects logged out state
             accountContainer.innerHTML = `
                 <div style="text-align: center; padding: 50px; font-size: 18px; margin-top: 220px;">
                     <p>Zaloguj się</p>
@@ -218,7 +258,7 @@
         const price = offerDetails.price_pln || 'Brak ceny';
 
         propertyElement.innerHTML = `
-            <div class="property-container">
+            <div class="property-container" onclick="openOfferLink('${offerId}')" style="cursor: pointer;">
                 <img src="${imageUrl}" alt="Mieszkanie" class="property-image" 
                      onerror="this.src='https://via.placeholder.com/300x200?text=Brak+zdjęcia'">
                 <div class="property-details">
@@ -229,7 +269,7 @@
                         Dodano: ${new Date(addedAt).toLocaleDateString('pl-PL')}
                     </p>
                 </div>
-                <button class="remove-property-btn" onclick="removeFromWatchlist('${offerId}')" title="Usuń z obserwowanych">
+                <button class="remove-property-btn" onclick="event.stopPropagation(); removeFromWatchlist('${offerId}')" title="Usuń z obserwowanych">
                     <span class="material-icons">delete</span>
                 </button>
             </div>
@@ -330,6 +370,7 @@
             .catch(error => {
                 console.error('Error loading user data:', error);
                 localStorage.removeItem('authToken');
+                updateNavigation(); // Update navigation when token is invalid
                 showAccount(new Event('click'));
             });
     }
@@ -348,17 +389,7 @@
 
     function setupAccountForm() {
         console.log('Setting up account form');
-
-        const logoutBtn = document.querySelector('.logout');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', function (e) {
-                e.preventDefault();
-                localStorage.removeItem('authToken');
-                alert('Zostałeś wylogowany');
-                showHome(new Event('click'));
-            });
-        }
-
+        // Account form setup logic can be added here if needed
     }
 
     function setupLoginForm() {
@@ -411,6 +442,7 @@
                             localStorage.setItem('authToken', 'logged_in_' + Date.now());
                         }
 
+                        updateNavigation(); // Update navigation after login
                         showAccount(new Event('click'));
                     } else {
                         const error = await response.text();
@@ -467,6 +499,15 @@
                     console.error('Error removing from watchlist:', error);
                     alert(`Błąd: ${error.message}`);
                 });
+        }
+    }
+
+    function openOfferLink(offerId) {
+        if (offerId && offerId.startsWith('http')) {
+            window.open(offerId, '_blank');
+        } else {
+            console.error('Invalid offer URL:', offerId);
+            alert('Nie można otworzyć linku do oferty');
         }
     }
 

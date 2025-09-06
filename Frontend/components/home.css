@@ -126,6 +126,22 @@
     color: #fff;
 }
 
+#register-btn {
+    background: #fff !important;
+    color: #111 !important;
+    border-radius: 0.6rem;
+    padding: 0.3125rem 1.125rem;
+    font-weight: 600;
+    border: 0.1rem solid #fff;
+    transition: background 0.3s, color 0.3s;
+}
+
+#register-btn:hover {
+    background: #eee !important;
+    color: #111 !important;
+    border-color: #eee;
+}
+
 .menu-bg {
     display: flex;
     align-items: center;
