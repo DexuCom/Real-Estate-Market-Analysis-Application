@@ -52,12 +52,10 @@
 </body>
 
 <script>
-    // Initialize navigation on page load
     document.addEventListener('DOMContentLoaded', function () {
         updateNavigation();
     });
 
-    // Function to update navigation based on authentication status
     function updateNavigation() {
         const authToken = localStorage.getItem('authToken');
         const loginBtn = document.getElementById('login-btn');
@@ -65,19 +63,16 @@
         const logoutBtn = document.getElementById('logout-btn');
 
         if (authToken) {
-            // User is logged in - show logout button, hide login/register
             loginBtn.style.display = 'none';
             registerBtn.style.display = 'none';
             logoutBtn.style.display = 'block';
         } else {
-            // User is not logged in - show login/register buttons, hide logout
             loginBtn.style.display = 'block';
             registerBtn.style.display = 'block';
             logoutBtn.style.display = 'none';
         }
     }
 
-    // Logout function
     function logout(event) {
         event.preventDefault();
         localStorage.removeItem('authToken');
@@ -86,12 +81,23 @@
         showHome(new Event('click'));
     }
 
-    // Load home content on page load
     fetch('components/home.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('home-placeholder').innerHTML = data;
+            loadScript('components/home.js');
         });
+
+    function loadScript(src) {
+        if (document.querySelector(`script[src="${src}"]`)) {
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        document.head.appendChild(script);
+    }
 
     function showMap(event) {
         event.preventDefault();
@@ -129,7 +135,7 @@
 
         const authToken = localStorage.getItem('authToken');
         if (!authToken) {
-            updateNavigation(); // Ensure navigation reflects logged out state
+            updateNavigation();
             accountContainer.innerHTML = `
                 <div style="text-align: center; padding: 50px; font-size: 18px; margin-top: 220px;">
                     <p>Zaloguj się</p>
@@ -370,7 +376,7 @@
             .catch(error => {
                 console.error('Error loading user data:', error);
                 localStorage.removeItem('authToken');
-                updateNavigation(); // Update navigation when token is invalid
+                updateNavigation();
                 showAccount(new Event('click'));
             });
     }
@@ -389,7 +395,6 @@
 
     function setupAccountForm() {
         console.log('Setting up account form');
-        // Account form setup logic can be added here if needed
     }
 
     function setupLoginForm() {
@@ -442,7 +447,7 @@
                             localStorage.setItem('authToken', 'logged_in_' + Date.now());
                         }
 
-                        updateNavigation(); // Update navigation after login
+                        updateNavigation();
                         showAccount(new Event('click'));
                     } else {
                         const error = await response.text();

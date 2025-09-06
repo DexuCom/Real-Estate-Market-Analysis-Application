@@ -1,4 +1,1 @@
-Logout button, watchlist element click redirect
-
-- logout button (login/register button not visible when logged in)
-- clicking on estate in watchlist redirects to estate announcement url
+Home page design rework

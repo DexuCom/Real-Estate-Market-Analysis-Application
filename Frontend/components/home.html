@@ -8,13 +8,22 @@
             narzędzi sztucznej inteligencji.
         </div>
 
-        <a href="#" class="hero-btn" onclick="showMap(event)">
-            <span class="material-icons"
-                style="vertical-align: middle; font-size: 1.3em; margin-right: 0.5em;">approval</span>
-            Przejdź do mapy
-        </a>
+        <div class="hero-buttons">
+            <button class="hero-tab-btn active" onclick="switchTab('heatmap', this)">
+                <span class="material-icons">map</span>
+                Mapa ciepła
+            </button>
+            <button class="hero-tab-btn" onclick="switchTab('search', this)">
+                <span class="material-icons">search</span>
+                Wyszukiwarka
+            </button>
+            <button class="hero-tab-btn" onclick="switchTab('ai', this)">
+                <span class="material-icons">psychology</span>
+                Model scoringowy AI
+            </button>
+        </div>
         <div class="hero-image-container">
-            <img src="assets/heatmap.png" alt="Mapa nieruchomości" class="hero-image">
+            <img id="hero-image" src="assets/heatmap.png" alt="Mapa ciepła cen" class="hero-image">
         </div>
     </div>
 </div>
