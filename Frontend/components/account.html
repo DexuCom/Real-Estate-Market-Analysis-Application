@@ -12,7 +12,7 @@
             <div class="account-actions">
                 <button class="account-btn">Edytuj profil</button>
                 <button class="account-btn secondary">Zmień hasło</button>
-                <button class="account-btn logout">Wyloguj się</button>
+                <button class="account-btn logout" onclick="logout(event)">Wyloguj się</button>
             </div>
         </div>
     </div>
@@ -20,105 +20,8 @@
     <div class="properties-section">
         <div class="saved-properties">
             <h3 class="properties-title">⭐Zapisane ogłoszenia</h3>
-            <div class="properties-list">
-                <div class="property-item">
-                    <img src="https://img1.staticmorizon.com.pl/thumb/aHR0cDovL21lZGlhLmRvbXkucGwvaW1nL3pkamVjaWEvbW9vbmlhLzgvbW9vbmlhX21zXzg5NDA2Ml8xLmpwZyN2PTFfMzc2NDM2NDQ0NA==/3x2_xs:fill_and_crop/mieszkanie-na-sprzedaz-gdansk-jasien-57-m.jpg"
-                        alt="Mieszkanie" class="property-image">
-                    <div class="property-details">
-                        <h4 class="property-address">Gdańsk, Leszczynowa</h4>
-                        <p class="property-info">57 m² • 2 pokoje • piętro 3/4</p>
-                        <p class="property-price">659 000 PLN</p>
-                    </div>
-                </div>
-
-                <div class="property-item">
-                    <img src="https://img1.staticmorizon.com.pl/thumb/aHR0cDovL21lZGlhLmRvbXkucGwvaW1nL3pkamVjaWEvbmFkbW8xL2MvbmFkbW8xX21zXzczNTAxMl8xLmpwZyN2PTFfMzc1Nzg1MjU1Ng==/3x2_xs:fill_and_crop/mieszkanie-na-sprzedaz-gdansk-przerobka-41-m.jpg"
-                        alt="Mieszkanie" class="property-image">
-                    <div class="property-details">
-                        <h4 class="property-address">Gdańsk, Kryniczna</h4>
-                        <p class="property-info">41 m² • 2 pokoje • parter/1</p>
-                        <p class="property-price">659 000 PLN</p>
-                    </div>
-                </div>
-
-                <div class="property-item">
-                    <img src="https://img1.staticmorizon.com.pl/thumb/aHR0cDovL21lZGlhLmRvbXkucGwvaW1nL2Rld2Vsb3Blcnp5LzExMTMzX3dpenVhbGl6YWNqYTEuanBnI3Y9MTc1MzY5MDIxNA==/3x2_xs:fill_and_crop/mieszkanie-w-inwestycji-wolne-miasto-etap-vii-gdansk-70-m.jpg"
-                        alt="Mieszkanie" class="property-image">
-                    <div class="property-details">
-                        <h4 class="property-address">Gdańsk, ul. Cedrowa</h4>
-                        <p class="property-info">70 m² • 3 pokoje • piętro 3/3</p>
-                        <p class="property-price">399 000 PLN</p>
-                    </div>
-                </div>
-
-                <div class="property-item">
-                    <img src="https://img1.staticmorizon.com.pl/thumb/aHR0cDovL21lZGlhLmRvbXkucGwvaW1nL2Rld2Vsb3Blcnp5LzExMTMzX3dpenVhbGl6YWNqYTUuanBnI3Y9MTc1MzY5MDIxNA==/3x2_xs:fill_and_crop/mieszkanie-w-inwestycji-wolne-miasto-etap-vii-gdansk-34-m.jpg"
-                        alt="Mieszkanie" class="property-image">
-                    <div class="property-details">
-                        <h4 class="property-address">Gdańsk, ul. Cedrowa</h4>
-                        <p class="property-info">34 m² • 2 pokoje • piętro 1/3</p>
-                        <p class="property-price">399 000 PLN</p>
-                    </div>
-                </div>
-
-                <div class="property-item">
-                    <img src="https://img1.staticmorizon.com.pl/thumb/aHR0cDovL21lZGlhLmRvbXkucGwvaW1nL2Rld2Vsb3Blcnp5LzExMTMzX3dpenVhbGl6YWNqYTguanBnI3Y9MTc1MzY5MDIxNA==/3x2_xs:fill_and_crop/mieszkanie-w-inwestycji-wolne-miasto-etap-vii-gdansk-74-m.jpg"
-                        alt="Mieszkanie" class="property-image">
-                    <div class="property-details">
-                        <h4 class="property-address">Gdańsk, ul. Cedrowa</h4>
-                        <p class="property-info">74 m² • 3 pokoje • piętro 3/3</p>
-                        <p class="property-price">782 214 PLN</p>
-                    </div>
-                </div>
-
-                <div class="property-item">
-                    <img src="https://img1.staticmorizon.com.pl/thumb/aHR0cDovL21lZGlhLmRvbXkucGwvaW1nL3pkamVjaWEvdHlzemtpZXcvZC90eXN6a2lld19tc19UWTcyNzIwMF8xLmpwZyN2PTFfMzc1MDg3NzIyNA==/3x2_xs:fill_and_crop/mieszkanie-na-sprzedaz-gdansk-wrzeszcz-91-m.jpg"
-                        alt="Mieszkanie" class="property-image">
-                    <div class="property-details">
-                        <h4 class="property-address">Gdańsk, Aleja Grunwaldzka</h4>
-                        <p class="property-info">91 m² • 4 pokoje • piętro 1/4</p>
-                        <p class="property-price">782 214 PLN</p>
-                    </div>
-                </div>
-
-                <div class="property-item">
-                    <img src="https://img1.staticmorizon.com.pl/thumb/aHR0cDovL21lZGlhLmRvbXkucGwvaW1nL3pkamVjaWEvdHlzemtpZXcvMy90eXN6a2lld19tc19UWTUwMDE3M18xLmpwZyN2PTFfMzc1OTIyODEzOQ==/3x2_xs:fill_and_crop/mieszkanie-na-sprzedaz-gdansk-wrzeszcz-48-m.jpg"
-                        alt="Mieszkanie" class="property-image">
-                    <div class="property-details">
-                        <h4 class="property-address">Gdańsk, Zbyszka z Bogdańca</h4>
-                        <p class="property-info">48 m² • 2 pokoje • parter/2</p>
-                        <p class="property-price">462 901 PLN</p>
-                    </div>
-                </div>
-
-                <div class="property-item">
-                    <img src="https://img1.staticmorizon.com.pl/thumb/aHR0cDovL21lZGlhLmRvbXkucGwvaW1nL3pkamVjaWEvdHlzemtpZXcvNC90eXN6a2lld19tc19UWTcwNjc1N18xLmpwZyN2PTFfMzc0NjU1NDkyMg==/3x2_xs:fill_and_crop/mieszkanie-na-sprzedaz-gdansk-siedlce-45-m.jpg"
-                        alt="Mieszkanie" class="property-image">
-                    <div class="property-details">
-                        <h4 class="property-address">Gdańsk, Kartuska</h4>
-                        <p class="property-info">45 m² • 3 pokoje • piętro 2/2</p>
-                        <p class="property-price">462 901 PLN</p>
-                    </div>
-                </div>
-
-                <div class="property-item">
-                    <img src="https://img1.staticmorizon.com.pl/thumb/aHR0cDovL21lZGlhLmRvbXkucGwvaW1nL3pkamVjaWEvdHlzemtpZXcvZC90eXN6a2lld19tc19UWTE3ODg2OV8xLmpwZyN2PTFfMzc0ODc0MDE0OQ==/3x2_xs:fill_and_crop/mieszkanie-na-sprzedaz-gdansk-orunia-sw-wojciech-lipce-48-m.jpg"
-                        alt="Mieszkanie" class="property-image">
-                    <div class="property-details">
-                        <h4 class="property-address">Gdańsk, Gen. Leopolda Okulickiego</h4>
-                        <p class="property-info">48 m² • 2 pokoje • piętro 4/4</p>
-                        <p class="property-price">826 225 PLN</p>
-                    </div>
-                </div>
-
-                <div class="property-item">
-                    <img src="https://img1.staticmorizon.com.pl/thumb/aHR0cDovL21lZGlhLmRvbXkucGwvaW1nL3pkamVjaWEvdHlzemtpZXcvMy90eXN6a2lld19tc19UWTY4NDAwNF8xLmpwZyN2PTFfMzc1Nzg4MzMyMg==/3x2_xs:fill_and_crop/mieszkanie-na-sprzedaz-gdansk-przymorze-46-m.jpg"
-                        alt="Mieszkanie" class="property-image">
-                    <div class="property-details">
-                        <h4 class="property-address">Gdańsk, Piastowska</h4>
-                        <p class="property-info">46 m² • 2 pokoje • piętro 2/10</p>
-                        <p class="property-price">826 225 PLN</p>
-                    </div>
-                </div>
+            <div class="properties-list" id="properties-list">
             </div>
         </div>
+    </div>
+</div>

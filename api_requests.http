@@ -1,9 +1,114 @@
-### Show offer details
-GET http://localhost:8080/api/offer/show?offerId=https://www.morizon.pl/oferta/sprzedaz-mieszkanie-gdansk-przerobka-kryniczna-41m2-mzn2045941732
+### SYSTEM HEALTH CHECKS ###
+
+### Gateway health check
+GET http://localhost:8080/gateway-check
+
+###
+
+### USER AUTHENTICATION ENDPOINTS ###
+
+### Register new user
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "username": "test16",
+  "password": "testpassword123",
+  "email": "test16@example.com"
+}
+
+### Register another user for testing
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "username": "john_doe",
+  "password": "securepassword456",
+  "email": "john.doe@email.com"
+}
+
+### Login user
+POST http://localhost:8080/api/users/login
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "testpassword123"
+}
+
+### Login with wrong credentials (should fail)
+POST http://localhost:8080/api/users/login
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "wrongpassword"
+}
+
+### Get user data (requires user ID - get it after registration/login)
+GET http://localhost:8080/api/users/ba6e97db-1f6f-41fc-a80a-5f948f0ace8c
+
+### Get user data with JWT token (if authentication is required)
+GET http://localhost:8080/api/users/01234567-89ab-cdef-0123-456789abcdef
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+###
+
+### WATCHLIST ENDPOINTS ###
+
+### Add offer to watchlist (requires user ID and offer ID)
+POST http://localhost:8080/api/watchLists/add?userId=ba6e97db-1f6f-41fc-a80a-5f948f0ace8c&offerId=https://www.morizon.pl/oferta/sprzedaz-mieszkanie-gdansk-przymorze-obroncow-wybrzeza-65m2-mzn2045743213
+
+### Remove offer from watchlist
+DELETE http://localhost:8080/api/watchLists/remove?userId=ba6e97db-1f6f-41fc-a80a-5f948f0ace8c&offerId=https://www.morizon.pl/oferta/sprzedaz-mieszkanie-gdansk-przymorze-obroncow-wybrzeza-65m2-mzn2045743213
+
+### Get all watchlist items for user
+GET http://localhost:8080/api/watchLists/ba6e97db-1f6f-41fc-a80a-5f948f0ace8c
+
+###
+
+### OFFER ENDPOINTS ###
+
 ### Show offer details
 GET http://localhost:8080/api/offer/show?offerId=https://www.morizon.pl/oferta/sprzedaz-mieszkanie-gdansk-wrzeszcz-jesionowa-67m2-mzn2046112109
-
 
 ### Add offers from csv to database
 POST http://localhost:8080/api/offer/add
 
+
+### Get non-existing offer (should return 404)
+GET http://localhost:8080/api/offer/show?offerId=https://www.morizon.pl/oferta/non-existing-offer
+
+###
+
+### VALIDATION TESTS ###
+
+### Register user with invalid email (should fail)
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "username": "testuser2",
+  "password": "testpassword123",
+  "email": "invalid-email"
+}
+
+### Register user with short password (should fail)
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "username": "testuser3",
+  "password": "short",
+  "email": "test3@example.com"
+}
+
+### Register user with short username (should fail)
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "username": "ab",
+  "password": "testpassword123",
+  "email": "test4@example.com"
+}
