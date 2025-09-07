@@ -1,1 +1,1 @@
-Home page design rework
+Home page parallax effect, code refactoring, files management

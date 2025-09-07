@@ -47,15 +47,65 @@ function initializeHomeComponent() {
 
     preloadImages();
     setInitialImage();
+    initParallax();
+}
+
+function initParallax() {
+    const isMobile = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    if (isMobile) {
+        return;
+    }
+
+    const parallaxElements = document.querySelectorAll('.parallax-element');
+    const parallaxBg = document.querySelector('.parallax-bg');
+    const parallaxOverlay = document.querySelector('.parallax-overlay');
+
+    let mouseX = 0;
+    let mouseY = 0;
+    let targetX = 0;
+    let targetY = 0;
+
+    document.addEventListener('mousemove', (e) => {
+        targetX = (e.clientX / window.innerWidth) - 0.5;
+        targetY = (e.clientY / window.innerHeight) - 0.5;
+    });
+
+    function animate() {
+        mouseX += (targetX - mouseX) * 0.1;
+        mouseY += (targetY - mouseY) * 0.1;
+
+        if (parallaxBg) {
+            const bgMoveX = mouseX * 20;
+            const bgMoveY = mouseY * 20;
+            parallaxBg.style.transform = `translate(${bgMoveX}px, ${bgMoveY}px)`;
+        }
+
+        if (parallaxOverlay) {
+            const overlayMoveX = mouseX * -15;
+            const overlayMoveY = mouseY * -15;
+            parallaxOverlay.style.transform = `translate(${overlayMoveX}px, ${overlayMoveY}px)`;
+        }
+
+        parallaxElements.forEach(element => {
+            const speed = parseFloat(element.dataset.speed) || 0.5;
+            const moveX = mouseX * speed * 30;
+            const moveY = mouseY * speed * 30;
+
+            element.style.transform = `translate(${moveX}px, ${moveY}px)`;
+        });
+
+        requestAnimationFrame(animate);
+    }
+
+    animate();
 }
 
 function setInitialImage() {
-    // Znajdź aktywny przycisk
     const activeButton = document.querySelector('.hero-tab-btn.active');
     const heroImage = document.getElementById('hero-image');
 
     if (activeButton && heroImage) {
-        // Sprawdź który tab jest aktywny na podstawie onclick
         const onclick = activeButton.getAttribute('onclick');
 
         if (onclick.includes("'heatmap'")) {
