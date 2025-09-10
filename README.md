@@ -21,27 +21,15 @@ Run the following command in **PowerShell** and paste the result into your `.env
 [Convert]::ToBase64String((1..32 | ForEach-Object { Get-Random -Maximum 256 }) -as [byte[]])
 ```
 
----
+### 2. Run with Docker Compose (on Windows)
 
-### 2. Build `.jar` files with Maven
-Perform packaging for both **web-api** and **gateway-app**:
-
-1. Open the **Maven side panel**  
-2. In **Lifecycle**, select `package`  
-3. Run it  
-
-This will generate the `.jar` files needed for the application.
-
----
-
-### 3. Run with Docker Compose
-
-#### ▶️ Without rebuilding images
+#### ▶️ run entire app on docker
 ```bash
-docker compose --env-file <file_name>.env up
+runAllDocker.bat
 ```
 
-#### 🔄 With rebuilding images
+#### ▶️ run for local dev (only needed containers on docker)
 ```bash
-docker compose --env-file <file_name>.env up --build
+runLocalDev.bat
 ```
+and then turn on the applications you need
