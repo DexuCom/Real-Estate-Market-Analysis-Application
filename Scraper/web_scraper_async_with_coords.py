@@ -20,6 +20,8 @@ WINDA_RE = re.compile(r"\bwinda\b", re.IGNORECASE)
 MIEJSCE_POSTOJOWE_RE = re.compile(r"miejsce\s+postojowe", re.IGNORECASE)
 OBIEKT_ZAMKNIETY_RE = re.compile(r"\bobiekt zamknięty\b", re.IGNORECASE)
 
+CENA_RE = re.compile(r"")
+
 async def fetch(session, url):
     async with session.get(url, headers=HEADERS) as response:
         return await response.text()
@@ -27,47 +29,74 @@ async def fetch(session, url):
 def parse_page(html):
     soup = BeautifulSoup(html, 'lxml')
 
-    price_divs = soup.find_all("div", attrs={"data-v-3ad00e2f": ""})
-    street_spans = soup.find_all("span", attrs={"class": "repT6T", "data-v-8fbe0482": ""})
-    info_divs = soup.find_all("div", class_="property-info")
-    offer_links = soup.find_all("a", class_="_4izXSr")
-    image_divs = soup.find_all("div", class_="gallery-slider__img-wrapper gallery-slider__img-wrapper")
-
-    prices = []
-    for div in price_divs:
-        text = div.get_text(strip=True)
-        if "zł" in text:
-            numeric_price = text.replace("zł", "").replace(" ", "").replace("\xa0", "")
-            try:
-                price = int(numeric_price)
-                prices.append(price)
-            except ValueError:
-                continue
-
-    streets = [span.get_text(strip=True) for span in street_spans]
-
-    property_infos = []
-    for info_div in info_divs:
-        text = info_div.get_text(separator=" ", strip=True)
-        parts = text.split("•")
-        size = parts[0].strip() if len(parts) > 0 else None
-        rooms = parts[1].strip() if len(parts) > 1 else None
-        floor = parts[2].strip() if len(parts) > 2 else None
-        property_infos.append((size, rooms, floor))
-
-    image_links = []
-    for div in image_divs:
-        img = div.find("img")
-        if img and img.get("src"):
-            image_links.append(img.get("src"))
-        else:
-            image_links.append("")
-
+    offer_cards = soup.find_all("div", class_="card__outer")
     base_detail_url = "https://www.morizon.pl"
-    detail_links = [base_detail_url + a['href'] for a in offer_links if a.get('href')]
 
     results = []
-    for street, price, (size, rooms, floor), detail_url, image_link in zip(streets, prices, property_infos, detail_links, image_links):
+
+    for offer_card in offer_cards:
+        street = None
+        price = None
+        size = None
+        floor = None
+        detail_url = None
+        image_url = None
+
+        link_tag = offer_card.find("a", attrs={"data-cy": "propertyUrl"})
+        if not link_tag:
+            print("Offer didn't have a link!")
+            continue
+        detail_url = base_detail_url + link_tag['href']
+
+        price_holder = offer_card.find("div", attrs={"data-cy": "cardPropertyOfferPrice"})
+        if price_holder:
+            # robimy to w ten sposób bo nie ma sensownego selektora,
+            # być może lepiej regexem ze zł wydobyć?
+            price_element = price_holder.select_one('div:nth-of-type(2) > div')
+            if price_element:
+                price_string = price_element.get_text(strip=True)
+                numeric_price = price_string.replace("zł", "").replace(" ", "").replace("\xa0", "")
+                try:
+                    price = int(numeric_price)
+                except ValueError:
+                    print("Error when trying to convert numeric_price to price, price was " + numeric_price)
+                    continue
+
+        location_holder = offer_card.find("div", attrs={"data-cy": "locationTree"})
+        if location_holder:
+            street_element = location_holder.find_next_sibling('span')
+            if street_element:
+                street = street_element.get_text(strip=True)
+
+        info_div = offer_card.find("div", class_="property-info")
+        if info_div:
+            text = info_div.get_text(separator=" ", strip=True)
+            parts = text.split("•")
+            if len(parts) > 0:
+                size_text = parts[0].strip().replace("m²", "").replace(",", "")
+                try:
+                    size = float(size_text)
+                except ValueError:
+                    print("Unable to convert size " + size_text + " into a float")
+
+            if len(parts) > 1:
+                room_count = re.search(r'\d+', parts[1].strip()).group(0)
+                rooms = int(room_count)
+
+            if len(parts) > 2:
+                floor_text = parts[2].strip().lower()
+                if "parter" in floor_text:
+                    floor = 0
+                else:
+                    floor_match = re.search(r'\d+', floor_text)
+                    if floor_match:
+                        floor = int(floor_match.group(0))
+
+
+        image_element = offer_card.find("img", attrs={"data-cy": "gallerySliderImgThumbnail"})
+        if image_element:
+            image_url = image_element.get("src")
+
         results.append({
             "city": SELECTED_CITY,
             "street": street,
@@ -76,8 +105,9 @@ def parse_page(html):
             "rooms": rooms,
             "floor": floor,
             "detail_url": detail_url,
-            "image_url": image_link
-        })
+            "image_url": image_url
+            }
+        )
 
     return results
 
@@ -167,8 +197,17 @@ def parse_coords(html):
                 json_end = script.string.rfind('}')
                 json_str = script.string[json_start:json_end+1]
                 data = json.loads(json_str)
-                coords = data.get("coords", None)
-                return coords
+                coords_data = data.get("coords", None)
+                if coords_data:
+                    coords_data = coords_data.split(',')
+                    longitude = coords_data[0]
+                    latitude = coords_data[1]
+                    return {
+                        "longitude": longitude,
+                        "latitude": latitude
+                    }
+
+                return None
         except Exception:
             pass
     return None
@@ -183,8 +222,8 @@ async def scrape_prices_and_streets(base_url, pages=1):
 
         start_time = time.perf_counter()
         pages_html = await asyncio.gather(*tasks)
-
         for i, html in enumerate(pages_html, start=1):
+
             progress = (i / pages) * 100
             print(f"Processing page {i}/{pages} ({progress:.1f}%)...")
             page_results = parse_page(html)
@@ -228,7 +267,10 @@ async def scrape_prices_and_streets(base_url, pages=1):
             if i % max(1, total_offers // 10) == 0 or i == total_offers:
                 print(f"Fetching coordinates: {i}/{total_offers} ({progress:.1f}%)")
             coords = parse_coords(coords_html)
-            item["coords"] = coords if coords else ""
+
+            item["longitude"] = coords["longitude"] if coords else None
+            item["latitude"] = coords["latitude"] if coords else None
+
 
         end_time = time.perf_counter()
 
