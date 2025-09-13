@@ -188,19 +188,45 @@ function toggleHeatmap() {
 }
 
 function loadPropertyData() {
-    fetch('../../ScraperOutput/Gdańsk-morizon.csv')
-        .then(response => response.text())
+    console.log('Loading property data from CSV...');
+    fetch('../../Scraper/ScraperOutput/Gdańsk-morizon.csv')
+        .then(response => {
+            console.log('Fetch response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.text();
+        })
         .then(csvText => {
+            console.log('CSV text loaded, length:', csvText.length);
+            console.log('First 500 chars:', csvText.substring(0, 500));
+
             Papa.parse(csvText, {
                 header: true,
                 skipEmptyLines: true,
                 complete: function (results) {
-                    results.data.forEach(function (row) {
+                    console.log('CSV parsing complete, data rows:', results.data.length);
+                    results.data.forEach(function (row, index) {
+                        console.log(`Row ${index}:`, {
+                            coords: row.coords,
+                            street: row.street,
+                            price_pln: row.price_pln,
+                            size_m2: row.size_m2
+                        });
+
                         if (row.coords) {
-                            const [lat, lng] = row.coords.split(',').map(coord => parseFloat(coord));
+                            const coordsString = row.coords.replace(/['"]/g, '');
+                            const [lat, lng] = coordsString.split(',').map(coord => parseFloat(coord.trim()));
+
+                            console.log(`Parsed coordinates for ${row.street}: lat=${lat}, lng=${lng}`);
+
                             if (!isNaN(lat) && !isNaN(lng)) {
                                 createPropertyMarker(row, lat, lng);
+                            } else {
+                                console.error(`Invalid coordinates for ${row.street}:`, coordsString);
                             }
+                        } else {
+                            console.warn(`Missing coords for row ${index}:`, row);
                         }
                     });
                 }
@@ -381,13 +407,18 @@ function addToWatchlist(offerId) {
         return;
     }
 
+    const userId = parent.getCurrentUserId(); // Get from parent window (index.html)
+    if (!userId) {
+        alert('Błąd: Brak informacji o użytkowniku. Zaloguj się ponownie.');
+        return;
+    }
+
     const addButton = document.getElementById('addToWatchlist');
     const originalText = addButton.textContent;
 
     addButton.disabled = true;
     addButton.textContent = 'Dodawanie...';
 
-    const userId = 'ba6e97db-1f6f-41fc-a80a-5f948f0ace8c';
     const url = `http://localhost:8080/api/watchLists/add?userId=${encodeURIComponent(userId)}&offerId=${encodeURIComponent(offerId)}`;
 
     fetch(url, {
