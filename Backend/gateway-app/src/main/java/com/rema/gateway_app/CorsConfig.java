@@ -16,15 +16,9 @@ public class CorsConfig {
     public CorsWebFilter corsWebFilter() {
         final CorsConfiguration corsConfig = new CorsConfiguration();
         corsConfig.setAllowCredentials(true);
-        // Dodanie konkretnych origin dla deweloperki
         corsConfig.setAllowedOrigins(Arrays.asList(
-            "http://localhost:3000",
-            "http://localhost:5500", 
             "http://127.0.0.1:5500",
-            "http://localhost:5501",
-            "http://127.0.0.1:5501",
-            "http://localhost:8080",
-            "http://127.0.0.1:8080"
+            "http://localhost:5500"
         ));
         corsConfig.setMaxAge(3600L);
         corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"));
