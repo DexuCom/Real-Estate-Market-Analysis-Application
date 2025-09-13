@@ -70,7 +70,7 @@ public class UserService {
         verificationToken.setExpiryDate(LocalDateTime.now().plusDays(1));
         verificationTokenRepository.save(verificationToken);
 
-        String link = "http://localhost:8080/api/v1/auth/verify?token=" + token;
+        String link = "http://localhost:8080/api/users/verify?token=" + token;
         emailService.sendVerificationEmail(savedUser.getEmail(), link);
 
         return savedUser;

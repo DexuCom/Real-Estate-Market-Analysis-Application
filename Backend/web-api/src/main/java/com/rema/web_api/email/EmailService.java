@@ -3,6 +3,7 @@ package com.rema.web_api.email;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -14,12 +15,14 @@ public class EmailService {
         this.mailSender = _mailSender;
     }
 
+    @Async
     @Transactional
     public void sendVerificationEmail(String to, String verificationLink) {
 
         SimpleMailMessage message = new SimpleMailMessage();
 
         message.setTo(to);
+        message.setFrom("estatescoutcomp@gmail.com");
         message.setSubject("Potwierdź rejestrację");
         message.setText("Kliknij w link, aby potwierdzić rejestrację: " + verificationLink);
 
@@ -32,6 +35,7 @@ public class EmailService {
         SimpleMailMessage message = new SimpleMailMessage();
 
         message.setTo(to);
+        message.setFrom("estatescoutcomp@gmail.com");
         message.setSubject("Resetowanie hasła");
         message.setText("Kliknij w link, aby zresetować hasło: " + resetLink);
 
