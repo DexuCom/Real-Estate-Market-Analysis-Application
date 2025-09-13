@@ -59,7 +59,7 @@ public class UserService {
         
         if(userOptional.isEmpty())
         {
-            throw new IllegalStateException("Niepoprawne dane logowania");
+            throw new IllegalStateException("Nie istnieje uzytkownik o takim loginie");
         }
         
         User user = userOptional.get();
@@ -71,7 +71,7 @@ public class UserService {
         }
         else
         {
-            throw new IllegalStateException("Niepoprawne dane logowania");
+            throw new IllegalStateException("Niepoprawne haslo");
         }
     }
 }
