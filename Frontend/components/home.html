@@ -1,14 +1,16 @@
 <link rel="stylesheet" href="home.css">
 <div class="content">
+    <div class="parallax-bg"></div>
+    <div class="parallax-overlay"></div>
     <div class="hero-section">
-        <div class="hero-title">Znajdź nieruchomość <br>dopasowaną dla Ciebie</div>
-        <div class="hero-desc">
+        <div class="hero-title parallax-element" data-speed="0.5">Znajdź nieruchomość <br>dopasowaną dla Ciebie</div>
+        <div class="hero-desc parallax-element" data-speed="0.3">
             Przeglądaj mapy cieplne cen nieruchomości i korzystaj z inteligentnego modelu scoringowego. Wszystko w
             jednym miejscu, skutecznie i wygodnie. Odkryj nowe możliwości analizy rynku nieruchomości ze wsparciem
             narzędzi sztucznej inteligencji.
         </div>
 
-        <div class="hero-buttons">
+        <div class="hero-buttons parallax-element" data-speed="0.2">
             <button class="hero-tab-btn active" onclick="switchTab('heatmap', this)">
                 <span class="material-icons">map</span>
                 Mapa ciepła
@@ -22,7 +24,7 @@
                 Model scoringowy AI
             </button>
         </div>
-        <div class="hero-image-container">
+        <div class="hero-image-container parallax-element" data-speed="0.4">
             <img id="hero-image" src="assets/heatmap.png" alt="Mapa ciepła cen" class="hero-image">
         </div>
     </div>

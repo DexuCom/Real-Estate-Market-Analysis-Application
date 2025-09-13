@@ -122,8 +122,35 @@
                 .then(response => response.text())
                 .then(data => {
                     loginContainer.innerHTML = data;
-                    setupLoginForm();
+
+                    const existingScript = document.getElementById('login-script');
+                    if (existingScript) {
+                        existingScript.remove();
+                    }
+
+                    const script = document.createElement('script');
+                    script.id = 'login-script';
+                    script.src = 'components/login.js';
+                    script.onload = function () {
+                        console.log('Login script loaded successfully');
+                        if (typeof setupLoginForm === 'function') {
+                            setupLoginForm();
+                        } else {
+                            console.error('setupLoginForm function not found');
+                        }
+                    };
+                    script.onerror = function () {
+                        console.error('Failed to load login script');
+                    };
+                    document.head.appendChild(script);
                 });
+        } else {
+            console.log('Login already loaded, setting up form');
+            if (typeof setupLoginForm === 'function') {
+                setupLoginForm();
+            } else {
+                console.error('setupLoginForm function not found');
+            }
         }
     }
 
@@ -152,13 +179,40 @@
                 .then(response => response.text())
                 .then(data => {
                     accountContainer.innerHTML = data;
-                    loadUserData();
-                    loadWatchlistProperties();
-                    setupAccountForm();
+
+                    const existingScript = document.getElementById('account-script');
+                    if (existingScript) {
+                        existingScript.remove();
+                    }
+
+                    const script = document.createElement('script');
+                    script.id = 'account-script';
+                    script.src = 'components/account.js';
+                    script.onload = function () {
+                        console.log('Account script loaded successfully');
+                        if (typeof setupAccountForm === 'function') {
+                            setupAccountForm();
+                        } else {
+                            console.error('setupAccountForm function not found');
+                        }
+                    };
+                    script.onerror = function () {
+                        console.error('Failed to load account script');
+                    };
+                    document.head.appendChild(script);
                 });
         } else {
-            loadUserData();
-            loadWatchlistProperties();
+            console.log('Account already loaded, refreshing data');
+            if (typeof loadUserData === 'function') {
+                loadUserData();
+            } else {
+                console.error('loadUserData function not found');
+            }
+            if (typeof loadWatchlistProperties === 'function') {
+                loadWatchlistProperties();
+            } else {
+                console.error('loadWatchlistProperties function not found');
+            }
         }
     }
 
@@ -173,293 +227,40 @@
                 .then(response => response.text())
                 .then(data => {
                     registerContainer.innerHTML = data;
-                    setupRegisterForm();
-                });
-        }
-    }
 
-    function loadWatchlistProperties() {
-        console.log('Loading watchlist properties');
-
-        const userId = 'ba6e97db-1f6f-41fc-a80a-5f948f0ace8c';
-
-        fetch(`http://localhost:8080/api/watchLists/${userId}`)
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error('Failed to load watchlist');
-                }
-            })
-            .then(watchlistItems => {
-                console.log('Watchlist items loaded:', watchlistItems);
-                displayWatchlistProperties(watchlistItems);
-            })
-            .catch(error => {
-                console.error('Error loading watchlist:', error);
-                displayEmptyWatchlist();
-            });
-    }
-
-    function displayWatchlistProperties(watchlistItems) {
-        const propertiesList = document.getElementById('properties-list');
-        if (!propertiesList) {
-            console.error('Properties list container not found');
-            return;
-        }
-
-        propertiesList.innerHTML = '';
-
-        if (watchlistItems.length === 0) {
-            propertiesList.innerHTML = `
-                <div style="text-align: center; padding: 30px; color: #666;">
-                    <p>Brak zapisanych ogłoszeń</p>
-                    <p style="font-size: 14px;">Dodaj nieruchomości do watchlist, aby je tutaj zobaczyć</p>
-                </div>
-            `;
-            return;
-        }
-
-        watchlistItems.forEach(item => {
-            fetchOfferDetails(item.offerId).then(offerDetails => {
-                if (offerDetails) {
-                    addPropertyToList(offerDetails, item.addedAt, item.offerId);
-                }
-            });
-        });
-    }
-
-    function fetchOfferDetails(offerId) {
-        const encodedOfferId = encodeURIComponent(offerId);
-        return fetch(`http://localhost:8080/api/offer/show?offerId=${encodedOfferId}`)
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error('Failed to load offer details');
-                }
-            })
-            .catch(error => {
-                console.error('Error loading offer details for:', offerId, error);
-                return null;
-            });
-    }
-
-    function addPropertyToList(offerDetails, addedAt, offerId) {
-        const propertiesList = document.getElementById('properties-list');
-        if (!propertiesList) return;
-
-        if (propertiesList.innerHTML.includes('Brak zapisanych ogłoszeń')) {
-            propertiesList.innerHTML = '';
-        }
-
-        const propertyElement = document.createElement('div');
-        propertyElement.className = 'property-item';
-
-        const imageUrl = offerDetails.image_url || 'assets/no-photo.jpg';
-        const address = offerDetails.city + ", " + offerDetails.street || 'Brak adresu';
-        const area = offerDetails.size_m2 || 'N/A';
-        const rooms = offerDetails.rooms || 'N/A';
-        const floor = offerDetails.floor || 'N/A';
-        const price = offerDetails.price_pln || 'Brak ceny';
-
-        propertyElement.innerHTML = `
-            <div class="property-container" onclick="openOfferLink('${offerId}')" style="cursor: pointer;">
-                <img src="${imageUrl}" alt="Mieszkanie" class="property-image" 
-                     onerror="this.src='https://via.placeholder.com/300x200?text=Brak+zdjęcia'">
-                <div class="property-details">
-                    <h4 class="property-address">${address}</h4>
-                    <p class="property-info">${area} • ${rooms} pokoje • ${floor}</p>
-                    <p class="property-price">${price} PLN</p>
-                    <p style="font-size: 12px; color: #666; margin-top: 5px;">
-                        Dodano: ${new Date(addedAt).toLocaleDateString('pl-PL')}
-                    </p>
-                </div>
-                <button class="remove-property-btn" onclick="event.stopPropagation(); removeFromWatchlist('${offerId}')" title="Usuń z obserwowanych">
-                    <span class="material-icons">delete</span>
-                </button>
-            </div>
-        `;
-
-        propertiesList.appendChild(propertyElement);
-    }
-
-    function displayEmptyWatchlist() {
-        const propertiesList = document.getElementById('properties-list');
-        if (!propertiesList) return;
-
-        propertiesList.innerHTML = `
-            <div style="text-align: center; padding: 30px; color: #666;">
-                <p>Wystąpił błąd podczas ładowania zapisanych ogłoszeń</p>
-                <p style="font-size: 14px;">Spróbuj odświeżyć stronę</p>
-            </div>
-        `;
-    }
-
-    function setupRegisterForm() {
-        console.log('Setting up register form');
-        const registerBtn = document.getElementById("registerBtn");
-        console.log('Register button found:', registerBtn);
-
-        if (registerBtn) {
-            registerBtn.addEventListener("click", async function (e) {
-                console.log('Register function started');
-
-                const username = document.getElementById('username').value;
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-                const confirmPassword = document.getElementById('confirmPassword').value;
-
-                if (password !== confirmPassword) {
-                    alert('Hasła nie są identyczne!');
-                    return;
-                }
-
-                const userData = {
-                    username: username,
-                    password: password,
-                    email: email
-                };
-
-                try {
-                    const response = await fetch('http://localhost:8080/api/users', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(userData)
-                    });
-
-                    if (response.ok) {
-                        const contentType = response.headers.get('content-type');
-                        let result;
-
-                        if (contentType && contentType.includes('application/json')) {
-                            result = await response.json();
-                        } else {
-                            result = await response.text();
-                        }
-
-                        console.log('Registration successful:', result);
-                        alert('Rejestracja przebiegła pomyślnie! Teraz możesz się zalogować.');
-                        showLogin(new Event('click'));
-                    } else {
-                        const error = await response.text();
-                        alert('Błąd rejestracji: ' + error);
+                    const existingScript = document.getElementById('register-script');
+                    if (existingScript) {
+                        existingScript.remove();
                     }
-                } catch (error) {
-                    alert('Błąd połączenia z serwerem: ' + error.message);
-                }
-            });
+
+                    const script = document.createElement('script');
+                    script.id = 'register-script';
+                    script.src = 'components/register.js';
+                    script.onload = function () {
+                        console.log('Register script loaded successfully');
+                        if (typeof setupRegisterForm === 'function') {
+                            setupRegisterForm();
+                        } else {
+                            console.error('setupRegisterForm function not found');
+                        }
+                    };
+                    script.onerror = function () {
+                        console.error('Failed to load register script');
+                    };
+                    document.head.appendChild(script);
+                });
         } else {
-            console.error('Register button not found!');
-        }
-    }
-
-    function loadUserData() {
-        console.log('Loading user data');
-
-        const userId = 'ba6e97db-1f6f-41fc-a80a-5f948f0ace8c';
-
-        fetch(`http://localhost:8080/api/users/${userId}`)
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error('Failed to load user data');
-                }
-            })
-            .then(userData => {
-                console.log('User data loaded:', userData);
-                updateUserInterface(userData);
-            })
-            .catch(error => {
-                console.error('Error loading user data:', error);
-                localStorage.removeItem('authToken');
-                updateNavigation();
-                showAccount(new Event('click'));
-            });
-    }
-
-    function updateUserInterface(userData) {
-        const usernameDisplay = document.querySelector('.username');
-        if (usernameDisplay) {
-            usernameDisplay.textContent = userData.email;
-        }
-
-        const avatarLetter = document.querySelector('.avatar-letter');
-        if (avatarLetter && userData.username) {
-            avatarLetter.textContent = userData.username.charAt(0).toUpperCase();
+            console.log('Register already loaded, setting up form');
+            if (typeof setupRegisterForm === 'function') {
+                setupRegisterForm();
+            } else {
+                console.error('setupRegisterForm function not found');
+            }
         }
     }
 
     function setupAccountForm() {
         console.log('Setting up account form');
-    }
-
-    function setupLoginForm() {
-        console.log('Setting up login form');
-        const loginBtn = document.getElementById("loginBtn");
-        console.log('Login button found:', loginBtn);
-
-        if (loginBtn) {
-            loginBtn.addEventListener("click", async function (e) {
-                console.log('Login function started');
-
-                const email = document.getElementById('loginEmail').value;
-                const password = document.getElementById('loginPassword').value;
-
-                if (!email || !password) {
-                    alert('Proszę wypełnić wszystkie pola!');
-                    return;
-                }
-
-                const loginData = {
-                    username: email,
-                    password: password
-                };
-
-                try {
-                    const response = await fetch('http://localhost:8080/api/users/login', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(loginData)
-                    });
-
-                    if (response.ok) {
-                        const contentType = response.headers.get('content-type');
-                        let result;
-
-                        if (contentType && contentType.includes('application/json')) {
-                            result = await response.json();
-                        } else {
-                            result = await response.text();
-                        }
-
-                        console.log('Login successful:', result);
-                        alert('Logowanie przebiegło pomyślnie!');
-
-                        if (result && result.token) {
-                            localStorage.setItem('authToken', result.token);
-                        } else {
-                            localStorage.setItem('authToken', 'logged_in_' + Date.now());
-                        }
-
-                        updateNavigation();
-                        showAccount(new Event('click'));
-                    } else {
-                        const error = await response.text();
-                        alert('Błąd logowania: ' + error);
-                    }
-                } catch (error) {
-                    alert('Błąd połączenia z serwerem: ' + error.message);
-                }
-            });
-        } else {
-            console.error('Login button not found!');
-        }
     }
 
     function hideAllContainers() {
@@ -468,52 +269,6 @@
         document.getElementById('login-placeholder').style.display = 'none';
         document.getElementById('register-placeholder').style.display = 'none';
         document.getElementById('account-placeholder').style.display = 'none';
-    }
-
-    function removeFromWatchlist(offerId) {
-        const userId = 'ba6e97db-1f6f-41fc-a80a-5f948f0ace8c';
-
-        if (!userId) {
-            console.log('Brak userId');
-            return;
-        }
-
-        if (confirm('Czy na pewno chcesz usunąć to ogłoszenie z obserwowanych?')) {
-            const url = `http://localhost:8080/api/watchLists/remove?userId=${encodeURIComponent(userId)}&offerId=${encodeURIComponent(offerId)}`;
-
-            fetch(url, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then(async response => {
-                    const data = await response.json().catch(() => ({}));
-                    if (response.ok) {
-                        console.log('Offer removed from watchlist');
-                        const propertiesList = document.getElementById('properties-list');
-                        if (propertiesList) {
-                            propertiesList.innerHTML = '';
-                            loadWatchlistProperties();
-                        }
-                    } else {
-                        throw new Error(data.message || 'Failed to remove offer from watchlist');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error removing from watchlist:', error);
-                    alert(`Błąd: ${error.message}`);
-                });
-        }
-    }
-
-    function openOfferLink(offerId) {
-        if (offerId && offerId.startsWith('http')) {
-            window.open(offerId, '_blank');
-        } else {
-            console.error('Invalid offer URL:', offerId);
-            alert('Nie można otworzyć linku do oferty');
-        }
     }
 
 </script>

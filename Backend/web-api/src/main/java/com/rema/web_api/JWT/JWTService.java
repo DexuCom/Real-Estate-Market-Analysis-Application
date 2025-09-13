@@ -30,10 +30,11 @@ public class JWTService {
     {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", user.getRole().name());
+        claims.put("username", user.getUsername());
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(user.getUsername())
+                .setSubject(user.getId().toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + this.jwtExpirationTime))
                 .signWith(getRealKey(), SignatureAlgorithm.HS256)
