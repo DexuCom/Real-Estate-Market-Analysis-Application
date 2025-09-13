@@ -56,6 +56,44 @@
         updateNavigation();
     });
 
+    // Function to decode JWT token and extract user ID
+    function getUserIdFromToken() {
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken || authToken.startsWith('logged_in_')) {
+            console.warn('No valid JWT token found');
+            return null;
+        }
+
+        try {
+            // JWT has 3 parts separated by dots: header.payload.signature
+            const parts = authToken.split('.');
+            if (parts.length !== 3) {
+                console.error('Invalid JWT token format');
+                return null;
+            }
+
+            // Decode the payload (second part)
+            const payload = JSON.parse(atob(parts[1]));
+            console.log('Decoded JWT payload:', payload);
+
+            return payload.sub; // 'sub' contains the user ID
+        } catch (error) {
+            console.error('Error decoding JWT token:', error);
+            return null;
+        }
+    }
+
+    // Function to get current user ID (with fallback)
+    function getCurrentUserId() {
+        const userId = getUserIdFromToken();
+        if (userId) {
+            return userId;
+        }
+
+        console.warn('Using fallback user ID');
+        return '853041d7-44c2-4646-807e-b3c12afe73c4'; // Fallback for development
+    }
+
     function updateNavigation() {
         const authToken = localStorage.getItem('authToken');
         const loginBtn = document.getElementById('login-btn');

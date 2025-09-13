@@ -12,7 +12,11 @@ function initializeAccountComponent() {
 function loadUserData() {
     console.log('Loading user data');
 
-    const userId = 'ba6e97db-1f6f-41fc-a80a-5f948f0ace8c';
+    const userId = getCurrentUserId();
+    if (!userId) {
+        console.error('Cannot load user data: No user ID available');
+        return;
+    }
 
     fetch(`http://localhost:8080/api/users/${userId}`)
         .then(response => {
@@ -52,7 +56,11 @@ function loadWatchlistProperties() {
     const propertiesListElement = document.getElementById('properties-list');
     console.log('Properties list element found:', propertiesListElement);
 
-    const userId = 'ba6e97db-1f6f-41fc-a80a-5f948f0ace8c';
+    const userId = getCurrentUserId();
+    if (!userId) {
+        console.error('Cannot load watchlist: No user ID available');
+        return;
+    }
 
     fetch(`http://localhost:8080/api/watchLists/${userId}`)
         .then(response => {
@@ -186,10 +194,11 @@ function displayEmptyWatchlist() {
 }
 
 function removeFromWatchlist(offerId) {
-    const userId = 'ba6e97db-1f6f-41fc-a80a-5f948f0ace8c';
+    const userId = getCurrentUserId();
 
     if (!userId) {
-        console.log('Brak userId');
+        console.error('Cannot remove from watchlist: No user ID available');
+        alert('Błąd: Brak informacji o użytkowniku');
         return;
     }
 

@@ -55,7 +55,14 @@ public class UserService {
 
     public String loginUser(UserLoginRequestDTO userLoginRequestDTO)
     {
-        User user = userRepository.findByUsername(userLoginRequestDTO.username()).get();
+        Optional<User> userOptional = userRepository.findByUsername(userLoginRequestDTO.username());
+        
+        if(userOptional.isEmpty())
+        {
+            throw new IllegalStateException("Niepoprawne dane logowania");
+        }
+        
+        User user = userOptional.get();
 
         if(BCrypt.checkpw(userLoginRequestDTO.password(), user.getPasswordHash()))
         {
@@ -64,9 +71,7 @@ public class UserService {
         }
         else
         {
-            throw new IllegalStateException("Niepoprawne haslo");
+            throw new IllegalStateException("Niepoprawne dane logowania");
         }
-
-
     }
 }
