@@ -9,6 +9,8 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.function.Function;
 
 import java.security.Key;
@@ -23,7 +25,7 @@ public class JWTService {
     @Value("${jwt.expiration}")
     private long jwtExpirationTime;
 
-
+    @Transactional
     public String generateToken(User user)
     {
         Map<String, Object> claims = new HashMap<>();
@@ -39,12 +41,13 @@ public class JWTService {
 
     }
 
+    @Transactional
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = getClaimsFromToken(token);
         return claimsResolver.apply(claims);
     }
 
-
+    @Transactional
     private Claims getClaimsFromToken(String token)
     {
         return Jwts.parserBuilder()
@@ -55,6 +58,7 @@ public class JWTService {
 
     }
 
+    @Transactional
     public boolean isTokenValid(String token, User user)
     {
         if(isTokenExpired(token))
@@ -72,16 +76,19 @@ public class JWTService {
 
     }
 
+    @Transactional
     public Role getUserRoleFromToken(String token)
     {
         return extractClaim(token, claims ->  Role.valueOf(claims.get("role", String.class)));
     }
 
+    @Transactional
     public boolean isTokenExpired(String token)
     {
         return extractClaim(token, Claims::getExpiration).before(new Date());
     }
 
+    @Transactional
     private Key getRealKey()
     {
         byte[] bytes = Decoders.BASE64.decode(key);

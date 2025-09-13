@@ -3,6 +3,7 @@ package com.rema.web_api.email;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class EmailService {
@@ -13,6 +14,7 @@ public class EmailService {
         this.mailSender = _mailSender;
     }
 
+    @Transactional
     public void sendVerificationEmail(String to, String verificationLink) {
 
         SimpleMailMessage message = new SimpleMailMessage();
@@ -24,6 +26,7 @@ public class EmailService {
         mailSender.send(message);
     }
 
+    @Transactional
     public void sendPasswordResetEmail(String to, String resetLink) {
 
         SimpleMailMessage message = new SimpleMailMessage();

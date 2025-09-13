@@ -2,6 +2,7 @@ package com.rema.web_api.offer;
 
 import com.opencsv.CSVReader;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class OfferService {
         return offerRepository.findById(offerId);
     }
 
+    @Transactional
     public List<Offer> registerOffers() {
 
         List<Offer> savedOffers = new ArrayList<>();

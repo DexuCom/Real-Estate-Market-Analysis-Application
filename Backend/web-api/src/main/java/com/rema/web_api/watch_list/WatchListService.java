@@ -1,6 +1,7 @@
 package com.rema.web_api.watch_list;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,6 +16,7 @@ public class WatchListService {
         this.watchListRepository = _watchListRepository;
     }
 
+    @Transactional
     public WatchList addWatchList(UUID userId, String offerId) {
 
         WatchListId id = new WatchListId(userId, offerId);
@@ -31,6 +33,7 @@ public class WatchListService {
         return watchListRepository.save(watchList);
     }
 
+    @Transactional
     public void deleteFromWatchList(UUID userId, String offerId) {
 
         WatchListId id = new WatchListId(userId, offerId);
@@ -43,6 +46,7 @@ public class WatchListService {
         }
     }
 
+    @Transactional
     public List<WatchList> getAllWatchListElements(UUID userId) {
 
         List<WatchList> userWatchList = watchListRepository.findByIdUserId(userId);
