@@ -298,7 +298,7 @@ if __name__ == "__main__":
     output_dir = "ScraperOutput"
     os.makedirs(output_dir, exist_ok=True)
     
-    data = asyncio.run(scrape_prices_and_streets(BASE_URL, pages=2))
+    data = asyncio.run(scrape_prices_and_streets(BASE_URL, pages=150))
 
     output_file = os.path.join(output_dir, f"{SELECTED_CITY}-morizon.csv")
     df = pd.DataFrame(data)
