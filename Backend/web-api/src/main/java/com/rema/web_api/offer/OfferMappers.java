@@ -8,6 +8,7 @@ public class OfferMappers {
         return OfferMapPointDTO.builder()
                 .id(offer.getId())
                 .latitude(offer.getLatitude())
-                .longitude(offer.getLongitude()).build();
+                .longitude(offer.getLongitude())
+                .pricePln(offer.getPricePln()).build();
     }
 }

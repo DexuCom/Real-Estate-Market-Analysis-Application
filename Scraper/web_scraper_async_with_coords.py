@@ -200,8 +200,8 @@ def parse_coords(html):
                 coords_data = data.get("coords", None)
                 if coords_data:
                     coords_data = coords_data.split(',')
-                    longitude = coords_data[0]
-                    latitude = coords_data[1]
+                    longitude = coords_data[1]
+                    latitude = coords_data[0]
                     return {
                         "longitude": longitude,
                         "latitude": latitude

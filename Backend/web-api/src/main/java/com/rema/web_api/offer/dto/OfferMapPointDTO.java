@@ -15,6 +15,8 @@ public class OfferMapPointDTO {
     private double longitude;
     private double latitude;
 
+    private Integer pricePln;
+
 }
 
 
