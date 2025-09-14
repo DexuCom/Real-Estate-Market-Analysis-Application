@@ -1,12 +1,17 @@
 package com.rema.web_api.offer;
 
-import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
+import com.rema.web_api.offer.dto.OfferMapPointDTO;
+import jakarta.annotation.PostConstruct;
+import org.apache.commons.io.input.BOMInputStream;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.math.BigDecimal;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,25 +22,28 @@ public class OfferService {
 
     private final OfferRepository offerRepository;
 
-    public OfferService (OfferRepository _offerRepository){
+    public OfferService(OfferRepository _offerRepository) {
         this.offerRepository = _offerRepository;
     }
 
-    public Optional<Offer> getOffer(String offerId) {
+    @PostConstruct
+    private void init() throws IOException {
+        this.registerOffers();
+    }
+
+    public Optional<Offer> getOffer(UUID offerId) {
         return offerRepository.findById(offerId);
     }
 
-    public List<Offer> registerOffers() {
+    public List<Offer> registerOffers() throws IOException {
 
         offerRepository.deleteAll();
 
         List<Offer> savedOffers = new ArrayList<>();
 
-        try {
+        try (BOMInputStream bomInputStream = new BOMInputStream(new ClassPathResource("offers.csv").getInputStream());
+             Reader reader = new InputStreamReader(bomInputStream, StandardCharsets.UTF_8)) {
 
-            InputStreamReader reader = new InputStreamReader(
-                    getClass().getResourceAsStream("/offers.csv")
-            );
 
             CsvToBean<OfferCsv> csvToBean = new CsvToBeanBuilder<OfferCsv>(reader)
                     .withType(OfferCsv.class)
@@ -43,22 +51,20 @@ public class OfferService {
                     .build();
             List<OfferCsv> offerCsvList = csvToBean.parse();
 
-            for(OfferCsv offerCsv : offerCsvList)
-            {
+            for (OfferCsv offerCsv : offerCsvList) {
                 Offer offer = Offer.builder()
-                        .id(UUID.randomUUID())
                         .city(offerCsv.getCity())
                         .street(offerCsv.getStreet())
-                        .price_pln(offerCsv.getPrice_pln())
-                        .size_m2(offerCsv.getSize_m2())
+                        .pricePln(offerCsv.getPricePln())
+                        .sizeM2(offerCsv.getSize_m2())
                         .rooms(offerCsv.getRooms())
                         .floor(offerCsv.getFloor())
-                        .image_url(offerCsv.getImage_url())
-                        .detail_url(offerCsv.getDetail_url())
-                        .year_built(offerCsv.getYear_built())
+                        .imageUrl(offerCsv.getImageUrl())
+                        .detailUrl(offerCsv.getDetailUrl())
+                        .yearBuilt(offerCsv.getYearBuilt())
                         .market(offerCsv.getMarket())
                         .heating(offerCsv.getHeating())
-                        .total_floors(offerCsv.getTotal_floors())
+                        .totalFloors(offerCsv.getTotalFloors())
                         .intercom(offerCsv.getIntercom())
                         .basement(offerCsv.getBasement())
                         .furnished(offerCsv.getFurnished())
@@ -80,5 +86,12 @@ public class OfferService {
         }
 
         return savedOffers;
+    }
+
+
+    public List<OfferMapPointDTO> getAllMapPoints() {
+        List<Offer> offers = offerRepository.findAll();
+        return offers.stream().map(OfferMappers::mapToOfferMapPointDTO).toList();
+
     }
 }

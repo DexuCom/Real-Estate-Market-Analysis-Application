@@ -1,15 +1,10 @@
 package com.rema.web_api.offer;
 
 import com.opencsv.bean.CsvBindByName;
-import com.opencsv.bean.CsvToBean;
-import com.opencsv.bean.CsvToBeanBuilder;
 import lombok.Data;
-
-import java.math.BigDecimal;
 
 @Data
 public class OfferCsv {
-
 
 
     @CsvBindByName(column = "city")
@@ -19,7 +14,7 @@ public class OfferCsv {
     private String street;
 
     @CsvBindByName(column = "price_pln")
-    private Integer price_pln;
+    private Integer pricePln;
 
     @CsvBindByName(column = "size_m2")
     private String size_m2;
@@ -31,11 +26,11 @@ public class OfferCsv {
     private String floor;
 
     @CsvBindByName(column = "image_url")
-    private String image_url;
+    private String imageUrl;
     @CsvBindByName(column = "detail_url")
-    private String detail_url;
+    private String detailUrl;
     @CsvBindByName(column = "year_built")
-    private Integer year_built;
+    private Integer yearBuilt;
 
     @CsvBindByName(column = "market")
     private String market;
@@ -44,7 +39,7 @@ public class OfferCsv {
     private String heating;
 
     @CsvBindByName(column = "total_floors")
-    private Integer total_floors;
+    private Integer totalFloors;
 
     @CsvBindByName(column = "intercom")
     private Integer intercom;
@@ -58,10 +53,10 @@ public class OfferCsv {
     @CsvBindByName(column = "elevator")
     private Integer elevator;
 
-    @CsvBindByName(column = "parkingSpace")
+    @CsvBindByName(column = "parking_space")
     private Integer parkingSpace;
 
-    @CsvBindByName(column = "gatedProperty")
+    @CsvBindByName(column = "gated_property")
     private Integer gatedProperty;
 
     @CsvBindByName(column = "balcony")
@@ -74,8 +69,8 @@ public class OfferCsv {
     private Integer garden;
 
     @CsvBindByName(column = "latitude")
-    private BigDecimal latitude;
+    private double latitude;
 
     @CsvBindByName(column = "longitude")
-    private BigDecimal longitude;
+    private double longitude;
 }

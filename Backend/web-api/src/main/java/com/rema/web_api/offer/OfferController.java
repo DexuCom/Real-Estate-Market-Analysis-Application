@@ -2,13 +2,16 @@ package com.rema.web_api.offer;
 
 import com.rema.web_api.global.dto.ErrorDTO;
 import com.rema.web_api.offer.dto.OfferDTO;
+import com.rema.web_api.offer.dto.OfferMapPointDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/offer")
@@ -30,11 +33,13 @@ public class OfferController {
             return ResponseEntity.
                     badRequest()
                     .body(errorDTO);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @GetMapping("/show")
-    public ResponseEntity<?> getOffer(@RequestParam String offerId) {
+    public ResponseEntity<?> getOffer(@RequestParam UUID offerId) {
 
         Optional<Offer> offerOptional = offerService.getOffer(offerId);
 
@@ -49,19 +54,20 @@ public class OfferController {
 
         Offer offer = offerOptional.get();
         OfferDTO offerDTO = OfferDTO.builder()
-                .offerId(offer.getId().toString())
+                .id(offer.getId())
+                .detailUrl(offer.getId().toString())
                 .city(offer.getCity())
                 .street(offer.getStreet())
-                .price_pln(offer.getPrice_pln())
-                .size_m2(offer.getSize_m2())
+                .pricePln(offer.getPricePln())
+                .sizeM2(offer.getSizeM2())
                 .rooms(offer.getRooms())
                 .floor(offer.getFloor())
-                .image_url(offer.getImage_url())
-                .detail_url(offer.getDetail_url())
-                .year_built(offer.getYear_built())
+                .imageUrl(offer.getImageUrl())
+                .detailUrl(offer.getDetailUrl())
+                .yearBuilt(offer.getYearBuilt())
                 .market(offer.getMarket())
                 .heating(offer.getHeating())
-                .total_floors(offer.getTotal_floors())
+                .totalFloors(offer.getTotalFloors())
                 .intercom(offer.getIntercom())
                 .basement(offer.getBasement())
                 .furnished(offer.getFurnished())
@@ -75,5 +81,16 @@ public class OfferController {
 
 
         return ResponseEntity.ok(offerDTO);
+    }
+
+    @GetMapping("/map-points")
+    public ResponseEntity<List<OfferMapPointDTO>> getAllMapPoints() {
+        try {
+            List<OfferMapPointDTO> offerMapPointDTOList = offerService.getAllMapPoints();
+            return ResponseEntity.ok(offerMapPointDTOList);
+        } catch (Exception ex) {
+            return ResponseEntity.internalServerError().build();
+        }
+
     }
 }
