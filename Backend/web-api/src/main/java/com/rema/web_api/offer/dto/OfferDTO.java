@@ -17,6 +17,7 @@ public class OfferDTO {
     private String rooms;
     private String floor;
     private String image_url;
+    private String detail_url;
     private Integer year_built;
     private String market;
     private String heating;

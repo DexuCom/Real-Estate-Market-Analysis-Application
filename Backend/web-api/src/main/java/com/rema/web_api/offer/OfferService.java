@@ -1,12 +1,16 @@
 package com.rema.web_api.offer;
 
 import com.opencsv.CSVReader;
+import com.opencsv.bean.CsvToBean;
+import com.opencsv.bean.CsvToBeanBuilder;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class OfferService {
@@ -23,6 +27,8 @@ public class OfferService {
 
     public List<Offer> registerOffers() {
 
+        offerRepository.deleteAll();
+
         List<Offer> savedOffers = new ArrayList<>();
 
         try {
@@ -30,55 +36,45 @@ public class OfferService {
             InputStreamReader reader = new InputStreamReader(
                     getClass().getResourceAsStream("/offers.csv")
             );
-            CSVReader csvReader = new CSVReader(reader);
 
-            String[] line;
-            boolean headerLine = true;
+            CsvToBean<OfferCsv> csvToBean = new CsvToBeanBuilder<OfferCsv>(reader)
+                    .withType(OfferCsv.class)
+                    .withIgnoreLeadingWhiteSpace(true)
+                    .build();
+            List<OfferCsv> offerCsvList = csvToBean.parse();
 
-            while ((line = csvReader.readNext()) != null) {
-
-                if (headerLine) {
-
-                    headerLine = false;
-                    continue;
-                }
-
-                String offerId = line[6];
-
-                Optional<Offer> existingOffer = offerRepository.findById(offerId);
-                if (existingOffer.isPresent()) {
-                    continue;
-                }
-
+            for(OfferCsv offerCsv : offerCsvList)
+            {
                 Offer offer = Offer.builder()
-                        .offerId(line[6])
-                        .city(line[0])
-                        .street(line[1])
-                        .price_pln(Integer.valueOf(line[2]))
-                        .size_m2(line[3])
-                        .rooms(line[4])
-                        .floor(line[5])
-                        .image_url(line[7])
-                        .year_built(Integer.valueOf(line[8]))
-                        .market(line[9])
-                        .heating(line[10])
-                        .total_floors(Integer.valueOf(line[11]))
-                        .intercom(Integer.valueOf(line[12]))
-                        .basement(Integer.valueOf(line[13]))
-                        .furnished(Integer.valueOf(line[14]))
-                        .elevator(Integer.valueOf(line[15]))
-                        .parkingSpace(Integer.valueOf(line[16]))
-                        .gatedProperty(Integer.valueOf(line[17]))
-                        .balcony(Integer.valueOf(line[18]))
-                        .terrace(Integer.valueOf(line[19]))
-                        .garden(Integer.valueOf(line[20]))
+                        .id(UUID.randomUUID())
+                        .city(offerCsv.getCity())
+                        .street(offerCsv.getStreet())
+                        .price_pln(offerCsv.getPrice_pln())
+                        .size_m2(offerCsv.getSize_m2())
+                        .rooms(offerCsv.getRooms())
+                        .floor(offerCsv.getFloor())
+                        .image_url(offerCsv.getImage_url())
+                        .detail_url(offerCsv.getDetail_url())
+                        .year_built(offerCsv.getYear_built())
+                        .market(offerCsv.getMarket())
+                        .heating(offerCsv.getHeating())
+                        .total_floors(offerCsv.getTotal_floors())
+                        .intercom(offerCsv.getIntercom())
+                        .basement(offerCsv.getBasement())
+                        .furnished(offerCsv.getFurnished())
+                        .elevator(offerCsv.getElevator())
+                        .parkingSpace(offerCsv.getParkingSpace())
+                        .gatedProperty(offerCsv.getGatedProperty())
+                        .balcony(offerCsv.getBalcony())
+                        .terrace(offerCsv.getTerrace())
+                        .garden(offerCsv.getGarden())
+                        .latitude(offerCsv.getLatitude())
+                        .longitude(offerCsv.getLongitude())
                         .build();
-
                 offerRepository.save(offer);
                 savedOffers.add(offer);
             }
 
-            csvReader.close();
         } catch (Exception e) {
             throw new IllegalStateException(e.getMessage());
         }

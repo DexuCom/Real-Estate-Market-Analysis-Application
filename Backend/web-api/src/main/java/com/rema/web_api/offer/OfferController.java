@@ -20,14 +20,11 @@ public class OfferController {
     @PostMapping("/add")
     public ResponseEntity<?> addData() {
 
-        try
-        {
+        try {
             List<Offer> offer = offerService.registerOffers();
 
             return ResponseEntity.ok().build();
-        }
-        catch (IllegalStateException e)
-        {
+        } catch (IllegalStateException e) {
             ErrorDTO errorDTO = new ErrorDTO(e.getMessage(), HttpStatus.BAD_REQUEST.value());
 
             return ResponseEntity.
@@ -52,7 +49,7 @@ public class OfferController {
 
         Offer offer = offerOptional.get();
         OfferDTO offerDTO = OfferDTO.builder()
-                .offerId(offer.getOfferId())
+                .offerId(offer.getId().toString())
                 .city(offer.getCity())
                 .street(offer.getStreet())
                 .price_pln(offer.getPrice_pln())
@@ -60,6 +57,7 @@ public class OfferController {
                 .rooms(offer.getRooms())
                 .floor(offer.getFloor())
                 .image_url(offer.getImage_url())
+                .detail_url(offer.getDetail_url())
                 .year_built(offer.getYear_built())
                 .market(offer.getMarket())
                 .heating(offer.getHeating())

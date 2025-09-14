@@ -6,8 +6,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
 
+import java.util.UUID;
+
 @Entity
-@Table(name="offer")
+@Table(name = "offer")
 @Getter
 @Setter
 @Builder
@@ -16,8 +18,7 @@ import lombok.*;
 public class Offer {
 
     @Id
-    @Column(length = 1000)
-    private String offerId;
+    private UUID id;
 
     private String city;
     private String street;
@@ -27,6 +28,8 @@ public class Offer {
     private String floor;
     @Column(length = 1000)
     private String image_url;
+    @Column(length = 1000)
+    private String detail_url;
     private Integer year_built;
     private String market;
     private String heating;
@@ -40,4 +43,7 @@ public class Offer {
     private Integer balcony;
     private Integer terrace;
     private Integer garden;
+
+    private double longitude;
+    private double latitude;
 }
