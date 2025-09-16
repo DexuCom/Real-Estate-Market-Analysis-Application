@@ -56,17 +56,84 @@
         updateNavigation();
     });
 
+    function base64UrlDecode(str) {
+        str = str.replace(/-/g, '+').replace(/_/g, '/');
+
+        while (str.length % 4) {
+            str += '=';
+        }
+
+        return atob(str);
+    }
+
+    function getUserIdFromToken() {
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken || authToken.startsWith('logged_in_')) {
+            console.warn('No valid JWT token found');
+            return null;
+        }
+
+        try {
+            const parts = authToken.split('.');
+            if (parts.length !== 3) {
+                console.error('Invalid JWT token format');
+                return null;
+            }
+
+            const payload = JSON.parse(base64UrlDecode(parts[1]));
+            console.log('Decoded JWT payload:', payload);
+
+            return payload.sub;
+        } catch (error) {
+            console.error('Error decoding JWT token:', error);
+            return null;
+        }
+    }
+
+    function getCurrentUserId() {
+        const userId = getUserIdFromToken();
+        if (userId) {
+            return userId;
+        }
+    }
+
+    function isTokenExpired() {
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken || authToken.startsWith('logged_in_')) {
+            return true;
+        }
+
+        try {
+            const parts = authToken.split('.');
+            if (parts.length !== 3) return true;
+
+            const payload = JSON.parse(base64UrlDecode(parts[1]));
+            const currentTime = Math.floor(Date.now() / 1000);
+
+            return payload.exp && payload.exp < currentTime;
+        } catch (error) {
+            console.error('Error checking token expiration:', error);
+            return true;
+        }
+    }
+
     function updateNavigation() {
         const authToken = localStorage.getItem('authToken');
         const loginBtn = document.getElementById('login-btn');
         const registerBtn = document.getElementById('register-btn');
         const logoutBtn = document.getElementById('logout-btn');
 
-        if (authToken) {
+        if (authToken && !isTokenExpired()) {
             loginBtn.style.display = 'none';
             registerBtn.style.display = 'none';
             logoutBtn.style.display = 'block';
         } else {
+            if (authToken && isTokenExpired()) {
+                localStorage.removeItem('authToken');
+                alert('Twoja sesja wygasła. Zaloguj się ponownie.');
+                console.log('Expired token removed');
+            }
+
             loginBtn.style.display = 'block';
             registerBtn.style.display = 'block';
             logoutBtn.style.display = 'none';

@@ -1,1 +1,1 @@
-Home page parallax effect, code refactoring, files management
+Updated README.MD, CORS fixed, error message on wrong login/password, removed old ScraperOutput folder

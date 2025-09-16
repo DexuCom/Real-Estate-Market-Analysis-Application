@@ -1,13 +1,12 @@
 package com.rema.web_api.offer;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.UUID;
+
 @Entity
-@Table(name="offer")
+@Table(name = "offer")
 @Getter
 @Setter
 @Builder
@@ -16,21 +15,24 @@ import lombok.*;
 public class Offer {
 
     @Id
-    @Column(length = 1000)
-    private String offerId;
+    @GeneratedValue
+    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
+    private UUID id;
 
     private String city;
     private String street;
-    private Integer price_pln;
-    private String size_m2;
+    private Integer pricePln;
+    private String sizeM2;
     private String rooms;
     private String floor;
     @Column(length = 1000)
-    private String image_url;
-    private Integer year_built;
+    private String imageUrl;
+    @Column(length = 1000)
+    private String detailUrl;
+    private Integer yearBuilt;
     private String market;
     private String heating;
-    private Integer total_floors;
+    private Integer totalFloors;
     private Integer intercom;
     private Integer basement;
     private Integer furnished;
@@ -40,4 +42,7 @@ public class Offer {
     private Integer balcony;
     private Integer terrace;
     private Integer garden;
+
+    private double longitude;
+    private double latitude;
 }
