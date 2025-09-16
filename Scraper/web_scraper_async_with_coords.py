@@ -200,8 +200,8 @@ def parse_coords(html):
                 coords_data = data.get("coords", None)
                 if coords_data:
                     coords_data = coords_data.split(',')
-                    longitude = coords_data[0]
-                    latitude = coords_data[1]
+                    longitude = coords_data[1]
+                    latitude = coords_data[0]
                     return {
                         "longitude": longitude,
                         "latitude": latitude
@@ -247,12 +247,12 @@ async def scrape_prices_and_streets(base_url, pages=1):
             item["heating"] = heating
             total_floors = parse_total_floors(detail_soup)
             item["total_floors"] = total_floors
-            item["Intercom"] = parse_boolean_feature(detail_soup, DOMOFON_RE)
-            item["Basement"] = parse_boolean_feature(detail_soup, PIWNICA_RE)
-            item["Furnished"] = parse_boolean_feature(detail_soup, MEBLE_RE)
-            item["Elevator"] = parse_boolean_feature(detail_soup, WINDA_RE)
-            item["Parking space"] = parse_boolean_feature(detail_soup, MIEJSCE_POSTOJOWE_RE)
-            item["Gated property"] = parse_boolean_feature(detail_soup, OBIEKT_ZAMKNIETY_RE)
+            item["intercom"] = parse_boolean_feature(detail_soup, DOMOFON_RE)
+            item["basement"] = parse_boolean_feature(detail_soup, PIWNICA_RE)
+            item["furnished"] = parse_boolean_feature(detail_soup, MEBLE_RE)
+            item["elevator"] = parse_boolean_feature(detail_soup, WINDA_RE)
+            item["parking_space"] = parse_boolean_feature(detail_soup, MIEJSCE_POSTOJOWE_RE)
+            item["gated_property"] = parse_boolean_feature(detail_soup, OBIEKT_ZAMKNIETY_RE)
             item["balcony"] = parse_balcony(detail_soup)
             item["terrace"] = parse_terrace(detail_soup)
             item["garden"] = parse_garden(detail_soup)
@@ -298,7 +298,7 @@ if __name__ == "__main__":
     output_dir = "ScraperOutput"
     os.makedirs(output_dir, exist_ok=True)
     
-    data = asyncio.run(scrape_prices_and_streets(BASE_URL, pages=2))
+    data = asyncio.run(scrape_prices_and_streets(BASE_URL, pages=20))
 
     output_file = os.path.join(output_dir, f"{SELECTED_CITY}-morizon.csv")
     df = pd.DataFrame(data)
