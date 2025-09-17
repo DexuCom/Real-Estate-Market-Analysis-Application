@@ -1,1 +1,1 @@
-Updated README.MD, CORS fixed, error message on wrong login/password, removed old ScraperOutput folder
+Updated map and watchlist to use new api requests

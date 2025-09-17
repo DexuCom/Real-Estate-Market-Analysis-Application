@@ -188,47 +188,40 @@ function toggleHeatmap() {
 }
 
 function loadPropertyData() {
-    console.log('Loading property data from CSV...');
-    fetch('../../Scraper/ScraperOutput/Gdańsk-morizon.csv')
+    console.log('Loading property data from API...');
+    fetch('http://localhost:8080/api/offer/map-points')
         .then(response => {
             console.log('Fetch response status:', response.status);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            return response.text();
+            return response.json();
         })
-        .then(csvText => {
-            console.log('CSV text loaded, length:', csvText.length);
-            console.log('First 500 chars:', csvText.substring(0, 500));
+        .then(data => {
+            console.log('Property data loaded from API, count:', data.length);
+            console.log('Sample data:', data.slice(0, 3));
 
-            Papa.parse(csvText, {
-                header: true,
-                skipEmptyLines: true,
-                complete: function (results) {
-                    console.log('CSV parsing complete, data rows:', results.data.length);
-                    results.data.forEach(function (row, index) {
-                        console.log(`Row ${index}:`, {
-                            coords: row.coords,
-                            street: row.street,
-                            price_pln: row.price_pln,
-                            size_m2: row.size_m2
-                        });
+            data.forEach(function (offer, index) {
+                console.log(`Offer ${index}:`, {
+                    id: offer.id,
+                    latitude: offer.latitude,
+                    longitude: offer.longitude,
+                    pricePln: offer.pricePln
+                });
 
-                        if (row.coords) {
-                            const coordsString = row.coords.replace(/['"]/g, '');
-                            const [lat, lng] = coordsString.split(',').map(coord => parseFloat(coord.trim()));
+                if (offer.latitude && offer.longitude) {
+                    const lat = parseFloat(offer.latitude);
+                    const lng = parseFloat(offer.longitude);
 
-                            console.log(`Parsed coordinates for ${row.street}: lat=${lat}, lng=${lng}`);
+                    console.log(`Parsed coordinates for offer ${offer.id}: lat=${lat}, lng=${lng}`);
 
-                            if (!isNaN(lat) && !isNaN(lng)) {
-                                createPropertyMarker(row, lat, lng);
-                            } else {
-                                console.error(`Invalid coordinates for ${row.street}:`, coordsString);
-                            }
-                        } else {
-                            console.warn(`Missing coords for row ${index}:`, row);
-                        }
-                    });
+                    if (!isNaN(lat) && !isNaN(lng)) {
+                        createPropertyMarker(offer, lat, lng);
+                    } else {
+                        console.error(`Invalid coordinates for offer ${offer.id}:`, offer.latitude, offer.longitude);
+                    }
+                } else {
+                    console.warn(`Missing coordinates for offer ${index}:`, offer);
                 }
             });
         })
@@ -237,8 +230,9 @@ function loadPropertyData() {
         });
 }
 
-function createPropertyMarker(row, lat, lng) {
-    const pricePerSqm = calculatePricePerSqm(row.price_pln, row.size_m2);
+function createPropertyMarker(offer, lat, lng) {
+    const estimatedSize = 50;
+    const pricePerSqm = offer.pricePln / estimatedSize;
     const iconColor = getColorByPrice(pricePerSqm);
 
     const minPrice = 5000;
@@ -258,7 +252,7 @@ function createPropertyMarker(row, lat, lng) {
     const marker = L.marker([lat, lng], { icon: homeIcon }).addTo(map);
 
     marker.on('click', function () {
-        showPropertyPanel(row, pricePerSqm);
+        showPropertyPanel(offer, pricePerSqm);
     });
 
     setTimeout(() => {
@@ -269,7 +263,7 @@ function createPropertyMarker(row, lat, lng) {
     }, 100);
 }
 
-async function showPropertyPanel(row, pricePerSqm) {
+async function showPropertyPanel(offer, pricePerSqm) {
     const panel = document.getElementById('propertyPanel');
 
     const addButton = document.getElementById('addToWatchlist');
@@ -282,10 +276,10 @@ async function showPropertyPanel(row, pricePerSqm) {
     panel.classList.add('active');
 
     try {
-        const response = await fetch(`http://localhost:8080/api/offer/show?offerId=${encodeURIComponent(row.detail_url)}`);
+        const response = await fetch(`http://localhost:8080/api/offer/show?offerId=${encodeURIComponent(offer.id)}`);
         if (response.ok) {
             const offerDetails = await response.json();
-            populatePropertyDetails(offerDetails, row, pricePerSqm);
+            populatePropertyDetails(offerDetails, offer, pricePerSqm);
         } else {
             setErrorState('Błąd pobierania danych z API');
         }
@@ -334,22 +328,22 @@ function setErrorState(errorMessage) {
     document.getElementById('addToWatchlist').onclick = null;
 }
 
-function populatePropertyDetails(offerDetails, row, pricePerSqm) {
+function populatePropertyDetails(offerDetails, offer, pricePerSqm) {
     document.getElementById('propertyStreet').textContent = offerDetails.street || 'Brak danych';
-    document.getElementById('currentPrice').textContent = (offerDetails.price_pln ? offerDetails.price_pln.toLocaleString() + ' PLN' : 'Brak danych');
-    document.getElementById('propertySize').textContent = offerDetails.size_m2 || 'Brak danych';
+    document.getElementById('currentPrice').textContent = (offerDetails.pricePln ? offerDetails.pricePln.toLocaleString() + ' PLN' : 'Brak danych');
+    document.getElementById('propertySize').textContent = offerDetails.sizeM2 || 'Brak danych';
     document.getElementById('propertyRooms').textContent = offerDetails.rooms || 'Brak danych';
     document.getElementById('propertyFloor').textContent = offerDetails.floor || 'Brak danych';
-    document.getElementById('propertyYear').textContent = offerDetails.year_built || 'Brak danych';
+    document.getElementById('propertyYear').textContent = offerDetails.yearBuilt || 'Brak danych';
     document.getElementById('propertyMarket').textContent = offerDetails.market ? `Rynek ${offerDetails.market}` : 'Brak danych';
     document.getElementById('propertyHeating').textContent = offerDetails.heating || 'Brak danych';
-    document.getElementById('propertyTotalFloors').textContent = offerDetails.total_floors ? `Budynek ${offerDetails.total_floors}-piętrowy` : 'Brak danych';
+    document.getElementById('propertyTotalFloors').textContent = offerDetails.totalFloors ? `Budynek ${offerDetails.totalFloors}-piętrowy` : 'Brak danych';
 
     let apiPricePerSqm = pricePerSqm;
-    if (offerDetails.price_pln && offerDetails.size_m2) {
-        const sizeNum = parseFloat(offerDetails.size_m2.toString().replace(/[^\d]/g, ''));
+    if (offerDetails.pricePln && offerDetails.sizeM2) {
+        const sizeNum = parseFloat(offerDetails.sizeM2.toString().replace(/[^\d]/g, ''));
         if (sizeNum > 0) {
-            apiPricePerSqm = offerDetails.price_pln / sizeNum;
+            apiPricePerSqm = offerDetails.pricePln / sizeNum;
         }
     }
     document.getElementById('pricePerSqm').textContent = Math.round(apiPricePerSqm).toLocaleString() + ' zł / m²';
@@ -359,11 +353,11 @@ function populatePropertyDetails(offerDetails, row, pricePerSqm) {
     setPropertyImage(offerDetails);
 
     document.getElementById('viewOffer').onclick = function () {
-        window.open(row.detail_url, '_blank');
+        window.open(offerDetails.detailUrl, '_blank');
     };
 
     document.getElementById('addToWatchlist').onclick = function () {
-        addToWatchlist(row.detail_url);
+        addToWatchlist(offer.id);
     };
 }
 
@@ -391,8 +385,8 @@ function setPropertyAmenities(offerDetails) {
 function setPropertyImage(offerDetails) {
     const imageDiv = document.getElementById('propertyImage');
 
-    if (offerDetails.image_url) {
-        imageDiv.innerHTML = `<img src="${offerDetails.image_url}" alt="Zdjęcie mieszkania">`;
+    if (offerDetails.imageUrl) {
+        imageDiv.innerHTML = `<img src="${offerDetails.imageUrl}" alt="Zdjęcie mieszkania">`;
     } else {
         imageDiv.innerHTML = '<div style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #666; font-family: \'Outfit\', Arial, sans-serif;">Brak zdjęcia</div>';
     }
@@ -407,7 +401,7 @@ function addToWatchlist(offerId) {
         return;
     }
 
-    const userId = parent.getCurrentUserId(); // Get from parent window (index.html)
+    const userId = parent.getCurrentUserId();
     if (!userId) {
         alert('Błąd: Brak informacji o użytkowniku. Zaloguj się ponownie.');
         return;

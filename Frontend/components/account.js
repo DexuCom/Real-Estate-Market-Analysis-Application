@@ -150,17 +150,17 @@ function addPropertyToList(offerDetails, addedAt, offerId) {
     const propertyElement = document.createElement('div');
     propertyElement.className = 'property-item';
 
-    const imageUrl = offerDetails.image_url || 'assets/no-photo.jpg';
+    const imageUrl = offerDetails.imageUrl || 'assets/no-photo.jpg';
     const address = offerDetails.city + ", " + offerDetails.street || 'Brak adresu';
-    const area = offerDetails.size_m2 || 'N/A';
+    const area = offerDetails.sizeM2 || 'N/A';
     const rooms = offerDetails.rooms || 'N/A';
     const floor = offerDetails.floor || 'N/A';
-    const price = offerDetails.price_pln || 'Brak ceny';
+    const price = offerDetails.pricePln || 'Brak ceny';
 
     console.log('Creating property element with data:', { imageUrl, address, area, rooms, floor, price });
 
     propertyElement.innerHTML = `
-        <div class="property-container" onclick="openOfferLink('${offerId}')" style="cursor: pointer;">
+        <div class="property-container" onclick="openOfferLink('${offerDetails.detailUrl}')" style="cursor: pointer;">
             <img src="${imageUrl}" alt="Mieszkanie" class="property-image" 
                  onerror="this.src='https://via.placeholder.com/300x200?text=Brak+zdjęcia'">
             <div class="property-details">
@@ -231,11 +231,11 @@ function removeFromWatchlist(offerId) {
     }
 }
 
-function openOfferLink(offerId) {
-    if (offerId && offerId.startsWith('http')) {
-        window.open(offerId, '_blank');
+function openOfferLink(detailUrl) {
+    if (detailUrl && detailUrl.startsWith('http')) {
+        window.open(detailUrl, '_blank');
     } else {
-        console.error('Invalid offer URL:', offerId);
+        console.error('Invalid offer URL:', detailUrl);
         alert('Nie można otworzyć linku do oferty');
     }
 }
