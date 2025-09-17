@@ -5,6 +5,7 @@ var currentLayer = null;
 var heatmapLayer = null;
 var heatmapData = [];
 var markerClusterGroup = null;
+var allOffers = [];
 
 function initializeRealEstateMap() {
     console.log('Initializing Real Estate Map');
@@ -135,8 +136,8 @@ function setupEventListeners() {
 }
 
 function calculatePricePerSqm(price, size) {
-    const priceNum = parseFloat(price.replace(/[^\d]/g, ''));
-    const sizeNum = parseFloat(size.replace(/[^\d]/g, ''));
+    const priceNum = parseFloat(price.replace(/[^\d.]/g, ''));
+    const sizeNum = parseFloat(size.replace(/[^\d.]/g, ''));
     return sizeNum > 0 ? priceNum / sizeNum : 0;
 }
 
@@ -145,6 +146,26 @@ function createBackgroundHeatmapData() {
     const bounds = map.getBounds();
     const latRange = bounds.getNorth() - bounds.getSouth();
     const lngRange = bounds.getEast() - bounds.getWest();
+
+    let totalPricePerSqm = 0;
+    let validOffers = 0;
+
+    allOffers.forEach(offer => {
+        if (offer.sizeM2 && offer.pricePln) {
+            const pricePerSqm = calculatePricePerSqm(offer.pricePln.toString(), offer.sizeM2.toString());
+            if (pricePerSqm > 0) {
+                totalPricePerSqm += pricePerSqm;
+                validOffers++;
+            }
+        }
+    });
+
+    const averagePricePerSqm = validOffers > 0 ? totalPricePerSqm / validOffers : 12500;
+
+    const minPrice = 5000;
+    const maxPrice = 20000;
+    let averageIntensity = (averagePricePerSqm - minPrice) / (maxPrice - minPrice);
+    averageIntensity = Math.max(0.1, Math.min(0.9, averageIntensity));
 
     const gridSize = 25;
     const latStep = latRange / gridSize;
@@ -155,7 +176,7 @@ function createBackgroundHeatmapData() {
             const lat = bounds.getSouth() + (i * latStep);
             const lng = bounds.getWest() + (j * lngStep);
 
-            backgroundPoints.push([lat, lng, 0.01]);
+            backgroundPoints.push([lat, lng, averageIntensity]);
         }
     }
     return backgroundPoints;
@@ -169,18 +190,23 @@ function toggleHeatmap() {
             const backgroundData = createBackgroundHeatmapData();
             const combinedData = [...backgroundData, ...heatmapData];
 
+            const currentZoom = map.getZoom();
+            const baseOpacity = Math.max(0.05, 0.25 - (currentZoom - 11) * 0.03);
+            const maxOpacity = Math.max(0.08, baseOpacity * 1.5);
+
             heatmapLayer = L.heatLayer(combinedData, {
-                radius: 70,
-                blur: 50,
-                maxZoom: 15,
-                minOpacity: 0.15,
+                radius: Math.max(30, 80 - (currentZoom - 11) * 5),
+                blur: Math.max(20, 60 - (currentZoom - 11) * 5),
+                maxZoom: 18,
+                minOpacity: Math.max(0.01, baseOpacity * 0.3),
+                maxOpacity: maxOpacity,
                 gradient: {
-                    0.0: '#4CAF50',
-                    0.1: '#4CAF50',
-                    0.3: '#66BB6A',
-                    0.5: '#FFC107',
-                    0.7: '#FF9800',
-                    1.0: '#F44336'
+                    0.0: `rgba(76, 175, 80, ${baseOpacity})`,
+                    0.2: `rgba(139, 195, 74, ${baseOpacity * 1.1})`,
+                    0.4: `rgba(255, 235, 59, ${baseOpacity * 1.2})`,
+                    0.6: `rgba(255, 193, 7, ${baseOpacity * 1.2})`,
+                    0.8: `rgba(255, 152, 0, ${baseOpacity * 1.3})`,
+                    1.0: `rgba(244, 67, 54, ${baseOpacity * 1.3})`
                 }
             }).addTo(map);
         }
@@ -200,6 +226,7 @@ function loadPropertyData() {
     }
 
     heatmapData = [];
+    allOffers = [];
 
     fetch('http://localhost:8080/api/offer/map-points')
         .then(response => {
@@ -213,28 +240,37 @@ function loadPropertyData() {
             console.log('Property data loaded from API, count:', data.length);
             console.log('Sample data:', data.slice(0, 3));
 
-            data.forEach(function (offer, index) {
-                console.log(`Offer ${index}:`, {
-                    id: offer.id,
-                    latitude: offer.latitude,
-                    longitude: offer.longitude,
-                    pricePln: offer.pricePln
+            const offerPromises = data.map(offer => {
+                if (offer.latitude && offer.longitude) {
+                    return fetch(`http://localhost:8080/api/offer/show?offerId=${encodeURIComponent(offer.id)}`)
+                        .then(response => response.ok ? response.json() : null)
+                        .catch(() => null);
+                }
+                return Promise.resolve(null);
+            });
+
+            Promise.all(offerPromises).then(detailedOffers => {
+                detailedOffers.forEach((offerDetails, index) => {
+                    if (offerDetails && data[index]) {
+                        allOffers.push({
+                            ...offerDetails,
+                            latitude: data[index].latitude,
+                            longitude: data[index].longitude,
+                            id: data[index].id
+                        });
+                    }
                 });
 
-                if (offer.latitude && offer.longitude) {
-                    const lat = parseFloat(offer.latitude);
-                    const lng = parseFloat(offer.longitude);
+                data.forEach(function (offer, index) {
+                    if (offer.latitude && offer.longitude) {
+                        const lat = parseFloat(offer.latitude);
+                        const lng = parseFloat(offer.longitude);
 
-                    console.log(`Parsed coordinates for offer ${offer.id}: lat=${lat}, lng=${lng}`);
-
-                    if (!isNaN(lat) && !isNaN(lng)) {
-                        createPropertyMarker(offer, lat, lng);
-                    } else {
-                        console.error(`Invalid coordinates for offer ${offer.id}:`, offer.latitude, offer.longitude);
+                        if (!isNaN(lat) && !isNaN(lng)) {
+                            createPropertyMarker(offer, lat, lng, detailedOffers[index]);
+                        }
                     }
-                } else {
-                    console.warn(`Missing coordinates for offer ${index}:`, offer);
-                }
+                });
             });
         })
         .catch(error => {
@@ -242,8 +278,19 @@ function loadPropertyData() {
         });
 }
 
-function createPropertyMarker(offer, lat, lng) {
-    heatmapData.push([lat, lng, 0.5]);
+function createPropertyMarker(offer, lat, lng, offerDetails) {
+    let realPricePerSqm = 12500;
+
+    if (offerDetails && offerDetails.pricePln && offerDetails.sizeM2) {
+        realPricePerSqm = calculatePricePerSqm(offerDetails.pricePln.toString(), offerDetails.sizeM2.toString());
+    }
+
+    const minPrice = 5000;
+    const maxPrice = 20000;
+    let intensity = (realPricePerSqm - minPrice) / (maxPrice - minPrice);
+    intensity = Math.max(0.1, Math.min(1.0, intensity));
+
+    heatmapData.push([lat, lng, intensity]);
 
     const homeIcon = L.divIcon({
         className: 'custom-home-icon',
@@ -261,8 +308,13 @@ function createPropertyMarker(offer, lat, lng) {
         marker.addTo(map);
     }
 
-    const estimatedSize = 50;
-    const pricePerSqm = offer.pricePln / estimatedSize;
+    let pricePerSqm = 12500;
+    if (offerDetails && offerDetails.pricePln && offerDetails.sizeM2) {
+        pricePerSqm = calculatePricePerSqm(offerDetails.pricePln.toString(), offerDetails.sizeM2.toString());
+    } else if (offer.pricePln) {
+        const estimatedSize = 50;
+        pricePerSqm = offer.pricePln / estimatedSize;
+    }
 
     marker.on('click', function () {
         showPropertyPanel(offer, pricePerSqm);
@@ -354,10 +406,7 @@ function populatePropertyDetails(offerDetails, offer, pricePerSqm) {
 
     let apiPricePerSqm = pricePerSqm;
     if (offerDetails.pricePln && offerDetails.sizeM2) {
-        const sizeNum = parseFloat(offerDetails.sizeM2.toString().replace(/[^\d]/g, ''));
-        if (sizeNum > 0) {
-            apiPricePerSqm = offerDetails.pricePln / sizeNum;
-        }
+        apiPricePerSqm = calculatePricePerSqm(offerDetails.pricePln.toString(), offerDetails.sizeM2.toString());
     }
     document.getElementById('pricePerSqm').textContent = Math.round(apiPricePerSqm).toLocaleString() + ' zł / m²';
 

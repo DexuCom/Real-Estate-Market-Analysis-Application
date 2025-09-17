@@ -529,6 +529,7 @@ html {
     color: white;
     font-weight: bold;
     border: 1px solid rgba(181, 226, 140, 0.9);
+    font-family: 'Outfit', Arial, sans-serif;
 }
 
 .marker-cluster div {
@@ -538,10 +539,20 @@ html {
     margin-top: 5px;
     text-align: center;
     border-radius: 50%;
-    font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
+    font-family: 'Outfit', Arial, sans-serif;
+    font-weight: 600;
+    font-size: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: white;
+}
+
+.marker-cluster div span {
+    font-family: 'Outfit', Arial, sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: white;
 }
 
 .marker-cluster-small {

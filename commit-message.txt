@@ -1,1 +1,1 @@
-Markers clustering on the map
+Major heatmap changes, changed css style for cluster icons
