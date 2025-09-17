@@ -1,1 +1,1 @@
-Updated map and watchlist to use new api requests
+Markers clustering on the map

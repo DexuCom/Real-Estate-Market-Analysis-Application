@@ -4,30 +4,73 @@ var tileLayers = {};
 var currentLayer = null;
 var heatmapLayer = null;
 var heatmapData = [];
+var markerClusterGroup = null;
 
 function initializeRealEstateMap() {
     console.log('Initializing Real Estate Map');
 
-    map = L.map('map').setView([54.37, 18.63], 11);
+    map = L.map('map', {
+        maxZoom: 18,
+        minZoom: 8
+    }).setView([54.37, 18.63], 11);
+
+    if (typeof L.markerClusterGroup === 'function') {
+        markerClusterGroup = L.markerClusterGroup({
+            maxClusterRadius: 60,
+            spiderfyOnMaxZoom: true,
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: true,
+            iconCreateFunction: function (cluster) {
+                const childCount = cluster.getChildCount();
+                let className = 'marker-cluster-';
+
+                if (childCount < 10) {
+                    className += 'small';
+                } else if (childCount < 100) {
+                    className += 'medium';
+                } else {
+                    className += 'large';
+                }
+
+                return new L.DivIcon({
+                    html: '<div><span>' + childCount + '</span></div>',
+                    className: 'marker-cluster ' + className,
+                    iconSize: new L.Point(40, 40)
+                });
+            }
+        });
+
+        map.addLayer(markerClusterGroup);
+        console.log('Marker clustering enabled');
+    } else {
+        console.warn('Leaflet.markercluster plugin not available - clustering disabled');
+        markerClusterGroup = null;
+    }
 
     tileLayers = {
         'openstreetmap': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
+            attribution: '© OpenStreetMap',
+            maxZoom: 19
         }),
         'cartodb': L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '© OpenStreetMap © CartoDB'
+            attribution: '© OpenStreetMap © CartoDB',
+            maxZoom: 19
         }),
         'cartodb-dark': L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '© OpenStreetMap © CartoDB'
+            attribution: '© OpenStreetMap © CartoDB',
+            maxZoom: 19
         }),
         'stamen-terrain': L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png', {
-            attribution: 'Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap'
+            attribution: 'Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap',
+            maxZoom: 18
         }),
         'stamen-toner': L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}{r}.png', {
-            attribution: 'Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap'
+            attribution: 'Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap',
+            maxZoom: 18
         }),
         'esri-satellite': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Tiles © Esri — Source: Esri, Maxar, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AeroGRID, IGN, and the GIS User Community'
+            attribution: 'Tiles © Esri — Source: Esri, Maxar, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AeroGRID, IGN, and the GIS User Community',
+            maxZoom: 18
         })
     };
 
@@ -97,44 +140,6 @@ function calculatePricePerSqm(price, size) {
     return sizeNum > 0 ? priceNum / sizeNum : 0;
 }
 
-function interpolateColor(color1, color2, factor) {
-    const c1 = hexToRgb(color1);
-    const c2 = hexToRgb(color2);
-
-    const r = Math.round(c1.r + (c2.r - c1.r) * factor);
-    const g = Math.round(c1.g + (c2.g - c1.g) * factor);
-    const b = Math.round(c1.b + (c2.b - c1.b) * factor);
-
-    return `rgb(${r}, ${g}, ${b})`;
-}
-
-function hexToRgb(hex) {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : null;
-}
-
-function getColorByPrice(pricePerSqm) {
-    const minPrice = 5000;
-    const maxPrice = 20000;
-
-    let normalizedPrice = (pricePerSqm - minPrice) / (maxPrice - minPrice);
-    normalizedPrice = Math.max(0, Math.min(1, normalizedPrice));
-
-    const greenColor = '#4CAF50';
-    const yellowColor = '#FFC107';
-    const redColor = '#F44336';
-
-    if (normalizedPrice < 0.5) {
-        return interpolateColor(greenColor, yellowColor, normalizedPrice * 2);
-    } else {
-        return interpolateColor(yellowColor, redColor, (normalizedPrice - 0.5) * 2);
-    }
-}
-
 function createBackgroundHeatmapData() {
     const backgroundPoints = [];
     const bounds = map.getBounds();
@@ -189,6 +194,13 @@ function toggleHeatmap() {
 
 function loadPropertyData() {
     console.log('Loading property data from API...');
+
+    if (markerClusterGroup) {
+        markerClusterGroup.clearLayers();
+    }
+
+    heatmapData = [];
+
     fetch('http://localhost:8080/api/offer/map-points')
         .then(response => {
             console.log('Fetch response status:', response.status);
@@ -231,15 +243,7 @@ function loadPropertyData() {
 }
 
 function createPropertyMarker(offer, lat, lng) {
-    const estimatedSize = 50;
-    const pricePerSqm = offer.pricePln / estimatedSize;
-    const iconColor = getColorByPrice(pricePerSqm);
-
-    const minPrice = 5000;
-    const maxPrice = 20000;
-    let intensity = (pricePerSqm - minPrice) / (maxPrice - minPrice);
-    intensity = Math.max(0.3, Math.min(1, intensity));
-    heatmapData.push([lat, lng, intensity]);
+    heatmapData.push([lat, lng, 0.5]);
 
     const homeIcon = L.divIcon({
         className: 'custom-home-icon',
@@ -249,7 +253,16 @@ function createPropertyMarker(offer, lat, lng) {
         popupAnchor: [0, -15]
     });
 
-    const marker = L.marker([lat, lng], { icon: homeIcon }).addTo(map);
+    const marker = L.marker([lat, lng], { icon: homeIcon });
+
+    if (markerClusterGroup) {
+        markerClusterGroup.addLayer(marker);
+    } else {
+        marker.addTo(map);
+    }
+
+    const estimatedSize = 50;
+    const pricePerSqm = offer.pricePln / estimatedSize;
 
     marker.on('click', function () {
         showPropertyPanel(offer, pricePerSqm);
@@ -258,9 +271,9 @@ function createPropertyMarker(offer, lat, lng) {
     setTimeout(() => {
         const iconElement = marker.getElement();
         if (iconElement) {
-            iconElement.style.backgroundColor = iconColor;
+            iconElement.style.setProperty('background-color', '#8b5cf6', 'important');
         }
-    }, 100);
+    }, 200);
 }
 
 async function showPropertyPanel(offer, pricePerSqm) {

@@ -27,6 +27,7 @@ html {
     font-size: 18px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
     border: 2px solid white;
+    background-color: #8b5cf6 !important;
 }
 
 .map-style-selector {
@@ -519,4 +520,53 @@ html {
     font-family: 'Outfit', Arial, sans-serif;
     font-weight: 500;
     border: 1px solid #bbdefb;
+}
+
+.marker-cluster {
+    background-color: rgba(181, 226, 140, 0.6);
+    border-radius: 50%;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    border: 1px solid rgba(181, 226, 140, 0.9);
+}
+
+.marker-cluster div {
+    width: 40px;
+    height: 40px;
+    margin-left: 5px;
+    margin-top: 5px;
+    text-align: center;
+    border-radius: 50%;
+    font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.marker-cluster-small {
+    background-color: rgba(181, 226, 140, 0.6);
+    border-color: rgba(181, 226, 140, 0.9);
+}
+
+.marker-cluster-small div {
+    background-color: rgba(110, 204, 57, 0.8);
+}
+
+.marker-cluster-medium {
+    background-color: rgba(241, 211, 87, 0.6);
+    border-color: rgba(241, 211, 87, 0.9);
+}
+
+.marker-cluster-medium div {
+    background-color: rgba(240, 194, 12, 0.8);
+}
+
+.marker-cluster-large {
+    background-color: rgba(253, 156, 115, 0.6);
+    border-color: rgba(253, 156, 115, 0.9);
+}
+
+.marker-cluster-large div {
+    background-color: rgba(241, 128, 23, 0.8);
 }
