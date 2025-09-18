@@ -3,8 +3,6 @@ package com.rema.web_api.offer;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.UUID;
-
 @Entity
 @Table(name = "offer")
 @Getter
@@ -16,13 +14,13 @@ public class Offer {
 
     @Id
     @GeneratedValue
-    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
-    private UUID id;
+    @Column
+    private int id;
 
     private String city;
     private String street;
     private Integer pricePln;
-    private String sizeM2;
+    private Float sizeM2;
     private String rooms;
     private String floor;
     @Column(length = 1000)
@@ -43,6 +41,6 @@ public class Offer {
     private Integer terrace;
     private Integer garden;
 
-    private double longitude;
-    private double latitude;
+    private float longitude;
+    private float latitude;
 }

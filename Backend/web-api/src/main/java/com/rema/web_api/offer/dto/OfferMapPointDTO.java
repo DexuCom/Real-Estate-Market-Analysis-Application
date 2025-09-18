@@ -4,18 +4,16 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @Getter
 @Setter
 @Builder
 public class OfferMapPointDTO {
 
-    private UUID id;
-    private double longitude;
-    private double latitude;
+    private int id;
+    private float x;
+    private float y;
 
-    private Integer pricePln;
+    private float pm2;
 
 }
 

@@ -7,8 +7,8 @@ public class OfferMappers {
     public static OfferMapPointDTO mapToOfferMapPointDTO(Offer offer) {
         return OfferMapPointDTO.builder()
                 .id(offer.getId())
-                .latitude(offer.getLatitude())
-                .longitude(offer.getLongitude())
-                .pricePln(offer.getPricePln()).build();
+                .y(offer.getLatitude())
+                .x(offer.getLongitude())
+                .pm2((float) (offer.getPricePln()) / offer.getSizeM2()).build();
     }
 }
