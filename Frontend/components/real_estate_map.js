@@ -6,6 +6,8 @@ var heatmapLayer = null;
 var heatmapData = [];
 var markerClusterGroup = null;
 var allOffers = [];
+var globalMinPrice = 5000;
+var globalMaxPrice = 20000;
 
 function initializeRealEstateMap() {
     console.log('Initializing Real Estate Map');
@@ -142,45 +144,45 @@ function calculatePricePerSqm(price, size) {
 }
 
 function createBackgroundHeatmapData() {
-    const backgroundPoints = [];
     const bounds = map.getBounds();
     const latRange = bounds.getNorth() - bounds.getSouth();
     const lngRange = bounds.getEast() - bounds.getWest();
-
-    let totalPricePerSqm = 0;
-    let validOffers = 0;
-
-    allOffers.forEach(offer => {
-        if (offer.sizeM2 && offer.pricePln) {
-            const pricePerSqm = calculatePricePerSqm(offer.pricePln.toString(), offer.sizeM2.toString());
-            if (pricePerSqm > 0) {
-                totalPricePerSqm += pricePerSqm;
-                validOffers++;
-            }
-        }
-    });
-
-    const averagePricePerSqm = validOffers > 0 ? totalPricePerSqm / validOffers : 12500;
-
-    const minPrice = 5000;
-    const maxPrice = 20000;
-    let averageIntensity = (averagePricePerSqm - minPrice) / (maxPrice - minPrice);
-    averageIntensity = Math.max(0.1, Math.min(0.9, averageIntensity));
-
     const gridSize = 25;
     const latStep = latRange / gridSize;
     const lngStep = lngRange / gridSize;
 
+    const pricesPerSqm = allOffers
+        .filter(offer => offer.sizeM2 && offer.pricePln)
+        .map(offer => calculatePricePerSqm(offer.pricePln.toString(), offer.sizeM2.toString()))
+        .filter(price => price > 0);
+
+    let intensity = 0.5;
+
+    if (pricesPerSqm.length > 0) {
+        const averagePricePerSqm = pricesPerSqm.reduce((sum, price) => sum + price, 0) / pricesPerSqm.length;
+        globalMinPrice = Math.min(...pricesPerSqm);
+        globalMaxPrice = Math.max(...pricesPerSqm);
+
+        intensity = globalMaxPrice > globalMinPrice ?
+            (averagePricePerSqm - globalMinPrice) / (globalMaxPrice - globalMinPrice) : 0.5;
+        intensity = Math.max(0.1, Math.min(0.9, intensity));
+    }
+
+    const backgroundPoints = [];
     for (let i = 0; i <= gridSize; i++) {
         for (let j = 0; j <= gridSize; j++) {
-            const lat = bounds.getSouth() + (i * latStep);
-            const lng = bounds.getWest() + (j * lngStep);
-
-            backgroundPoints.push([lat, lng, averageIntensity]);
+            backgroundPoints.push([
+                bounds.getSouth() + (i * latStep),
+                bounds.getWest() + (j * lngStep),
+                intensity
+            ]);
         }
     }
+
     return backgroundPoints;
 }
+
+
 
 function toggleHeatmap() {
     const isChecked = document.getElementById('heatmapToggle').checked;
@@ -279,15 +281,14 @@ function loadPropertyData() {
 }
 
 function createPropertyMarker(offer, lat, lng, offerDetails) {
-    let realPricePerSqm = 12500;
+    let realPricePerSqm = (globalMinPrice + globalMaxPrice) / 2;
 
     if (offerDetails && offerDetails.pricePln && offerDetails.sizeM2) {
         realPricePerSqm = calculatePricePerSqm(offerDetails.pricePln.toString(), offerDetails.sizeM2.toString());
     }
 
-    const minPrice = 5000;
-    const maxPrice = 20000;
-    let intensity = (realPricePerSqm - minPrice) / (maxPrice - minPrice);
+    let intensity = globalMaxPrice > globalMinPrice ?
+        (realPricePerSqm - globalMinPrice) / (globalMaxPrice - globalMinPrice) : 0.5;
     intensity = Math.max(0.1, Math.min(1.0, intensity));
 
     heatmapData.push([lat, lng, intensity]);
@@ -308,12 +309,12 @@ function createPropertyMarker(offer, lat, lng, offerDetails) {
         marker.addTo(map);
     }
 
-    let pricePerSqm = 12500;
-    if (offerDetails && offerDetails.pricePln && offerDetails.sizeM2) {
-        pricePerSqm = calculatePricePerSqm(offerDetails.pricePln.toString(), offerDetails.sizeM2.toString());
-    } else if (offer.pricePln) {
-        const estimatedSize = 50;
-        pricePerSqm = offer.pricePln / estimatedSize;
+    let pricePerSqm = realPricePerSqm;
+    if (!offerDetails || !offerDetails.pricePln || !offerDetails.sizeM2) {
+        if (offer.pricePln) {
+            const estimatedSize = 50;
+            pricePerSqm = offer.pricePln / estimatedSize;
+        }
     }
 
     marker.on('click', function () {
