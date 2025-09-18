@@ -1,1 +1,1 @@
-Updated README.MD, CORS fixed, error message on wrong login/password, removed old ScraperOutput folder
+Heatmap background generation function refactorization, minPrice and maxPrice are now calculated dynamically
