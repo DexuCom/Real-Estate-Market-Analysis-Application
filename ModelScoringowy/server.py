@@ -65,6 +65,9 @@ app = FastAPI(lifespan=lifespan)
 
 @app.post("/predict/{model}")
 async def predict(model: ModelName, request: DynamicPredictionInput):
+    print("incoming request")
+    print(request)
+
     if model.value not in MODELS:
         raise HTTPException(status_code=404, detail=f"{model.value} isn't loaded")
 
@@ -76,6 +79,9 @@ async def predict(model: ModelName, request: DynamicPredictionInput):
             raise HTTPException(status_code=400, detail="Request should be valid dictionary")
     except json.JSONDecodeError:
         raise HTTPException(status_code=400, detail="Invalid JSON format")
+    except Exception as ex:
+        print(f"Exception when getting data: {ex}")
+        raise HTTPException(status_code=500, detail=ex)
 
     try:
         input_dataframe = pd.DataFrame([data])
@@ -89,4 +95,5 @@ async def predict(model: ModelName, request: DynamicPredictionInput):
             "predictedPricePln": round(float(result[0]), 2)
         }
     except Exception as ex:
+        print(f"error when predicting price: {ex}")
         raise HTTPException(status_code=500, detail=f"Error when predicting price: {ex}")

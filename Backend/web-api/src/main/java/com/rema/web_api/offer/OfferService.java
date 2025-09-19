@@ -26,7 +26,7 @@ public class OfferService {
     private final OfferRepository offerRepository;
     private final WebClient webClient;
 
-    private final String PREDICTION_URL_SUFFIX = "/predict/";
+    private final String PREDICTION_URL_SUFFIX = "api/scoring-model/predict/";
 
     public OfferService(OfferRepository _offerRepository, WebClient _webClient) {
         this.offerRepository = _offerRepository;
@@ -112,7 +112,7 @@ public class OfferService {
     }
 
     public OfferPricePredictionResponse predictPriceForOffer(Offer offer, String model) {
-        String predictionUri = PREDICTION_URL_SUFFIX + "/" + model;
+        String predictionUri = PREDICTION_URL_SUFFIX + model;
 
         try {
             return webClient.post()

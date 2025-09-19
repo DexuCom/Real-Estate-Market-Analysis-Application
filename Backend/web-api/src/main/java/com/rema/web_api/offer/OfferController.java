@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/offer")
@@ -42,7 +41,7 @@ public class OfferController {
     }
 
     @GetMapping("/show")
-    public ResponseEntity<?> getOffer(@RequestParam UUID offerId) {
+    public ResponseEntity<?> getOffer(@RequestParam Integer offerId) {
 
         Optional<Offer> offerOptional = offerService.getOffer(offerId);
 
@@ -97,8 +96,8 @@ public class OfferController {
 
     }
 
-    @GetMapping("/predict-price/{id}?model={model}")
-    public ResponseEntity<OfferPricePredictionResponse> getPredictionForOfferById(
+    @GetMapping("/predict-price/{id}")
+    public ResponseEntity<?> getPredictionForOfferById(
             @PathVariable Integer id, @RequestParam(defaultValue = "xgb") String model) {
 
         try {
@@ -107,7 +106,7 @@ public class OfferController {
         } catch (NoSuchElementException ex) {
             return ResponseEntity.notFound().build();
         } catch (IllegalStateException ex) {
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.internalServerError().body(ex.getMessage());
         }
 
     }
