@@ -4,18 +4,16 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @Getter
 @Setter
 @Builder
 public class OfferDTO {
-    private UUID id;
+    private int id;
 
     private String city;
     private String street;
     private Integer pricePln;
-    private String sizeM2;
+    private Float sizeM2;
     private String rooms;
     private String floor;
 

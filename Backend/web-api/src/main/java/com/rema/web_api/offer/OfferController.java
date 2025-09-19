@@ -58,7 +58,7 @@ public class OfferController {
         Offer offer = offerOptional.get();
         OfferDTO offerDTO = OfferDTO.builder()
                 .id(offer.getId())
-                .detailUrl(offer.getId().toString())
+                .detailUrl(offer.getDetailUrl())
                 .city(offer.getCity())
                 .street(offer.getStreet())
                 .pricePln(offer.getPricePln())

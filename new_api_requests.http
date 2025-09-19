@@ -1,0 +1,5 @@
+### Get map points
+GET http://localhost:8080/api/offer/map-points
+
+### Get offer details
+GET http://localhost:8080/api/offer/show?offerId=918f903d-a380-430d-b9a0-ff984f50b382

@@ -75,7 +75,6 @@ GET http://localhost:8080/api/offer/show?offerId=https://www.morizon.pl/oferta/s
 ### Add offers from csv to database
 POST http://localhost:8080/api/offer/add
 
-
 ### Get non-existing offer (should return 404)
 GET http://localhost:8080/api/offer/show?offerId=https://www.morizon.pl/oferta/non-existing-offer
 
