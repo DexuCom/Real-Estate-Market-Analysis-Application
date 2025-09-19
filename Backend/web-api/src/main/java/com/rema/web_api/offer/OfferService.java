@@ -9,6 +9,7 @@ import org.apache.commons.io.input.BOMInputStream;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -16,14 +17,16 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class OfferService {
 
     private final OfferRepository offerRepository;
     private final WebClient webClient;
+
+    private final String PREDICTION_URL_SUFFIX = "/predict/";
 
     public OfferService(OfferRepository _offerRepository, WebClient _webClient) {
         this.offerRepository = _offerRepository;
@@ -35,7 +38,7 @@ public class OfferService {
         this.registerOffers();
     }
 
-    public Optional<Offer> getOffer(UUID offerId) {
+    public Optional<Offer> getOffer(Integer offerId) {
         return offerRepository.findById(offerId);
     }
 
@@ -100,7 +103,29 @@ public class OfferService {
     }
 
     public OfferPricePredictionResponse predictPriceForOfferById(Integer id, String model) {
-        offerRepository.findById()
+        Optional<Offer> offer = offerRepository.findById(id);
+        if (offer.isEmpty()) {
+            throw new NoSuchElementException();
+        }
+
+        return predictPriceForOffer(offer.get(), model);
+    }
+
+    public OfferPricePredictionResponse predictPriceForOffer(Offer offer, String model) {
+        String predictionUri = PREDICTION_URL_SUFFIX + "/" + model;
+
+        try {
+            return webClient.post()
+                    .uri(predictionUri)
+                    .body(Mono.just(offer), Offer.class)
+                    .retrieve()
+                    .bodyToMono(OfferPricePredictionResponse.class)
+                    .block();
+
+        } catch (Exception e) {
+            throw new IllegalStateException("Unable to get prediction from scoring model api: " + e.getMessage());
+        }
+
     }
 
 
