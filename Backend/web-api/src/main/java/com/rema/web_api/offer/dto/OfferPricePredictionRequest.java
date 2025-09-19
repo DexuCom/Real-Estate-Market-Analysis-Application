@@ -1,31 +1,17 @@
-package com.rema.web_api.offer;
+package com.rema.web_api.offer.dto;
 
-import jakarta.persistence.*;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
 
-@Entity
-@Table(name = "offer")
-@Getter
-@Setter
+@Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class Offer {
-
-    @Id
-    @GeneratedValue
-    @Column
-    private int id;
-
-    private String city;
-    private String street;
+public class OfferPricePredictionRequest {
     private Integer pricePln;
-    private Float sizeM2;
+    private String sizeM2;
     private String rooms;
     private String floor;
-    @Column(length = 1000)
     private String imageUrl;
-    @Column(length = 1000)
+
     private String detailUrl;
     private Integer yearBuilt;
     private String market;
@@ -41,6 +27,6 @@ public class Offer {
     private Integer terrace;
     private Integer garden;
 
-    private float longitude;
-    private float latitude;
+    private double longitude;
+    private double latitude;
 }

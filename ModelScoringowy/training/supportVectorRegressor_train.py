@@ -27,5 +27,5 @@ pipeline = Pipeline([
         ('svr', SVR(epsilon=0.1))
     ])
 
-trainModel(pipeline, SVR_SEARCH_CONFIG, FINISHED_MODEL_PATH)
+trainModel(pipeline, SVR_SEARCH_CONFIG, FINISHED_MODEL_PATH, K, RANDOM_SEED)
 

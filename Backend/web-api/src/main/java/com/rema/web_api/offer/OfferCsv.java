@@ -17,7 +17,7 @@ public class OfferCsv {
     private Integer pricePln;
 
     @CsvBindByName(column = "size_m2")
-    private String size_m2;
+    private Float size_m2;
 
     @CsvBindByName(column = "rooms")
     private String rooms;
@@ -69,8 +69,8 @@ public class OfferCsv {
     private Integer garden;
 
     @CsvBindByName(column = "latitude")
-    private double latitude;
+    private float latitude;
 
     @CsvBindByName(column = "longitude")
-    private double longitude;
+    private float longitude;
 }

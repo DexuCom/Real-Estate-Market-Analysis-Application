@@ -32,7 +32,14 @@ runAllDocker.bat
 ```bash
 runLocalDev.bat
 ```
-and then turn on the applications you need
+and then turn on the applications you need.
+
+##### scoring model
+In the ModelScoringowy folder: 
+```bash
+uvicorn server:app --reload
+```
+Swagger is available here: http://127.0.0.1:8000/docs
 
 ## 🗄️ Database Access via pgAdmin
 
