@@ -3,10 +3,12 @@ package com.rema.web_api.offer;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.rema.web_api.offer.dto.OfferMapPointDTO;
+import com.rema.web_api.offer.dto.OfferPricePredictionResponse;
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.io.input.BOMInputStream;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -21,9 +23,11 @@ import java.util.UUID;
 public class OfferService {
 
     private final OfferRepository offerRepository;
+    private final WebClient webClient;
 
-    public OfferService(OfferRepository _offerRepository) {
+    public OfferService(OfferRepository _offerRepository, WebClient _webClient) {
         this.offerRepository = _offerRepository;
+        this.webClient = _webClient;
     }
 
     @PostConstruct
@@ -94,4 +98,10 @@ public class OfferService {
         return offers.stream().map(OfferMappers::mapToOfferMapPointDTO).toList();
 
     }
+
+    public OfferPricePredictionResponse predictPriceForOfferById(Integer id, String model) {
+        offerRepository.findById()
+    }
+
+
 }

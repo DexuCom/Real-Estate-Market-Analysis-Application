@@ -3,6 +3,7 @@ package com.rema.web_api.offer;
 import com.rema.web_api.global.dto.ErrorDTO;
 import com.rema.web_api.offer.dto.OfferDTO;
 import com.rema.web_api.offer.dto.OfferMapPointDTO;
+import com.rema.web_api.offer.dto.OfferPricePredictionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,6 +21,7 @@ public class OfferController {
 
     @Autowired
     private OfferService offerService;
+
 
     @PostMapping("/add")
     public ResponseEntity<?> addData() {
@@ -93,4 +96,20 @@ public class OfferController {
         }
 
     }
+
+    @GetMapping("/predict-price/{id}?model={model}")
+    public ResponseEntity<OfferPricePredictionResponse> getPredictionForOfferById(
+            @PathVariable Integer id, @RequestParam(defaultValue = "xgb") String model) {
+
+        try {
+            OfferPricePredictionResponse prediction = offerService.predictPriceForOfferById(id, model);
+            return ResponseEntity.ok(prediction);
+        } catch (NoSuchElementException ex) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalStateException ex) {
+            return ResponseEntity.internalServerError().build();
+        }
+
+    }
+
 }
