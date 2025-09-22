@@ -14,6 +14,7 @@ services:
         
         environment:
             - WEB_API_URL=http://web-api:8081
+            - SCORING_MODEL_URL=http://scoring-model:80
 
     web-api:
         build: Backend\web-api
@@ -28,3 +29,11 @@ services:
             - JWT_KEY=${JWT_KEY}
             - JWT_EXPIRATION=${JWT_EXPIRATION}
             - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres_db:5432/${POSTGRES_DB}
+            - GATEWAY_URL = http://gateway-app:8080
+
+    scoring-model:
+        build: ModelScoringowy
+        container_name: scoring-model
+        restart: unless-stopped
+        networks:
+            - scoring-model-network
