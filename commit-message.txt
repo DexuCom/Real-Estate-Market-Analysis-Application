@@ -1,1 +1,1 @@
-Changed python ver from 3.9-slim to 3.11-slim, changed json fetch to work with new map-point DTO, removed calculatePricePerSqm from real_estate_map.js because its calculated on the Backend, added enter button listener in login form
+Remove unecessary offer details fetching - now heatmap uses price per square meter already calculated from the Backend, fixed error with double-loading .css files for components

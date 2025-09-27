@@ -238,38 +238,17 @@ function loadPropertyData() {
             console.log('Property data loaded from API, count:', data.length);
             console.log('Sample data:', data.slice(0, 3));
 
-            const offerPromises = data.map(offer => {
+            allOffers = data.slice();
+
+            data.forEach(function (offer) {
                 if (offer.x && offer.y) {
-                    return fetch(`http://localhost:8080/api/offer/show?offerId=${encodeURIComponent(offer.id)}`)
-                        .then(response => response.ok ? response.json() : null)
-                        .catch(() => null);
+                    const lat = parseFloat(offer.y);
+                    const lng = parseFloat(offer.x);
+
+                    if (!isNaN(lat) && !isNaN(lng)) {
+                        createPropertyMarker(offer, lat, lng);
+                    }
                 }
-                return Promise.resolve(null);
-            });
-
-            Promise.all(offerPromises).then(detailedOffers => {
-                detailedOffers.forEach((offerDetails, index) => {
-                    if (offerDetails && data[index]) {
-                        allOffers.push({
-                            ...offerDetails,
-                            x: data[index].x,
-                            y: data[index].y,
-                            id: data[index].id,
-                            pm2: data[index].pm2
-                        });
-                    }
-                });
-
-                data.forEach(function (offer, index) {
-                    if (offer.x && offer.y) {
-                        const lat = parseFloat(offer.y);
-                        const lng = parseFloat(offer.x);
-
-                        if (!isNaN(lat) && !isNaN(lng)) {
-                            createPropertyMarker(offer, lat, lng, detailedOffers[index]);
-                        }
-                    }
-                });
             });
         })
         .catch(error => {
@@ -277,7 +256,7 @@ function loadPropertyData() {
         });
 }
 
-function createPropertyMarker(offer, lat, lng, offerDetails) {
+function createPropertyMarker(offer, lat, lng) {
     let realPricePerSqm = (globalMinPrice + globalMaxPrice) / 2;
 
     if (offer.pm2) {
