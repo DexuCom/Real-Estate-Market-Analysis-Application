@@ -22,33 +22,6 @@ OBIEKT_ZAMKNIETY_RE = re.compile(r"\bobiekt zamknięty\b", re.IGNORECASE)
 
 CENA_RE = re.compile(r"")
 
-
-def standardize_heating_type(heating_text):
-    if not heating_text or heating_text == "-1":
-        return "-1"
-    
-    text = heating_text.strip().lower()
-    
-    if "miejskie" in text or "miast" in text:
-        return "C.O. miejskie"
-    
-    if "gaz" in text:
-        return "C.O. gazowe"
-    
-    if "elektry" in text:
-        return "C.O. elektryczne"
-    
-    if "własn" in text or "wlasn" in text:
-        return "C.O. własne"
-    
-    if "kotłowni" in text or "kotlowni" in text:
-        return "Kotłownia"
-    
-    if "pompa" in text:
-        return "Pompa ciepła"
-    
-    return "Inne"
-
 async def fetch(session, url):
     async with session.get(url, headers=HEADERS) as response:
         return await response.text()
@@ -77,6 +50,8 @@ def parse_page(html):
 
         price_holder = offer_card.find("div", attrs={"data-cy": "cardPropertyOfferPrice"})
         if price_holder:
+            # robimy to w ten sposób bo nie ma sensownego selektora,
+            # być może lepiej regexem ze zł wydobyć?
             price_element = price_holder.select_one('div:nth-of-type(2) > div')
             if price_element:
                 price_string = price_element.get_text(strip=True)
@@ -162,8 +137,7 @@ def parse_market(soup: BeautifulSoup):
 
 def parse_heating(soup: BeautifulSoup):
     text = parse_detail_value(soup, "Ogrzewanie")
-    raw_heating = text if text else "-1"
-    return standardize_heating_type(raw_heating)
+    return text if text else "-1"
 
 def parse_balcony(soup: BeautifulSoup) -> int:
     text = parse_detail_value(soup, "Balkon")
@@ -311,9 +285,9 @@ async def scrape_prices_and_streets(base_url, pages=1):
 
 if __name__ == "__main__":
     CITIES = {
-        "Gdańsk": "https://www.morizon.pl/mieszkania/gdansk/?ps%5Bwith_price%5D=1",
-        "Warszawa": "https://www.morizon.pl/mieszkania/warszawa/?ps%5Bwith_price%5D=1",
-        "Kraków": "https://www.morizon.pl/mieszkania/krakow/?ps%5Bwith_price%5D=1",
+        "Gdańsk": "https://www.morizon.pl/mieszkania/gdansk/?ps%5Blocation%5D%5Bmap%5D=1",
+        "Warszawa": "https://www.morizon.pl/mieszkania/warszawa/?ps%5Blocation%5D%5Bmap%5D=1",
+        "Kraków": "https://www.morizon.pl/mieszkania/krakow/?ps%5Blocation%5D%5Bmap%5D=1",
     }
 
     SELECTED_CITY = "Gdańsk"
