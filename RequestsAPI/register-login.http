@@ -1,0 +1,67 @@
+### Register new user
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "username": "test16",
+  "password": "testpassword123",
+  "email": "test16@example.com"
+}
+
+### Register another user for testing
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "username": "john_doe",
+  "password": "securepassword456",
+  "email": "john.doe@email.com"
+}
+
+### Login user
+POST http://localhost:8080/api/users/login
+Content-Type: application/json
+
+{
+  "username": "test16",
+  "password": "testpassword123"
+}
+
+### Login with wrong credentials (should fail)
+POST http://localhost:8080/api/users/login
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "wrongpassword"
+}
+
+### Register user with invalid email (should fail)
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "username": "testuser2",
+  "password": "testpassword123",
+  "email": "invalid-email"
+}
+
+### Register user with short password (should fail)
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "username": "testuser3",
+  "password": "short",
+  "email": "test3@example.com"
+}
+
+### Register user with short username (should fail)
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "username": "ab",
+  "password": "testpassword123",
+  "email": "test4@example.com"
+}

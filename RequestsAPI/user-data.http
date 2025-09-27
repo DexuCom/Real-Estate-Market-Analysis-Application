@@ -1,0 +1,6 @@
+### Get user data (requires user ID - get it after registration/login)
+GET http://localhost:8080/api/users/a6b6374a-926a-4adb-911d-cee5612b0ef3
+
+### Get user data with JWT token (if authentication is required)
+GET http://localhost:8080/api/users/01234567-89ab-cdef-0123-456789abcdef
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
