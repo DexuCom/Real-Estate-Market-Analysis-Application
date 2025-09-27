@@ -1,1 +1,1 @@
-Heatmap background generation function refactorization, minPrice and maxPrice are now calculated dynamically
+Changed python ver from 3.9-slim to 3.11-slim, changed json fetch to work with new map-point DTO, removed calculatePricePerSqm from real_estate_map.js because its calculated on the Backend, added enter button listener in login form

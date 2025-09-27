@@ -137,11 +137,7 @@ function setupEventListeners() {
     }
 }
 
-function calculatePricePerSqm(price, size) {
-    const priceNum = parseFloat(price.replace(/[^\d.]/g, ''));
-    const sizeNum = parseFloat(size.replace(/[^\d.]/g, ''));
-    return sizeNum > 0 ? priceNum / sizeNum : 0;
-}
+
 
 function createBackgroundHeatmapData() {
     const bounds = map.getBounds();
@@ -152,8 +148,8 @@ function createBackgroundHeatmapData() {
     const lngStep = lngRange / gridSize;
 
     const pricesPerSqm = allOffers
-        .filter(offer => offer.sizeM2 && offer.pricePln)
-        .map(offer => calculatePricePerSqm(offer.pricePln.toString(), offer.sizeM2.toString()))
+        .filter(offer => offer.pm2)
+        .map(offer => offer.pm2)
         .filter(price => price > 0);
 
     let intensity = 0.5;
@@ -243,7 +239,7 @@ function loadPropertyData() {
             console.log('Sample data:', data.slice(0, 3));
 
             const offerPromises = data.map(offer => {
-                if (offer.latitude && offer.longitude) {
+                if (offer.x && offer.y) {
                     return fetch(`http://localhost:8080/api/offer/show?offerId=${encodeURIComponent(offer.id)}`)
                         .then(response => response.ok ? response.json() : null)
                         .catch(() => null);
@@ -256,17 +252,18 @@ function loadPropertyData() {
                     if (offerDetails && data[index]) {
                         allOffers.push({
                             ...offerDetails,
-                            latitude: data[index].latitude,
-                            longitude: data[index].longitude,
-                            id: data[index].id
+                            x: data[index].x,
+                            y: data[index].y,
+                            id: data[index].id,
+                            pm2: data[index].pm2
                         });
                     }
                 });
 
                 data.forEach(function (offer, index) {
-                    if (offer.latitude && offer.longitude) {
-                        const lat = parseFloat(offer.latitude);
-                        const lng = parseFloat(offer.longitude);
+                    if (offer.x && offer.y) {
+                        const lat = parseFloat(offer.y);
+                        const lng = parseFloat(offer.x);
 
                         if (!isNaN(lat) && !isNaN(lng)) {
                             createPropertyMarker(offer, lat, lng, detailedOffers[index]);
@@ -283,8 +280,8 @@ function loadPropertyData() {
 function createPropertyMarker(offer, lat, lng, offerDetails) {
     let realPricePerSqm = (globalMinPrice + globalMaxPrice) / 2;
 
-    if (offerDetails && offerDetails.pricePln && offerDetails.sizeM2) {
-        realPricePerSqm = calculatePricePerSqm(offerDetails.pricePln.toString(), offerDetails.sizeM2.toString());
+    if (offer.pm2) {
+        realPricePerSqm = offer.pm2;
     }
 
     let intensity = globalMaxPrice > globalMinPrice ?
@@ -309,13 +306,7 @@ function createPropertyMarker(offer, lat, lng, offerDetails) {
         marker.addTo(map);
     }
 
-    let pricePerSqm = realPricePerSqm;
-    if (!offerDetails || !offerDetails.pricePln || !offerDetails.sizeM2) {
-        if (offer.pricePln) {
-            const estimatedSize = 50;
-            pricePerSqm = offer.pricePln / estimatedSize;
-        }
-    }
+    let pricePerSqm = offer.pm2 || realPricePerSqm;
 
     marker.on('click', function () {
         showPropertyPanel(offer, pricePerSqm);
@@ -406,9 +397,6 @@ function populatePropertyDetails(offerDetails, offer, pricePerSqm) {
     document.getElementById('propertyTotalFloors').textContent = offerDetails.totalFloors ? `Budynek ${offerDetails.totalFloors}-piętrowy` : 'Brak danych';
 
     let apiPricePerSqm = pricePerSqm;
-    if (offerDetails.pricePln && offerDetails.sizeM2) {
-        apiPricePerSqm = calculatePricePerSqm(offerDetails.pricePln.toString(), offerDetails.sizeM2.toString());
-    }
     document.getElementById('pricePerSqm').textContent = Math.round(apiPricePerSqm).toLocaleString() + ' zł / m²';
 
     setPropertyAmenities(offerDetails);
