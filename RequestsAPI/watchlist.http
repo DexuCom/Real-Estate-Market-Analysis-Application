@@ -1,0 +1,7 @@
+### Add offer to watchlist (requires user ID and offer ID)
+POST http://localhost:8080/api/watchLists/add?userId=ba6e97db-1f6f-41fc-a80a-5f948f0ace8c&offerId=123
+### Remove offer from watchlist
+DELETE http://localhost:8080/api/watchLists/remove?userId=ba6e97db-1f6f-41fc-a80a-5f948f0ace8c&offerId=123
+
+### Get all watchlist items for user
+GET http://localhost:8080/api/watchLists/a6b6374a-926a-4adb-911d-cee5612b0ef3

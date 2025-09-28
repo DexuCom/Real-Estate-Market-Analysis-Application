@@ -54,7 +54,7 @@ Open your browser and navigate to: **http://localhost:8090**
 
 ### 3. Add PostgreSQL Server
 1. Right-click on **"Servers"** in the left panel
-2. Select **"Create"** → **"Server"**
+2. Select **"Register"** → **"Server"**
 3. In the **"General"** tab:
    - **Name:** `PostgreSQL Local` (or any name you prefer)
 4. In the **"Connection"** tab:
@@ -65,7 +65,7 @@ Open your browser and navigate to: **http://localhost:8090**
    - **Password:** `password` (from your config.env)
 5. Click **"Save"**
 6. You can now access database tables:
-**postgres_db -> db -> Schemas -> public -> Tables**
+**Databases -> db -> Schemas -> public -> Tables**
 
 
 > **Note:** Make sure your Docker containers are running before attempting to connect to the database.

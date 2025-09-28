@@ -115,7 +115,6 @@ function clearLoginForm() {
 if (typeof window !== 'undefined') {
     window.setupLoginForm = setupLoginForm;
     window.initializeLoginComponent = initializeLoginComponent;
-    window.handleLoginFormSubmit = handleLoginFormSubmit;
     window.validateEmail = validateEmail;
     window.clearLoginForm = clearLoginForm;
 }
