@@ -35,7 +35,7 @@ def prepareData():
     dataframe_cleaned = dataframe.drop(columns=columns_to_drop)
 
     dataframe_cleaned['heating'] = dataframe_cleaned['heating'].replace('-1', 'Inne')
-    dataframe_cleaned['heating_is_unknown'] = (dataframe['heating'] == 'Inne').astype(int)
+    dataframe_cleaned['heating_is_unknown'] = (dataframe_cleaned['heating'] == 'Inne').astype(int)
     dataframe_cleaned['heating'] = dataframe_cleaned['heating'].map(HEATING_RANKING)
 
     dataframe_cleaned['market'] = (dataframe_cleaned['market'] == 'pierwotny').astype(int)
