@@ -22,6 +22,9 @@ OBIEKT_ZAMKNIETY_RE = re.compile(r"\bobiekt zamknięty\b", re.IGNORECASE)
 
 CENA_RE = re.compile(r"")
 
+POWIERZCHNIA_RE = re.compile(r"\d* m²")
+POKOJE_RE = re.compile(r"\d* pok", re.IGNORECASE)
+PIETRO_RE = re.compile(r"piętro \d*\/\d*|parter\/\d", re.IGNORECASE)
 
 def standardize_heating_type(heating_text):
     if not heating_text or heating_text == "-1":
@@ -96,27 +99,36 @@ def parse_page(html):
         info_div = offer_card.find("div", class_="property-info")
         if info_div:
             text = info_div.get_text(separator=" ", strip=True)
-            parts = text.split("•")
-            if len(parts) > 0:
-                size_text = parts[0].strip().replace("m²", "").replace(",", "")
+
+            size_match = POWIERZCHNIA_RE.search(text)
+            room_match = POKOJE_RE.search(text)
+            floor_match = PIETRO_RE.search(text)
+
+            if size_match:
+                size_text = size_match.group()
+
+                size_text = size_text.replace("m²", "").strip()
                 try:
                     size = float(size_text)
                 except ValueError:
                     print("Unable to convert size " + size_text + " into a float")
 
-            if len(parts) > 1:
-                room_count = re.search(r'\d+', parts[1].strip()).group(0)
-                rooms = int(room_count)
+            if room_match:
+                room_text = room_match.group()
+                try:
+                    rooms = int(re.search(r"\d+", room_text).group())
+                except ValueError:
+                    print("Unable to convert rooms " + room_text + " into int")
 
-            if len(parts) > 2:
-                floor_text = parts[2].strip().lower()
+            if floor_match:
+                floor_text = floor_match.group()
                 if "parter" in floor_text:
                     floor = 0
                 else:
-                    floor_match = re.search(r'\d+', floor_text)
-                    if floor_match:
-                        floor = int(floor_match.group(0))
-
+                    try:
+                        floor = int(re.search(r"\d+", floor_text).group())
+                    except ValueError:
+                        print("Unable to convert floor " + floor_text + "into int")
 
         image_element = offer_card.find("img", attrs={"data-cy": "gallerySliderImgThumbnail"})
         if image_element:
@@ -238,11 +250,11 @@ def parse_coords(html):
             pass
     return None
 
-async def scrape_prices_and_streets(base_url, pages=1):
+async def scrape_prices_and_streets(base_url, pages=1, start_page=1):
     results = []
     async with aiohttp.ClientSession() as session:
         tasks = []
-        for page in range(1, pages + 1):
+        for page in range(start_page, start_page + pages):
             url = f"{base_url}&page={page}"
             tasks.append(fetch(session, url))
 
@@ -324,7 +336,7 @@ if __name__ == "__main__":
     output_dir = "ScraperOutput"
     os.makedirs(output_dir, exist_ok=True)
     
-    data = asyncio.run(scrape_prices_and_streets(BASE_URL, pages=20))
+    data = asyncio.run(scrape_prices_and_streets(BASE_URL, pages=130, start_page=1))
 
     output_file = os.path.join(output_dir, f"{SELECTED_CITY}-morizon.csv")
     df = pd.DataFrame(data)
