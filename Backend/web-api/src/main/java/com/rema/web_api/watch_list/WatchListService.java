@@ -52,7 +52,7 @@ public class WatchListService {
         List<WatchList> userWatchList = watchListRepository.findByIdUserId(userId);
 
         if(userWatchList.isEmpty()) {
-            throw new IllegalStateException("Takiego użytkownika nie ma w bazie danych");
+            throw new IllegalStateException("Użytkownik nie ma nic na swojej liście obserwowanych nieruchomości");
         }
 
         return userWatchList;

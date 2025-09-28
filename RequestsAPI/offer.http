@@ -1,0 +1,8 @@
+### Add offers from csv to database
+POST http://localhost:8080/api/offer/add
+
+### Get map points
+GET http://localhost:8080/api/offer/map-points
+
+### Show offer details
+GET http://localhost:8080/api/offer/show?offerId=686

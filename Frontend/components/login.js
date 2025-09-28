@@ -54,9 +54,14 @@ function setupLoginForm() {
                     console.log('Login successful:', result);
                     alert('Logowanie przebiegło pomyślnie!');
 
-                    if (result && result.token) {
+                    if (result && result.jwt) {
+                        localStorage.setItem('authToken', result.jwt);
+                        console.log('JWT token saved:', result.jwt);
+                    } else if (result && result.token) {
                         localStorage.setItem('authToken', result.token);
+                        console.log('Token saved:', result.token);
                     } else {
+                        console.warn('No JWT token received, using fallback');
                         localStorage.setItem('authToken', 'logged_in_' + Date.now());
                     }
 
@@ -110,7 +115,6 @@ function clearLoginForm() {
 if (typeof window !== 'undefined') {
     window.setupLoginForm = setupLoginForm;
     window.initializeLoginComponent = initializeLoginComponent;
-    window.handleLoginFormSubmit = handleLoginFormSubmit;
     window.validateEmail = validateEmail;
     window.clearLoginForm = clearLoginForm;
 }

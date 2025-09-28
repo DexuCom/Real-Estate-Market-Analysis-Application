@@ -4,30 +4,76 @@ var tileLayers = {};
 var currentLayer = null;
 var heatmapLayer = null;
 var heatmapData = [];
+var markerClusterGroup = null;
+var allOffers = [];
+var globalMinPrice = 5000;
+var globalMaxPrice = 20000;
 
 function initializeRealEstateMap() {
     console.log('Initializing Real Estate Map');
 
-    map = L.map('map').setView([54.37, 18.63], 11);
+    map = L.map('map', {
+        maxZoom: 18,
+        minZoom: 8
+    }).setView([54.37, 18.63], 11);
+
+    if (typeof L.markerClusterGroup === 'function') {
+        markerClusterGroup = L.markerClusterGroup({
+            maxClusterRadius: 60,
+            spiderfyOnMaxZoom: true,
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: true,
+            iconCreateFunction: function (cluster) {
+                const childCount = cluster.getChildCount();
+                let className = 'marker-cluster-';
+
+                if (childCount < 10) {
+                    className += 'small';
+                } else if (childCount < 100) {
+                    className += 'medium';
+                } else {
+                    className += 'large';
+                }
+
+                return new L.DivIcon({
+                    html: '<div><span>' + childCount + '</span></div>',
+                    className: 'marker-cluster ' + className,
+                    iconSize: new L.Point(40, 40)
+                });
+            }
+        });
+
+        map.addLayer(markerClusterGroup);
+        console.log('Marker clustering enabled');
+    } else {
+        console.warn('Leaflet.markercluster plugin not available - clustering disabled');
+        markerClusterGroup = null;
+    }
 
     tileLayers = {
         'openstreetmap': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
+            attribution: '© OpenStreetMap',
+            maxZoom: 19
         }),
         'cartodb': L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '© OpenStreetMap © CartoDB'
+            attribution: '© OpenStreetMap © CartoDB',
+            maxZoom: 19
         }),
         'cartodb-dark': L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '© OpenStreetMap © CartoDB'
+            attribution: '© OpenStreetMap © CartoDB',
+            maxZoom: 19
         }),
         'stamen-terrain': L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png', {
-            attribution: 'Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap'
+            attribution: 'Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap',
+            maxZoom: 18
         }),
         'stamen-toner': L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}{r}.png', {
-            attribution: 'Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap'
+            attribution: 'Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap',
+            maxZoom: 18
         }),
         'esri-satellite': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Tiles © Esri — Source: Esri, Maxar, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AeroGRID, IGN, and the GIS User Community'
+            attribution: 'Tiles © Esri — Source: Esri, Maxar, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AeroGRID, IGN, and the GIS User Community',
+            maxZoom: 18
         })
     };
 
@@ -91,70 +137,48 @@ function setupEventListeners() {
     }
 }
 
-function calculatePricePerSqm(price, size) {
-    const priceNum = parseFloat(price.replace(/[^\d]/g, ''));
-    const sizeNum = parseFloat(size.replace(/[^\d]/g, ''));
-    return sizeNum > 0 ? priceNum / sizeNum : 0;
-}
 
-function interpolateColor(color1, color2, factor) {
-    const c1 = hexToRgb(color1);
-    const c2 = hexToRgb(color2);
-
-    const r = Math.round(c1.r + (c2.r - c1.r) * factor);
-    const g = Math.round(c1.g + (c2.g - c1.g) * factor);
-    const b = Math.round(c1.b + (c2.b - c1.b) * factor);
-
-    return `rgb(${r}, ${g}, ${b})`;
-}
-
-function hexToRgb(hex) {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : null;
-}
-
-function getColorByPrice(pricePerSqm) {
-    const minPrice = 5000;
-    const maxPrice = 20000;
-
-    let normalizedPrice = (pricePerSqm - minPrice) / (maxPrice - minPrice);
-    normalizedPrice = Math.max(0, Math.min(1, normalizedPrice));
-
-    const greenColor = '#4CAF50';
-    const yellowColor = '#FFC107';
-    const redColor = '#F44336';
-
-    if (normalizedPrice < 0.5) {
-        return interpolateColor(greenColor, yellowColor, normalizedPrice * 2);
-    } else {
-        return interpolateColor(yellowColor, redColor, (normalizedPrice - 0.5) * 2);
-    }
-}
 
 function createBackgroundHeatmapData() {
-    const backgroundPoints = [];
     const bounds = map.getBounds();
     const latRange = bounds.getNorth() - bounds.getSouth();
     const lngRange = bounds.getEast() - bounds.getWest();
-
     const gridSize = 25;
     const latStep = latRange / gridSize;
     const lngStep = lngRange / gridSize;
 
+    const pricesPerSqm = allOffers
+        .filter(offer => offer.pm2)
+        .map(offer => offer.pm2)
+        .filter(price => price > 0);
+
+    let intensity = 0.5;
+
+    if (pricesPerSqm.length > 0) {
+        const averagePricePerSqm = pricesPerSqm.reduce((sum, price) => sum + price, 0) / pricesPerSqm.length;
+        globalMinPrice = Math.min(...pricesPerSqm);
+        globalMaxPrice = Math.max(...pricesPerSqm);
+
+        intensity = globalMaxPrice > globalMinPrice ?
+            (averagePricePerSqm - globalMinPrice) / (globalMaxPrice - globalMinPrice) : 0.5;
+        intensity = Math.max(0.1, Math.min(0.9, intensity));
+    }
+
+    const backgroundPoints = [];
     for (let i = 0; i <= gridSize; i++) {
         for (let j = 0; j <= gridSize; j++) {
-            const lat = bounds.getSouth() + (i * latStep);
-            const lng = bounds.getWest() + (j * lngStep);
-
-            backgroundPoints.push([lat, lng, 0.01]);
+            backgroundPoints.push([
+                bounds.getSouth() + (i * latStep),
+                bounds.getWest() + (j * lngStep),
+                intensity
+            ]);
         }
     }
+
     return backgroundPoints;
 }
+
+
 
 function toggleHeatmap() {
     const isChecked = document.getElementById('heatmapToggle').checked;
@@ -164,18 +188,23 @@ function toggleHeatmap() {
             const backgroundData = createBackgroundHeatmapData();
             const combinedData = [...backgroundData, ...heatmapData];
 
+            const currentZoom = map.getZoom();
+            const baseOpacity = Math.max(0.05, 0.25 - (currentZoom - 11) * 0.03);
+            const maxOpacity = Math.max(0.08, baseOpacity * 1.5);
+
             heatmapLayer = L.heatLayer(combinedData, {
-                radius: 70,
-                blur: 50,
-                maxZoom: 15,
-                minOpacity: 0.15,
+                radius: Math.max(30, 80 - (currentZoom - 11) * 5),
+                blur: Math.max(20, 60 - (currentZoom - 11) * 5),
+                maxZoom: 18,
+                minOpacity: Math.max(0.01, baseOpacity * 0.3),
+                maxOpacity: maxOpacity,
                 gradient: {
-                    0.0: '#4CAF50',
-                    0.1: '#4CAF50',
-                    0.3: '#66BB6A',
-                    0.5: '#FFC107',
-                    0.7: '#FF9800',
-                    1.0: '#F44336'
+                    0.0: `rgba(76, 175, 80, ${baseOpacity})`,
+                    0.2: `rgba(139, 195, 74, ${baseOpacity * 1.1})`,
+                    0.4: `rgba(255, 235, 59, ${baseOpacity * 1.2})`,
+                    0.6: `rgba(255, 193, 7, ${baseOpacity * 1.2})`,
+                    0.8: `rgba(255, 152, 0, ${baseOpacity * 1.3})`,
+                    1.0: `rgba(244, 67, 54, ${baseOpacity * 1.3})`
                 }
             }).addTo(map);
         }
@@ -188,21 +217,37 @@ function toggleHeatmap() {
 }
 
 function loadPropertyData() {
-    fetch('../../ScraperOutput/Gdańsk-morizon.csv')
-        .then(response => response.text())
-        .then(csvText => {
-            Papa.parse(csvText, {
-                header: true,
-                skipEmptyLines: true,
-                complete: function (results) {
-                    results.data.forEach(function (row) {
-                        if (row.coords) {
-                            const [lat, lng] = row.coords.split(',').map(coord => parseFloat(coord));
-                            if (!isNaN(lat) && !isNaN(lng)) {
-                                createPropertyMarker(row, lat, lng);
-                            }
-                        }
-                    });
+    console.log('Loading property data from API...');
+
+    if (markerClusterGroup) {
+        markerClusterGroup.clearLayers();
+    }
+
+    heatmapData = [];
+    allOffers = [];
+
+    fetch('http://localhost:8080/api/offer/map-points')
+        .then(response => {
+            console.log('Fetch response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Property data loaded from API, count:', data.length);
+            console.log('Sample data:', data.slice(0, 3));
+
+            allOffers = data.slice();
+
+            data.forEach(function (offer) {
+                if (offer.x && offer.y) {
+                    const lat = parseFloat(offer.y);
+                    const lng = parseFloat(offer.x);
+
+                    if (!isNaN(lat) && !isNaN(lng)) {
+                        createPropertyMarker(offer, lat, lng);
+                    }
                 }
             });
         })
@@ -211,14 +256,17 @@ function loadPropertyData() {
         });
 }
 
-function createPropertyMarker(row, lat, lng) {
-    const pricePerSqm = calculatePricePerSqm(row.price_pln, row.size_m2);
-    const iconColor = getColorByPrice(pricePerSqm);
+function createPropertyMarker(offer, lat, lng) {
+    let realPricePerSqm = (globalMinPrice + globalMaxPrice) / 2;
 
-    const minPrice = 5000;
-    const maxPrice = 20000;
-    let intensity = (pricePerSqm - minPrice) / (maxPrice - minPrice);
-    intensity = Math.max(0.3, Math.min(1, intensity));
+    if (offer.pm2) {
+        realPricePerSqm = offer.pm2;
+    }
+
+    let intensity = globalMaxPrice > globalMinPrice ?
+        (realPricePerSqm - globalMinPrice) / (globalMaxPrice - globalMinPrice) : 0.5;
+    intensity = Math.max(0.1, Math.min(1.0, intensity));
+
     heatmapData.push([lat, lng, intensity]);
 
     const homeIcon = L.divIcon({
@@ -229,21 +277,27 @@ function createPropertyMarker(row, lat, lng) {
         popupAnchor: [0, -15]
     });
 
-    const marker = L.marker([lat, lng], { icon: homeIcon }).addTo(map);
+    const marker = L.marker([lat, lng], { icon: homeIcon });
+
+    if (markerClusterGroup) {
+        markerClusterGroup.addLayer(marker);
+    } else {
+        marker.addTo(map);
+    }
 
     marker.on('click', function () {
-        showPropertyPanel(row, pricePerSqm);
+        showPropertyPanel(offer, realPricePerSqm);
     });
 
     setTimeout(() => {
         const iconElement = marker.getElement();
         if (iconElement) {
-            iconElement.style.backgroundColor = iconColor;
+            iconElement.style.setProperty('background-color', '#8b5cf6', 'important');
         }
-    }, 100);
+    }, 200);
 }
 
-async function showPropertyPanel(row, pricePerSqm) {
+async function showPropertyPanel(offer, pricePerSqm) {
     const panel = document.getElementById('propertyPanel');
 
     const addButton = document.getElementById('addToWatchlist');
@@ -256,10 +310,10 @@ async function showPropertyPanel(row, pricePerSqm) {
     panel.classList.add('active');
 
     try {
-        const response = await fetch(`http://localhost:8080/api/offer/show?offerId=${encodeURIComponent(row.detail_url)}`);
+        const response = await fetch(`http://localhost:8080/api/offer/show?offerId=${encodeURIComponent(offer.id)}`);
         if (response.ok) {
             const offerDetails = await response.json();
-            populatePropertyDetails(offerDetails, row, pricePerSqm);
+            populatePropertyDetails(offerDetails, offer, pricePerSqm);
         } else {
             setErrorState('Błąd pobierania danych z API');
         }
@@ -308,24 +362,18 @@ function setErrorState(errorMessage) {
     document.getElementById('addToWatchlist').onclick = null;
 }
 
-function populatePropertyDetails(offerDetails, row, pricePerSqm) {
+function populatePropertyDetails(offerDetails, offer, pricePerSqm) {
     document.getElementById('propertyStreet').textContent = offerDetails.street || 'Brak danych';
-    document.getElementById('currentPrice').textContent = (offerDetails.price_pln ? offerDetails.price_pln.toLocaleString() + ' PLN' : 'Brak danych');
-    document.getElementById('propertySize').textContent = offerDetails.size_m2 || 'Brak danych';
+    document.getElementById('currentPrice').textContent = (offerDetails.pricePln ? offerDetails.pricePln.toLocaleString() + ' PLN' : 'Brak danych');
+    document.getElementById('propertySize').textContent = offerDetails.sizeM2 || 'Brak danych';
     document.getElementById('propertyRooms').textContent = offerDetails.rooms || 'Brak danych';
     document.getElementById('propertyFloor').textContent = offerDetails.floor || 'Brak danych';
-    document.getElementById('propertyYear').textContent = offerDetails.year_built || 'Brak danych';
+    document.getElementById('propertyYear').textContent = offerDetails.yearBuilt || 'Brak danych';
     document.getElementById('propertyMarket').textContent = offerDetails.market ? `Rynek ${offerDetails.market}` : 'Brak danych';
     document.getElementById('propertyHeating').textContent = offerDetails.heating || 'Brak danych';
-    document.getElementById('propertyTotalFloors').textContent = offerDetails.total_floors ? `Budynek ${offerDetails.total_floors}-piętrowy` : 'Brak danych';
+    document.getElementById('propertyTotalFloors').textContent = offerDetails.totalFloors ? `Budynek ${offerDetails.totalFloors}-piętrowy` : 'Brak danych';
 
     let apiPricePerSqm = pricePerSqm;
-    if (offerDetails.price_pln && offerDetails.size_m2) {
-        const sizeNum = parseFloat(offerDetails.size_m2.toString().replace(/[^\d]/g, ''));
-        if (sizeNum > 0) {
-            apiPricePerSqm = offerDetails.price_pln / sizeNum;
-        }
-    }
     document.getElementById('pricePerSqm').textContent = Math.round(apiPricePerSqm).toLocaleString() + ' zł / m²';
 
     setPropertyAmenities(offerDetails);
@@ -333,11 +381,11 @@ function populatePropertyDetails(offerDetails, row, pricePerSqm) {
     setPropertyImage(offerDetails);
 
     document.getElementById('viewOffer').onclick = function () {
-        window.open(row.detail_url, '_blank');
+        window.open(offerDetails.detailUrl, '_blank');
     };
 
     document.getElementById('addToWatchlist').onclick = function () {
-        addToWatchlist(row.detail_url);
+        addToWatchlist(offer.id);
     };
 }
 
@@ -365,8 +413,8 @@ function setPropertyAmenities(offerDetails) {
 function setPropertyImage(offerDetails) {
     const imageDiv = document.getElementById('propertyImage');
 
-    if (offerDetails.image_url) {
-        imageDiv.innerHTML = `<img src="${offerDetails.image_url}" alt="Zdjęcie mieszkania">`;
+    if (offerDetails.imageUrl) {
+        imageDiv.innerHTML = `<img src="${offerDetails.imageUrl}" alt="Zdjęcie mieszkania">`;
     } else {
         imageDiv.innerHTML = '<div style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #666; font-family: \'Outfit\', Arial, sans-serif;">Brak zdjęcia</div>';
     }
@@ -381,13 +429,18 @@ function addToWatchlist(offerId) {
         return;
     }
 
+    const userId = parent.getCurrentUserId();
+    if (!userId) {
+        alert('Błąd: Brak informacji o użytkowniku. Zaloguj się ponownie.');
+        return;
+    }
+
     const addButton = document.getElementById('addToWatchlist');
     const originalText = addButton.textContent;
 
     addButton.disabled = true;
     addButton.textContent = 'Dodawanie...';
 
-    const userId = 'ba6e97db-1f6f-41fc-a80a-5f948f0ace8c';
     const url = `http://localhost:8080/api/watchLists/add?userId=${encodeURIComponent(userId)}&offerId=${encodeURIComponent(offerId)}`;
 
     fetch(url, {

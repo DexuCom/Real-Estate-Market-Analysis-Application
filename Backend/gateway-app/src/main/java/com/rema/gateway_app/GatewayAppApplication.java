@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 public class GatewayAppApplication {
 	@Value("${urls.web-api}")
 	private String webApiURL;
+	@Value("${urls.scoring-model}")
+	private String scoringModelURL;
 
 	public static void main(String[] args) {
 		SpringApplication.run(GatewayAppApplication.class, args);
@@ -30,6 +32,12 @@ public class GatewayAppApplication {
 								.setStatus(HttpStatus.OK))
 						.uri("no://op")
 				)
+				.route("scoring-model-route", r -> r
+						.path("/api/scoring-model/**")
+						.filters(f -> f.rewritePath("/api/scoring-model/(?<segment>.*)", "/${segment}"))
+						.uri(scoringModelURL)
+				)
+
 
 				.route("webapi-route", r -> r
 						.path("/api/**")

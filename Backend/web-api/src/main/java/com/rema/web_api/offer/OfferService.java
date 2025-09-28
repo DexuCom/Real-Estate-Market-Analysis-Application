@@ -1,90 +1,135 @@
 package com.rema.web_api.offer;
 
-import com.opencsv.CSVReader;
+import com.opencsv.bean.CsvToBean;
+import com.opencsv.bean.CsvToBeanBuilder;
+import com.rema.web_api.offer.dto.OfferMapPointDTO;
+import com.rema.web_api.offer.dto.OfferPricePredictionResponse;
+import jakarta.annotation.PostConstruct;
+import org.apache.commons.io.input.BOMInputStream;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
 public class OfferService {
 
     private final OfferRepository offerRepository;
+    private final WebClient webClient;
 
-    public OfferService (OfferRepository _offerRepository){
+    private final String PREDICTION_URL_SUFFIX = "api/scoring-model/predict/";
+
+    public OfferService(OfferRepository _offerRepository, WebClient _webClient) {
         this.offerRepository = _offerRepository;
+        this.webClient = _webClient;
     }
 
-    public Optional<Offer> getOffer(String offerId) {
+    @PostConstruct
+    private void init() throws IOException {
+        this.registerOffers();
+    }
+
+
+    public Optional<Offer> getOffer(Integer offerId) {
         return offerRepository.findById(offerId);
     }
-
+          
     @Transactional
-    public List<Offer> registerOffers() {
+    public List<Offer> registerOffers() throws IOException {
+
+        offerRepository.deleteAll();
 
         List<Offer> savedOffers = new ArrayList<>();
 
-        try {
+        try (BOMInputStream bomInputStream = new BOMInputStream(new ClassPathResource("offers.csv").getInputStream());
+             Reader reader = new InputStreamReader(bomInputStream, StandardCharsets.UTF_8)) {
 
-            InputStreamReader reader = new InputStreamReader(
-                    getClass().getResourceAsStream("/offers.csv")
-            );
-            CSVReader csvReader = new CSVReader(reader);
 
-            String[] line;
-            boolean headerLine = true;
+            CsvToBean<OfferCsv> csvToBean = new CsvToBeanBuilder<OfferCsv>(reader)
+                    .withType(OfferCsv.class)
+                    .withIgnoreLeadingWhiteSpace(true)
+                    .build();
+            List<OfferCsv> offerCsvList = csvToBean.parse();
 
-            while ((line = csvReader.readNext()) != null) {
-
-                if (headerLine) {
-
-                    headerLine = false;
-                    continue;
-                }
-
-                String offerId = line[6];
-
-                Optional<Offer> existingOffer = offerRepository.findById(offerId);
-                if (existingOffer.isPresent()) {
-                    continue;
-                }
-
+            for (OfferCsv offerCsv : offerCsvList) {
                 Offer offer = Offer.builder()
-                        .offerId(line[6])
-                        .city(line[0])
-                        .street(line[1])
-                        .price_pln(Integer.valueOf(line[2]))
-                        .size_m2(line[3])
-                        .rooms(line[4])
-                        .floor(line[5])
-                        .image_url(line[7])
-                        .year_built(Integer.valueOf(line[8]))
-                        .market(line[9])
-                        .heating(line[10])
-                        .total_floors(Integer.valueOf(line[11]))
-                        .intercom(Integer.valueOf(line[12]))
-                        .basement(Integer.valueOf(line[13]))
-                        .furnished(Integer.valueOf(line[14]))
-                        .elevator(Integer.valueOf(line[15]))
-                        .parkingSpace(Integer.valueOf(line[16]))
-                        .gatedProperty(Integer.valueOf(line[17]))
-                        .balcony(Integer.valueOf(line[18]))
-                        .terrace(Integer.valueOf(line[19]))
-                        .garden(Integer.valueOf(line[20]))
+                        .city(offerCsv.getCity())
+                        .street(offerCsv.getStreet())
+                        .pricePln(offerCsv.getPricePln())
+                        .sizeM2(offerCsv.getSize_m2())
+                        .rooms(offerCsv.getRooms())
+                        .floor(offerCsv.getFloor())
+                        .imageUrl(offerCsv.getImageUrl())
+                        .detailUrl(offerCsv.getDetailUrl())
+                        .yearBuilt(offerCsv.getYearBuilt())
+                        .market(offerCsv.getMarket())
+                        .heating(offerCsv.getHeating())
+                        .totalFloors(offerCsv.getTotalFloors())
+                        .intercom(offerCsv.getIntercom())
+                        .basement(offerCsv.getBasement())
+                        .furnished(offerCsv.getFurnished())
+                        .elevator(offerCsv.getElevator())
+                        .parkingSpace(offerCsv.getParkingSpace())
+                        .gatedProperty(offerCsv.getGatedProperty())
+                        .balcony(offerCsv.getBalcony())
+                        .terrace(offerCsv.getTerrace())
+                        .garden(offerCsv.getGarden())
+                        .latitude(offerCsv.getLatitude())
+                        .longitude(offerCsv.getLongitude())
                         .build();
-
                 offerRepository.save(offer);
                 savedOffers.add(offer);
             }
 
-            csvReader.close();
         } catch (Exception e) {
             throw new IllegalStateException(e.getMessage());
         }
 
         return savedOffers;
     }
+
+
+    public List<OfferMapPointDTO> getAllMapPoints() {
+        List<Offer> offers = offerRepository.findAll();
+        return offers.stream().map(OfferMappers::mapToOfferMapPointDTO).toList();
+
+    }
+
+    public OfferPricePredictionResponse predictPriceForOfferById(Integer id, String model) {
+        Optional<Offer> offer = offerRepository.findById(id);
+        if (offer.isEmpty()) {
+            throw new NoSuchElementException();
+        }
+
+        return predictPriceForOffer(offer.get(), model);
+    }
+
+    public OfferPricePredictionResponse predictPriceForOffer(Offer offer, String model) {
+        String predictionUri = PREDICTION_URL_SUFFIX + model;
+
+        try {
+            return webClient.post()
+                    .uri(predictionUri)
+                    .body(Mono.just(offer), Offer.class)
+                    .retrieve()
+                    .bodyToMono(OfferPricePredictionResponse.class)
+                    .block();
+
+        } catch (Exception e) {
+            throw new IllegalStateException("Unable to get prediction from scoring model api: " + e.getMessage());
+        }
+
+    }
+
+
 }

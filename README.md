@@ -32,4 +32,40 @@ runAllDocker.bat
 ```bash
 runLocalDev.bat
 ```
-and then turn on the applications you need
+and then turn on the applications you need.
+
+##### scoring model
+In the ModelScoringowy folder: 
+```bash
+uvicorn server:app --reload
+```
+Swagger is available here: http://127.0.0.1:8000/docs
+
+## 🗄️ Database Access via pgAdmin
+
+After running the Docker Compose setup, you can access the PostgreSQL database through pgAdmin:
+
+### 1. Access pgAdmin Web Interface
+Open your browser and navigate to: **http://localhost:8090**
+
+### 2. Login to pgAdmin
+- **Email:** `admin@admin.com`
+- **Password:** `admin`
+
+### 3. Add PostgreSQL Server
+1. Right-click on **"Servers"** in the left panel
+2. Select **"Register"** → **"Server"**
+3. In the **"General"** tab:
+   - **Name:** `PostgreSQL Local` (or any name you prefer)
+4. In the **"Connection"** tab:
+   - **Host name/address:** `postgres_db`
+   - **Port:** `5432`
+   - **Maintenance database:** `db` (from your config.env)
+   - **Username:** `user` (from your config.env)
+   - **Password:** `password` (from your config.env)
+5. Click **"Save"**
+6. You can now access database tables:
+**Databases -> db -> Schemas -> public -> Tables**
+
+
+> **Note:** Make sure your Docker containers are running before attempting to connect to the database.

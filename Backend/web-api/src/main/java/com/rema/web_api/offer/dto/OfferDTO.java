@@ -8,19 +8,21 @@ import lombok.Setter;
 @Setter
 @Builder
 public class OfferDTO {
+    private int id;
 
-    private String offerId;
     private String city;
     private String street;
-    private Integer price_pln;
-    private String size_m2;
+    private Integer pricePln;
+    private Float sizeM2;
     private String rooms;
     private String floor;
-    private String image_url;
-    private Integer year_built;
+
+    private String imageUrl;
+    private String detailUrl;
+    private Integer yearBuilt;
     private String market;
     private String heating;
-    private Integer total_floors;
+    private Integer totalFloors;
     private Integer intercom;
     private Integer basement;
     private Integer furnished;
@@ -30,4 +32,5 @@ public class OfferDTO {
     private Integer balcony;
     private Integer terrace;
     private Integer garden;
+
 }
