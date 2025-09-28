@@ -38,7 +38,7 @@ def prepareData():
     dataframe_cleaned['heating_is_unknown'] = (dataframe['heating'] == 'Inne').astype(int)
     dataframe_cleaned['heating'] = dataframe_cleaned['heating'].map(HEATING_RANKING)
 
-    dataframe_cleaned['market'] = (dataframe['heating'] == 'pierwotny').astype(int)
+    dataframe_cleaned['market'] = (dataframe_cleaned['market'] == 'pierwotny').astype(int)
 
     num_columns_with_unknown = ['year_built', 'total_floors']
 
