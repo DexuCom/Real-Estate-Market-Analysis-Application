@@ -8,6 +8,7 @@ import jakarta.annotation.PostConstruct;
 import org.apache.commons.io.input.BOMInputStream;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -38,10 +39,12 @@ public class OfferService {
         this.registerOffers();
     }
 
+
     public Optional<Offer> getOffer(Integer offerId) {
         return offerRepository.findById(offerId);
     }
-
+          
+    @Transactional
     public List<Offer> registerOffers() throws IOException {
 
         offerRepository.deleteAll();

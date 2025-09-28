@@ -78,4 +78,58 @@ public class UserController {
         }
     }
 
+    @GetMapping("/verify")
+    public ResponseEntity<?> verifyUser(@RequestParam String token) {
+
+        try {
+
+            User user = userService.verifyUser(token);
+
+            return ResponseEntity.ok().body("Konto zostało pomyślnie zweryfikowane!");
+        } catch (IllegalArgumentException e) {
+
+            ErrorDTO errorDTO = new ErrorDTO(e.getMessage(), HttpStatus.BAD_REQUEST.value());
+
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(errorDTO);
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestParam String email) {
+
+        try {
+            String responseMessage = userService.forgotPassword(email);
+
+            return ResponseEntity.ok().body("Link do resetowania hasła został wysłany na podany adres email.");
+
+        } catch (IllegalStateException e) {
+
+            ErrorDTO errorDTO = new ErrorDTO(e.getMessage(), HttpStatus.BAD_REQUEST.value());
+            
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(errorDTO);
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
+
+        try {
+            
+            User user = userService.resetPassword(token, newPassword);
+        
+            return ResponseEntity.ok().body("Hasło zostało pomyślnie zresetowane!");
+       
+        } catch (IllegalArgumentException e) {
+
+            ErrorDTO errorDTO = new ErrorDTO(e.getMessage(), HttpStatus.BAD_REQUEST.value());
+            
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(errorDTO);
+        }
+    }
 }

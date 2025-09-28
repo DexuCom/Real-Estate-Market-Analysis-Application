@@ -21,7 +21,7 @@ public class User {
     private String username;
     private String passwordHash;
     private String email;
+    private Boolean enabled;
     @Enumerated(EnumType.STRING)
     private Role role;
-
 }
