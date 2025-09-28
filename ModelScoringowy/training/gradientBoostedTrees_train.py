@@ -18,6 +18,7 @@ XGBOOST_SEARCH_CONFIG = {
     'xgb__min_child_weight': [1, 5, 10]
 }
 
+
 pipeline = Pipeline([
     ('scaler', StandardScaler()),
     ('xgb', xgb.XGBRegressor(random_state=RANDOM_SEED))
