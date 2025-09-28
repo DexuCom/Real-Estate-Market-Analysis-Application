@@ -1,1 +1,1 @@
-Scraper estate heating type normalization, changed error message when userWatchList is empty, split requests into smaller files by category
+Changed login button to submit-type, fixed pricePerSqm bug

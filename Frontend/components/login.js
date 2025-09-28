@@ -97,19 +97,6 @@ function handleLoginFormSubmit() {
             }
         });
     }
-
-    const passwordInput = document.getElementById('loginPassword');
-    if (passwordInput) {
-        passwordInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const loginBtn = document.getElementById('loginBtn');
-                if (loginBtn) {
-                    loginBtn.click();
-                }
-            }
-        });
-    }
 }
 
 function validateEmail(email) {
@@ -128,7 +115,6 @@ function clearLoginForm() {
 if (typeof window !== 'undefined') {
     window.setupLoginForm = setupLoginForm;
     window.initializeLoginComponent = initializeLoginComponent;
-    window.handleLoginFormSubmit = handleLoginFormSubmit;
     window.validateEmail = validateEmail;
     window.clearLoginForm = clearLoginForm;
 }

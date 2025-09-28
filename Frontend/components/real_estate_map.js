@@ -285,10 +285,8 @@ function createPropertyMarker(offer, lat, lng) {
         marker.addTo(map);
     }
 
-    let pricePerSqm = offer.pm2 || realPricePerSqm;
-
     marker.on('click', function () {
-        showPropertyPanel(offer, pricePerSqm);
+        showPropertyPanel(offer, realPricePerSqm);
     });
 
     setTimeout(() => {
