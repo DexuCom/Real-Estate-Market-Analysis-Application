@@ -2,7 +2,8 @@ import os
 
 import numpy as np
 import pandas
-FILE_PATH = "../Scraper/ScraperOutput/Gdańsk-morizon.csv"
+# FILE_PATH = "../Scraper/ScraperOutput/Gdańsk-morizon.csv"
+FILE_PATH = "../Scraper/ScraperOutput/oferty.csv"
 
 # NORMAL HEATING
 HEATING_RANKING = {
