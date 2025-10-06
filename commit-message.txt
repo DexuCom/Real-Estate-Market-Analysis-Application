@@ -1,1 +1,1 @@
-Changed login button to submit-type, fixed pricePerSqm bug
+Added pages for password change, added new forgot-password.http file with rest requests

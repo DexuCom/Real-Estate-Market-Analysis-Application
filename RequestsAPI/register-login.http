@@ -3,9 +3,9 @@ POST http://localhost:8080/api/users
 Content-Type: application/json
 
 {
-  "username": "test16",
+  "username": "cheraleedankert",
   "password": "testpassword123",
-  "email": "test16@example.com"
+  "email": "cheralee.dankert@easymailer.live"
 }
 
 ### Register another user for testing
