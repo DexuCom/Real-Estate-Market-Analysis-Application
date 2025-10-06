@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="components/login.css">
     <link rel="stylesheet" href="components/register.css">
     <link rel="stylesheet" href="components/account.css">
+    <link rel="stylesheet" href="components/forgot_password.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 
@@ -52,6 +53,7 @@
     <div id="login-placeholder" style="display: none;"></div>
     <div id="register-placeholder" style="display: none;"></div>
     <div id="account-placeholder" style="display: none;"></div>
+    <div id="forgot-password-placeholder" style="display: none;"></div>
 </body>
 
 <script>
@@ -333,12 +335,56 @@
         console.log('Setting up account form');
     }
 
+    function showForgotPassword(event) {
+        event.preventDefault();
+        hideAllContainers();
+        const forgotPasswordContainer = document.getElementById('forgot-password-placeholder');
+        forgotPasswordContainer.style.display = 'block';
+
+        if (!forgotPasswordContainer.innerHTML) {
+            fetch('components/forgot_password.html')
+                .then(response => response.text())
+                .then(data => {
+                    forgotPasswordContainer.innerHTML = data;
+
+                    const existingScript = document.getElementById('forgot-password-script');
+                    if (existingScript) {
+                        existingScript.remove();
+                    }
+
+                    const script = document.createElement('script');
+                    script.id = 'forgot-password-script';
+                    script.src = 'components/forgot_password.js';
+                    script.onload = function () {
+                        console.log('Forgot password script loaded successfully');
+                        if (typeof setupForgotPasswordForm === 'function') {
+                            setupForgotPasswordForm();
+                        } else {
+                            console.error('setupForgotPasswordForm function not found');
+                        }
+                    };
+                    script.onerror = function () {
+                        console.error('Failed to load forgot password script');
+                    };
+                    document.head.appendChild(script);
+                });
+        } else {
+            console.log('Forgot password already loaded, setting up form');
+            if (typeof setupForgotPasswordForm === 'function') {
+                setupForgotPasswordForm();
+            } else {
+                console.error('setupForgotPasswordForm function not found');
+            }
+        }
+    }
+
     function hideAllContainers() {
         document.getElementById('mapContainer').style.display = 'none';
         document.getElementById('home-placeholder').style.display = 'none';
         document.getElementById('login-placeholder').style.display = 'none';
         document.getElementById('register-placeholder').style.display = 'none';
         document.getElementById('account-placeholder').style.display = 'none';
+        document.getElementById('forgot-password-placeholder').style.display = 'none';
     }
 
 </script>
