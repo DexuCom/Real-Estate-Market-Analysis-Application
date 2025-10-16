@@ -49,6 +49,9 @@
     <div id="mapContainer" class="map-container" style="display: none;">
         <iframe id="mapFrame" src="components/real_estate_map.html" frameborder="0"></iframe>
     </div>
+    <div id="scoring-report-container" class="map-container" style="display: none;">
+        <iframe id="scoringReportFrame" src="components/scoring_report.html" frameborder="0"></iframe>
+    </div>
     <div id="home-placeholder"></div>
     <div id="login-placeholder" style="display: none;"></div>
     <div id="register-placeholder" style="display: none;"></div>
@@ -380,11 +383,47 @@
 
     function hideAllContainers() {
         document.getElementById('mapContainer').style.display = 'none';
+        document.getElementById('scoring-report-container').style.display = 'none';
         document.getElementById('home-placeholder').style.display = 'none';
         document.getElementById('login-placeholder').style.display = 'none';
         document.getElementById('register-placeholder').style.display = 'none';
         document.getElementById('account-placeholder').style.display = 'none';
         document.getElementById('forgot-password-placeholder').style.display = 'none';
+    }
+
+    function loadComponent(componentName) {
+        hideAllContainers();
+
+        if (componentName === 'real_estate_map') {
+            document.getElementById('mapContainer').style.display = 'block';
+        } else if (componentName === 'scoring_report') {
+            document.getElementById('mapContainer').style.display = 'block';
+
+            const container = document.getElementById('scoring-report-container');
+            container.style.display = 'block';
+
+            const iframe = document.getElementById('scoringReportFrame');
+            if (iframe.contentWindow && iframe.contentWindow.initializeScoringReport) {
+                iframe.contentWindow.initializeScoringReport();
+            } else {
+                iframe.onload = function () {
+                    if (iframe.contentWindow.initializeScoringReport) {
+                        iframe.contentWindow.initializeScoringReport();
+                    }
+                };
+                if (!iframe.src || iframe.src === 'about:blank') {
+                    iframe.src = 'components/scoring_report.html';
+                }
+            }
+        } else if (componentName === 'home') {
+            showHome(new Event('click'));
+        } else if (componentName === 'login') {
+            showLogin(new Event('click'));
+        } else if (componentName === 'register') {
+            showRegister(new Event('click'));
+        } else if (componentName === 'account') {
+            showAccount(new Event('click'));
+        }
     }
 
 </script>

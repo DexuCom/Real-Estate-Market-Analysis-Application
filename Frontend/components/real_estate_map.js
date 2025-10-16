@@ -344,19 +344,19 @@ function setLoadingState() {
 
 function setErrorState(errorMessage) {
     document.getElementById('propertyStreet').textContent = errorMessage;
-    document.getElementById('currentPrice').textContent = 'Błąd połączenia';
-    document.getElementById('propertySize').textContent = 'Błąd połączenia';
-    document.getElementById('propertyRooms').textContent = 'Błąd połączenia';
-    document.getElementById('propertyFloor').textContent = 'Błąd połączenia';
-    document.getElementById('propertyYear').textContent = 'Błąd połączenia';
-    document.getElementById('propertyMarket').textContent = 'Błąd połączenia';
-    document.getElementById('propertyHeating').textContent = 'Błąd połączenia';
-    document.getElementById('propertyTotalFloors').textContent = 'Błąd połączenia';
-    document.getElementById('pricePerSqm').textContent = 'Błąd połączenia';
-    document.getElementById('propertyAmenities').innerHTML = '<span>Błąd połączenia z API</span>';
+    document.getElementById('currentPrice').textContent = errorMessage;
+    document.getElementById('propertySize').textContent = errorMessage;
+    document.getElementById('propertyRooms').textContent = errorMessage;
+    document.getElementById('propertyFloor').textContent = errorMessage;
+    document.getElementById('propertyYear').textContent = errorMessage;
+    document.getElementById('propertyMarket').textContent = errorMessage;
+    document.getElementById('propertyHeating').textContent = errorMessage;
+    document.getElementById('propertyTotalFloors').textContent = errorMessage;
+    document.getElementById('pricePerSqm').textContent = errorMessage;
+    document.getElementById('propertyAmenities').innerHTML = `<span>${errorMessage}</span>`;
 
     const imageDiv = document.getElementById('propertyImage');
-    imageDiv.innerHTML = '<div style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #666; font-family: \'Outfit\', Arial, sans-serif;">Błąd połączenia</div>';
+    imageDiv.innerHTML = `<div style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #666; font-family: 'Outfit', Arial, sans-serif;">${errorMessage}</div>`;
 
     document.getElementById('viewOffer').onclick = null;
     document.getElementById('addToWatchlist').onclick = null;
@@ -365,12 +365,12 @@ function setErrorState(errorMessage) {
 function populatePropertyDetails(offerDetails, offer, pricePerSqm) {
     document.getElementById('propertyStreet').textContent = offerDetails.street || 'Brak danych';
     document.getElementById('currentPrice').textContent = (offerDetails.pricePln ? offerDetails.pricePln.toLocaleString() + ' PLN' : 'Brak danych');
-    document.getElementById('propertySize').textContent = offerDetails.sizeM2 || 'Brak danych';
+    document.getElementById('propertySize').textContent = offerDetails.sizeM2 ? offerDetails.sizeM2 + ' m²' : 'Brak danych';
     document.getElementById('propertyRooms').textContent = offerDetails.rooms || 'Brak danych';
-    document.getElementById('propertyFloor').textContent = offerDetails.floor || 'Brak danych';
-    document.getElementById('propertyYear').textContent = offerDetails.yearBuilt || 'Brak danych';
+    document.getElementById('propertyFloor').textContent = offerDetails.floor ? `${offerDetails.floor} piętro` : 'Brak danych';
+    document.getElementById('propertyYear').textContent = offerDetails.yearBuilt ? offerDetails.yearBuilt + ' r.' : 'Brak danych';
     document.getElementById('propertyMarket').textContent = offerDetails.market ? `Rynek ${offerDetails.market}` : 'Brak danych';
-    document.getElementById('propertyHeating').textContent = offerDetails.heating || 'Brak danych';
+    document.getElementById('propertyHeating').textContent = (offerDetails.heating && offerDetails.heating !== -1) ? offerDetails.heating : 'Brak danych';
     document.getElementById('propertyTotalFloors').textContent = offerDetails.totalFloors ? `Budynek ${offerDetails.totalFloors}-piętrowy` : 'Brak danych';
 
     let apiPricePerSqm = pricePerSqm;
@@ -381,11 +381,17 @@ function populatePropertyDetails(offerDetails, offer, pricePerSqm) {
     setPropertyImage(offerDetails);
 
     document.getElementById('viewOffer').onclick = function () {
-        window.open(offerDetails.detailUrl, '_blank');
+        openScoringReport(offerDetails, offer, pricePerSqm);
     };
 
     document.getElementById('addToWatchlist').onclick = function () {
         addToWatchlist(offer.id);
+    };
+
+    window.currentReportData = {
+        offerDetails: offerDetails,
+        offer: offer,
+        pricePerSqm: pricePerSqm
     };
 }
 
@@ -468,6 +474,25 @@ function addToWatchlist(offerId) {
         });
 }
 
+function openScoringReport(offerDetails, offer, pricePerSqm) {
+    console.log('Opening scoring report with data:', { offerDetails, offer, pricePerSqm });
+
+    const reportData = {
+        offerDetails: offerDetails,
+        offer: offer,
+        pricePerSqm: pricePerSqm
+    };
+    localStorage.setItem('currentReportData', JSON.stringify(reportData));
+    console.log('Data saved to localStorage');
+
+    if (window.parent && window.parent.loadComponent) {
+        window.parent.loadComponent('scoring_report');
+        console.log('Loading scoring_report component');
+    } else {
+        console.error('Cannot access parent.loadComponent');
+    }
+}
+
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeRealEstateMap);
 } else {
@@ -479,4 +504,5 @@ if (typeof window !== 'undefined') {
     window.toggleHeatmap = toggleHeatmap;
     window.showPropertyPanel = showPropertyPanel;
     window.addToWatchlist = addToWatchlist;
+    window.openScoringReport = openScoringReport;
 }

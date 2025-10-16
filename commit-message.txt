@@ -1,1 +1,1 @@
-Added pages for password change, added new forgot-password.http file with rest requests
+Added scoring report frontend component, small changes in property panel
