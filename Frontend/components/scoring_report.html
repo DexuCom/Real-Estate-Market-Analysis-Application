@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raport Wyceny Nieruchomości</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="scoring_report.css">
+</head>
+
+<body>
+    <div class="report-container">
+        <div class="report-header">
+            <button id="closeReport" class="close-button">
+                <span class="material-icons">close</span>
+            </button>
+            <h1>Raport Wyceny Nieruchomości</h1>
+            <p class="report-subtitle">Szczegółowa analiza oferty</p>
+        </div>
+
+        <div class="report-content">
+            <div class="top-section">
+                <div class="image-section">
+                    <div id="reportImage" class="report-image"></div>
+                </div>
+
+                <div class="scoring-section">
+                    <h2>Wskaźnik Wyceny</h2>
+
+                    <div class="predicted-price-section">
+                        <div class="price-label">Przewidywana cena:</div>
+                        <div id="predictedPrice" class="predicted-price">-- PLN</div>
+                    </div>
+
+                    <div class="gauge-container">
+                        <canvas id="gaugeCanvas" width="260" height="140"></canvas>
+                        <div class="gauge-value">
+                            <span id="gaugeScore" class="score-number">--</span>
+                            <span class="score-label" id="scoreLabel">Ładowanie...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h2>
+                    <span class="material-icons">location_on</span>
+                    Lokalizacja
+                </h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Ulica:</span>
+                        <span class="info-value" id="reportStreet">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h2>
+                    <span class="material-icons">payments</span>
+                    Cena
+                </h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Cena całkowita:</span>
+                        <span class="info-value highlight" id="reportPrice">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Cena za m²:</span>
+                        <span class="info-value highlight" id="reportPricePerSqm">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h2>
+                    <span class="material-icons">home</span>
+                    Szczegóły Nieruchomości
+                </h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Powierzchnia:</span>
+                        <span class="info-value" id="reportSize">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Liczba pokoi:</span>
+                        <span class="info-value" id="reportRooms">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Piętro:</span>
+                        <span class="info-value" id="reportFloor">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Liczba pięter w budynku:</span>
+                        <span class="info-value" id="reportTotalFloors">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Rok budowy:</span>
+                        <span class="info-value" id="reportYear">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Rynek:</span>
+                        <span class="info-value" id="reportMarket">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Ogrzewanie:</span>
+                        <span class="info-value" id="reportHeating">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h2>
+                    <span class="material-icons">check_circle</span>
+                    Udogodnienia
+                </h2>
+                <div id="reportAmenities" class="amenities-grid">
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="viewOriginalOffer" class="btn btn-primary">
+                    <span class="material-icons">open_in_new</span>
+                    Zobacz oryginał oferty
+                </button>
+                <button id="addToWatchlistFromReport" class="btn btn-secondary">
+                    <span class="material-icons">bookmark_add</span>
+                    Dodaj do obserwowanych
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../config.js"></script>
+    <script src="scoring_report.js"></script>
+</body>
+
+</html>

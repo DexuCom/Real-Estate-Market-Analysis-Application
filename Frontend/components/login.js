@@ -33,7 +33,7 @@ function setupLoginForm() {
             };
 
             try {
-                const response = await fetch('http://localhost:8080/api/users/login', {
+                const response = await fetch(`${API_CONFIG.baseUrl}/api/users/login`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
