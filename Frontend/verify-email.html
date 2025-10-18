@@ -8,6 +8,7 @@
     <link rel="icon" type="image/png" href="assets/icon.png">
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="components/reset_password.css">
+    <script src="config.js"></script>
 </head>
 
 <body>
@@ -45,7 +46,7 @@
 
         async function verifyEmailAccount(token) {
             try {
-                const response = await fetch(`http://localhost:8080/api/users/verify?token=${encodeURIComponent(token)}`, {
+                const response = await fetch(`${API_CONFIG.baseUrl}/api/users/verify?token=${encodeURIComponent(token)}`, {
                     method: 'GET'
                 });
 

@@ -318,7 +318,7 @@ function addToWatchlistFromReport() {
     addButton.disabled = true;
     addButton.innerHTML = '<span class="material-icons">hourglass_empty</span>Dodawanie...';
 
-    const url = `http://localhost:8080/api/watchLists/add?userId=${encodeURIComponent(userId)}&offerId=${encodeURIComponent(currentOfferData.id)}`;
+    const url = `${API_CONFIG.baseUrl}/api/watchLists/add?userId=${encodeURIComponent(userId)}&offerId=${encodeURIComponent(currentOfferData.id)}`;
 
     fetch(url, {
         method: 'POST',

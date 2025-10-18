@@ -226,7 +226,7 @@ function loadPropertyData() {
     heatmapData = [];
     allOffers = [];
 
-    fetch('http://localhost:8080/api/offer/map-points')
+    fetch(`${API_CONFIG.baseUrl}/api/offer/map-points`)
         .then(response => {
             console.log('Fetch response status:', response.status);
             if (!response.ok) {
@@ -310,7 +310,7 @@ async function showPropertyPanel(offer, pricePerSqm) {
     panel.classList.add('active');
 
     try {
-        const response = await fetch(`http://localhost:8080/api/offer/show?offerId=${encodeURIComponent(offer.id)}`);
+        const response = await fetch(`${API_CONFIG.baseUrl}/api/offer/show?offerId=${encodeURIComponent(offer.id)}`);
         if (response.ok) {
             const offerDetails = await response.json();
             populatePropertyDetails(offerDetails, offer, pricePerSqm);
@@ -447,7 +447,7 @@ function addToWatchlist(offerId) {
     addButton.disabled = true;
     addButton.textContent = 'Dodawanie...';
 
-    const url = `http://localhost:8080/api/watchLists/add?userId=${encodeURIComponent(userId)}&offerId=${encodeURIComponent(offerId)}`;
+    const url = `${API_CONFIG.baseUrl}/api/watchLists/add?userId=${encodeURIComponent(userId)}&offerId=${encodeURIComponent(offerId)}`;
 
     fetch(url, {
         method: 'POST',

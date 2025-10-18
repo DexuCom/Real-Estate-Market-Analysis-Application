@@ -36,7 +36,7 @@ function setupForgotPasswordForm() {
             newForgotPasswordBtn.textContent = 'Wysyłanie...';
 
             try {
-                const response = await fetch(`http://localhost:8080/api/users/forgot-password?email=${encodeURIComponent(email)}`, {
+                const response = await fetch(`${API_CONFIG.baseUrl}/api/users/forgot-password?email=${encodeURIComponent(email)}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

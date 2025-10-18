@@ -53,7 +53,7 @@ function setupResetPasswordForm() {
             newResetPasswordBtn.textContent = 'Resetowanie...';
 
             try {
-                const response = await fetch(`http://localhost:8080/api/users/reset-password?token=${encodeURIComponent(token)}&newPassword=${encodeURIComponent(newPassword)}`, {
+                const response = await fetch(`${API_CONFIG.baseUrl}/api/users/reset-password?token=${encodeURIComponent(token)}&newPassword=${encodeURIComponent(newPassword)}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
