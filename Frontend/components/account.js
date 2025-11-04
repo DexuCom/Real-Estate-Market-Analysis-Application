@@ -18,7 +18,7 @@ function loadUserData() {
         return;
     }
 
-    fetch(`http://localhost:8080/api/users/${userId}`)
+    fetch(`${API_CONFIG.baseUrl}/api/users/${userId}`)
         .then(response => {
             if (response.ok) {
                 return response.json();
@@ -62,7 +62,7 @@ function loadWatchlistProperties() {
         return;
     }
 
-    fetch(`http://localhost:8080/api/watchLists/${userId}`)
+    fetch(`${API_CONFIG.baseUrl}/api/watchLists/${userId}`)
         .then(response => {
             console.log('Watchlist API response status:', response.status);
             if (response.ok) {
@@ -119,7 +119,7 @@ function displayWatchlistProperties(watchlistItems) {
 
 function fetchOfferDetails(offerId) {
     const encodedOfferId = encodeURIComponent(offerId);
-    return fetch(`http://localhost:8080/api/offer/show?offerId=${encodedOfferId}`)
+    return fetch(`${API_CONFIG.baseUrl}/api/offer/show?offerId=${encodedOfferId}`)
         .then(response => {
             if (response.ok) {
                 return response.json();
@@ -203,7 +203,7 @@ function removeFromWatchlist(offerId) {
     }
 
     if (confirm('Czy na pewno chcesz usunąć to ogłoszenie z obserwowanych?')) {
-        const url = `http://localhost:8080/api/watchLists/remove?userId=${encodeURIComponent(userId)}&offerId=${encodeURIComponent(offerId)}`;
+        const url = `${API_CONFIG.baseUrl}/api/watchLists/remove?userId=${encodeURIComponent(userId)}&offerId=${encodeURIComponent(offerId)}`;
 
         fetch(url, {
             method: 'DELETE',

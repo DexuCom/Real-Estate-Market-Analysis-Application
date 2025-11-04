@@ -1,1 +1,1 @@
-Changed login button to submit-type, fixed pricePerSqm bug
+Added base path config for Backend (in application.properties) and Frontend (in config.js)

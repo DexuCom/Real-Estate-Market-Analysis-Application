@@ -27,6 +27,9 @@ public class UserService {
     private final VerificationTokenRepository verificationTokenRepository;
     private final EmailService emailService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+    
+    @org.springframework.beans.factory.annotation.Value("${urls.frontend-base}")
+    private String frontendBaseUrl;
 
     public UserService(UserRepository _userRepository, PasswordEncoder _passwordEncoder, JWTService _jwtService,
                         VerificationTokenRepository _verificationTokenRepository, EmailService _emailService,
@@ -70,7 +73,7 @@ public class UserService {
         verificationToken.setExpiryDate(LocalDateTime.now().plusDays(1));
         verificationTokenRepository.save(verificationToken);
 
-        String link = "http://localhost:8080/api/users/verify?token=" + token;
+        String link = frontendBaseUrl + "/verify-email.html?verification_token=" + token;
         emailService.sendVerificationEmail(savedUser.getEmail(), link);
 
         return savedUser;
@@ -139,7 +142,7 @@ public class UserService {
         resetToken.setExpiryDate(LocalDateTime.now().plusHours(1));
         passwordResetTokenRepository.save(resetToken);
 
-        String resetLink = "http://localhost:8080/api/users/reset-password?token=" + token;
+        String resetLink = frontendBaseUrl + "/reset-password.html?token=" + token;
         emailService.sendPasswordResetEmail(user.getEmail(), resetLink);
 
         return resetLink;
