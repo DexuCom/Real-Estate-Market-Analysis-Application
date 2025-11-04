@@ -1,1 +1,1 @@
-Added base path config for Backend (in application.properties) and Frontend (in config.js)
+Initial Playwright e2e tests
