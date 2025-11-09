@@ -33,6 +33,7 @@ def prepareData():
 
     # TODO discuss with the team
     columns_to_drop = ['city', 'street', 'detail_url', 'image_url']
+
     dataframe_cleaned = dataframe.drop(columns=columns_to_drop)
 
     dataframe_cleaned['heating'] = dataframe_cleaned['heating'].replace('-1', 'Inne')

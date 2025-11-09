@@ -24,7 +24,7 @@ FINISHED_MODEL_PATH = "../models/svr_rema_model.joblib"
 
 pipeline = Pipeline([
         ('scaler', StandardScaler()),
-        ('svr', SVR(epsilon=0.1))
+        ('svr', SVR(epsilon=0.1, cache_size=4000, tol=1e-3))
     ])
 
 trainModel(pipeline, SVR_SEARCH_CONFIG, FINISHED_MODEL_PATH, K, RANDOM_SEED)
