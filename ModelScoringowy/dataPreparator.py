@@ -26,7 +26,14 @@ HEATING_RANKING = {
 #     "Pompa ciepła": 9
 # }
 
+
 def prepareData():
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    relative_file_path = os.path.join(script_dir, FILE_PATH)
+    dataframe = pandas.read_csv(relative_file_path)
+    prepareDataAfterLoad(dataframe)
+
+def prepareDataAfterLoad(dataframe):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     relative_file_path = os.path.join(script_dir, FILE_PATH)
     dataframe = pandas.read_csv(relative_file_path)
