@@ -104,7 +104,6 @@ async def predict(model: ModelName, request: DynamicPredictionInput):
         input_dataframe = pd.DataFrame([data])
 
         final_dataframe = prepareDataAfterLoad(input_dataframe)
-        final_dataframe = final_dataframe.drop(columns=["price_pln"])
         model_pipeline = MODELS[model.value]
         result = model_pipeline.predict(final_dataframe)
 
