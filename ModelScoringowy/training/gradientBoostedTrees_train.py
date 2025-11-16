@@ -15,12 +15,13 @@ XGBOOST_SEARCH_CONFIG = {
     'xgb__max_depth': [3, 5, 7, 9],
     'xgb__subsample': [0.6, 0.7, 0.8, 0.9, 1.0],
     'xgb__colsample_bytree': [0.6, 0.7, 0.8, 0.9, 1.0],
-    'xgb__min_child_weight': [1, 5, 10]
+    'xgb__min_child_weight': [1, 5, 10],
+
 }
 
 
 pipeline = Pipeline([
-    ('scaler', StandardScaler()),
+    ('scaler', StandardScaler().set_output()),
     ('xgb', xgb.XGBRegressor(random_state=RANDOM_SEED))
 ])
 

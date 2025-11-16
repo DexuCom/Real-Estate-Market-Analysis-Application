@@ -26,13 +26,21 @@ HEATING_RANKING = {
 #     "Pompa ciepła": 9
 # }
 
+
 def prepareData():
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    relative_file_path = os.path.join(script_dir, FILE_PATH)
+    dataframe = pandas.read_csv(relative_file_path)
+    prepareDataAfterLoad(dataframe)
+
+def prepareDataAfterLoad(dataframe):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     relative_file_path = os.path.join(script_dir, FILE_PATH)
     dataframe = pandas.read_csv(relative_file_path)
 
     # TODO discuss with the team
     columns_to_drop = ['city', 'street', 'detail_url', 'image_url']
+
     dataframe_cleaned = dataframe.drop(columns=columns_to_drop)
 
     dataframe_cleaned['heating'] = dataframe_cleaned['heating'].replace('-1', 'Inne')
