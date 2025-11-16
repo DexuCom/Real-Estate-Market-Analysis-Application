@@ -32,8 +32,13 @@
                     <h2>Wskaźnik Wyceny</h2>
 
                     <div class="predicted-price-section">
-                        <div class="price-label">Przewidywana cena:</div>
-                        <div id="predictedPrice" class="predicted-price">-- PLN</div>
+                        <div class="price-label">Cena z ogłoszenia:</div>
+                        <div id="actualPrice" class="predicted-price">-- PLN</div>
+                        <div class="price-label" style="margin-top: 15px;">Przewidywana cena:</div>
+                        <div id="predictedPrice" class="predicted-price">
+                            <span id="predictedPriceValue">-- PLN</span>
+                            <span id="priceDifference" class="price-difference"></span>
+                        </div>
                     </div>
 
                     <div class="gauge-container">

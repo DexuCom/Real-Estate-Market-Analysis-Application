@@ -1,1 +1,1 @@
-Initial Playwright e2e tests
+Integrated scoring with Frontend, changes to scoring report

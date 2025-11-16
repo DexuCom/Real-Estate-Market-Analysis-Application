@@ -139,36 +139,85 @@ function calculatePredictedPriceAndScore(offerDetails) {
     const actualPrice = offerDetails.pricePln;
 
     if (!actualPrice) {
-        document.getElementById('predictedPrice').textContent = 'Brak danych';
+        document.getElementById('actualPrice').textContent = 'Brak danych';
+        document.getElementById('predictedPriceValue').textContent = 'Brak danych';
+        document.getElementById('priceDifference').textContent = '';
         document.getElementById('gaugeScore').textContent = '--';
         document.getElementById('scoreLabel').textContent = 'Brak danych';
         return;
     }
 
-    const deviation = (Math.random() * 60) - 30;
-    const predictedPrice = Math.round(actualPrice * (1 + deviation / 100));
+    document.getElementById('actualPrice').textContent = actualPrice.toLocaleString() + ' PLN';
 
-    const percentageDifference = Math.abs(deviation);
-
-    let score;
-    if (percentageDifference <= 5) {
-        score = 100 - (percentageDifference * 2);
-    } else if (percentageDifference <= 15) {
-        score = 90 - ((percentageDifference - 5) * 3);
-    } else if (percentageDifference <= 25) {
-        score = 60 - ((percentageDifference - 15) * 2);
-    } else {
-        score = 40 - ((percentageDifference - 25) * 8);
+    if (!currentOfferData || !currentOfferData.id) {
+        console.error('Brak ID oferty');
+        document.getElementById('predictedPriceValue').textContent = 'Brak danych';
+        document.getElementById('priceDifference').textContent = '';
+        document.getElementById('gaugeScore').textContent = '--';
+        document.getElementById('scoreLabel').textContent = 'Brak danych';
+        return;
     }
 
-    score = Math.max(0, Math.min(100, Math.round(score)));
+    const url = `${API_CONFIG.baseUrl}/api/offer/predict-price/${currentOfferData.id}`;
 
-    document.getElementById('predictedPrice').textContent = predictedPrice.toLocaleString() + ' PLN';
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Błąd pobierania predykcji');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const predictedPrice = Math.round(data.predictedPricePln);
 
-    drawGauge(score, actualPrice, predictedPrice);
-}
+            const priceDifference = predictedPrice - actualPrice;
+            const priceDifferenceAbs = Math.abs(priceDifference);
 
-function setReportImage(offerDetails) {
+            document.getElementById('predictedPriceValue').textContent = predictedPrice.toLocaleString() + ' PLN';
+
+            const differenceElement = document.getElementById('priceDifference');
+            const sign = priceDifference > 0 ? '+' : '';
+            differenceElement.textContent = `(${sign}${priceDifference.toLocaleString()} PLN)`;
+            differenceElement.className = priceDifference < 0 ? 'price-difference negative' : 'price-difference positive';
+
+            const modelMAE = 80217.51;
+
+            let score;
+
+            if (priceDifference > 0) {
+                if (priceDifferenceAbs <= modelMAE / 2) {
+                    score = 50 + (priceDifferenceAbs / (modelMAE / 2)) * 25;
+                } else if (priceDifferenceAbs <= modelMAE) {
+                    score = 75 + ((priceDifferenceAbs - modelMAE / 2) / (modelMAE / 2)) * 15;
+                } else if (priceDifferenceAbs <= modelMAE * 1.5) {
+                    score = 90 + ((priceDifferenceAbs - modelMAE) / (modelMAE * 0.5)) * 8;
+                } else {
+                    score = 98 + Math.min(2, (priceDifferenceAbs - modelMAE * 1.5) / (modelMAE * 2));
+                }
+            } else {
+                if (priceDifferenceAbs <= modelMAE / 2) {
+                    score = 50 - (priceDifferenceAbs / (modelMAE / 2)) * 25;
+                } else if (priceDifferenceAbs <= modelMAE) {
+                    score = 25 - ((priceDifferenceAbs - modelMAE / 2) / (modelMAE / 2)) * 15;
+                } else if (priceDifferenceAbs <= modelMAE * 1.5) {
+                    score = 10 - ((priceDifferenceAbs - modelMAE) / (modelMAE * 0.5)) * 8;
+                } else {
+                    score = Math.max(0, 2 - ((priceDifferenceAbs - modelMAE * 1.5) / (modelMAE * 2)));
+                }
+            }
+
+            score = Math.max(0, Math.min(100, Math.round(score)));
+
+            drawGauge(score, actualPrice, predictedPrice);
+        })
+        .catch(error => {
+            console.error('Error fetching predicted price:', error);
+            document.getElementById('predictedPriceValue').textContent = 'Błąd pobierania danych';
+            document.getElementById('priceDifference').textContent = '';
+            document.getElementById('gaugeScore').textContent = '--';
+            document.getElementById('scoreLabel').textContent = 'Błąd';
+        });
+} function setReportImage(offerDetails) {
     const imageDiv = document.getElementById('reportImage');
 
     if (offerDetails.imageUrl) {
@@ -267,17 +316,31 @@ function drawGauge(score, actualPrice, predictedPrice) {
 
     let label = '';
     if (score < 30) {
-        label = 'Słaba wycena';
+        label = 'Bardzo zawyżona cena';
     } else if (score < 50) {
-        label = 'Przeciętna wycena';
+        label = 'Zawyżona cena';
     } else if (score < 70) {
-        label = 'Dobra wycena';
+        label = 'Cena rynkowa';
     } else if (score < 85) {
-        label = 'Bardzo dobra wycena';
+        label = 'Atrakcyjna cena';
     } else {
-        label = 'Doskonała wycena';
+        label = 'Okazja cenowa';
     }
-    document.getElementById('scoreLabel').textContent = label;
+    let labelClass = '';
+    if (score < 30) {
+        labelClass = 'score-label-negative';
+    } else if (score < 50) {
+        labelClass = 'score-label-negative';
+    } else if (score < 70) {
+        labelClass = 'score-label-neutral';
+    } else if (score < 85) {
+        labelClass = 'score-label-positive';
+    } else {
+        labelClass = 'score-label-positive';
+    }
+    const scoreLabelEl = document.getElementById('scoreLabel');
+    scoreLabelEl.textContent = label;
+    scoreLabelEl.className = 'score-label ' + labelClass;
 }
 
 function closeReport() {

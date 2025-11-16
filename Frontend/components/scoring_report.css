@@ -1,3 +1,15 @@
+.score-label.score-label-negative {
+    color: #f44336;
+}
+
+.score-label.score-label-positive {
+    color: #4caf50;
+}
+
+.score-label.score-label-neutral {
+    color: #222;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -167,6 +179,23 @@ body::before {
     font-weight: 700;
     color: #667eea;
     line-height: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.price-difference {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.price-difference.positive {
+    color: #4caf50;
+}
+
+.price-difference.negative {
+    color: #f44336;
 }
 
 .gauge-container {
