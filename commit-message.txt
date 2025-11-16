@@ -1,1 +1,1 @@
-Changes to scoring report, score calculation changes
+Fixed scraper, removed old .csv files
