@@ -20,7 +20,7 @@ WINDA_RE = re.compile(r"\bwinda\b", re.IGNORECASE)
 MIEJSCE_POSTOJOWE_RE = re.compile(r"miejsce\s+postojowe", re.IGNORECASE)
 OBIEKT_ZAMKNIETY_RE = re.compile(r"\bobiekt zamknięty\b", re.IGNORECASE)
 
-CENA_RE = re.compile(r"")
+CENA_RE = re.compile(r"[\d\s]+zł", re.IGNORECASE)
 
 POWIERZCHNIA_RE = re.compile(r"\d* m²")
 POKOJE_RE = re.compile(r"\d* pok", re.IGNORECASE)
@@ -78,23 +78,29 @@ def parse_page(html):
             continue
         detail_url = base_detail_url + link_tag['href']
 
+        location_div = offer_card.find("div", attrs={"data-cy": "propertyCardLocation"})
+        if location_div:
+            street_span = location_div.find("span")
+            if street_span:
+                street = street_span.get_text(strip=True)
+        else:
+            location_holder = offer_card.find("div", attrs={"data-cy": "locationTree"})
+            if location_holder:
+                street_element = location_holder.find_next_sibling('span')
+                if street_element:
+                    street = street_element.get_text(strip=True)
+
         price_holder = offer_card.find("div", attrs={"data-cy": "cardPropertyOfferPrice"})
         if price_holder:
-            price_element = price_holder.select_one('div:nth-of-type(2) > div')
-            if price_element:
-                price_string = price_element.get_text(strip=True)
-                numeric_price = price_string.replace("zł", "").replace(" ", "").replace("\xa0", "")
+            price_text_full = price_holder.get_text(separator=" ", strip=True)
+            price_match = re.search(r"([\d\s]+)zł", price_text_full)
+            if price_match:
+                price_text = price_match.group(1)
+                numeric_price = price_text.replace(" ", "").replace("\xa0", "")
                 try:
                     price = int(numeric_price)
                 except ValueError:
-                    print("Error when trying to convert numeric_price to price, price was " + numeric_price)
-                    continue
-
-        location_holder = offer_card.find("div", attrs={"data-cy": "locationTree"})
-        if location_holder:
-            street_element = location_holder.find_next_sibling('span')
-            if street_element:
-                street = street_element.get_text(strip=True)
+                    print("Unable to convert price " + price_text + " into int")
 
         info_div = offer_card.find("div", class_="property-info")
         if info_div:
@@ -152,6 +158,14 @@ def parse_page(html):
 def parse_detail_value(soup: BeautifulSoup, label_text: str):
     span = soup.find("span", string=label_text)
     if span:
+        parent_row = span.find_parent("div", class_="information-table__row")
+        if parent_row:
+            value_cell = parent_row.find("div", class_="information-table__cell--value")
+            if value_cell:
+                val_div = value_cell.find("div", attrs={"data-cy": "itemValue"})
+                if val_div:
+                    return val_div.get_text(strip=True)
+        
         parent_div = span.find_parent("div", class_="iT04N1")
         if parent_div:
             value_div = parent_div.find("div", class_="YSTCwm M3ijI0")
@@ -163,13 +177,21 @@ def parse_detail_value(soup: BeautifulSoup, label_text: str):
 
 
 def parse_year_built(soup: BeautifulSoup):
-    text = parse_detail_value(soup, "Rok budowy")
-    return int(text) if text and text.isdigit() else -1
+    page_text = soup.get_text(separator=" ", strip=True)
+    match = re.search(r"Rok budowy\s*(\d{4})", page_text, re.IGNORECASE)
+    if match:
+        year = match.group(1)
+        return int(year) if year.isdigit() else -1
+    return -1
 
 
 def parse_market(soup: BeautifulSoup):
-    text = parse_detail_value(soup, "Rynek")
-    return text.strip().lower() if text else ""
+    page_text = soup.get_text(separator=" ", strip=True).lower()
+    if "pierwotny" in page_text:
+        return "Pierwotny"
+    if "wtórny" in page_text or "wtorny" in page_text:
+        return "Wtórny"
+    return -1
 
 
 def parse_heating(soup: BeautifulSoup):
@@ -336,7 +358,7 @@ if __name__ == "__main__":
     output_dir = "ScraperOutput"
     os.makedirs(output_dir, exist_ok=True)
     
-    data = asyncio.run(scrape_prices_and_streets(BASE_URL, pages=130, start_page=1))
+    data = asyncio.run(scrape_prices_and_streets(BASE_URL, pages=2, start_page=1))
 
     output_file = os.path.join(output_dir, f"{SELECTED_CITY}-morizon.csv")
     df = pd.DataFrame(data)
