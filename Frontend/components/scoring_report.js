@@ -184,27 +184,11 @@ function calculatePredictedPriceAndScore(offerDetails) {
 
             let score;
 
-            if (priceDifference > 0) {
-                if (priceDifferenceAbs <= modelMAE / 2) {
-                    score = 50 + (priceDifferenceAbs / (modelMAE / 2)) * 25;
-                } else if (priceDifferenceAbs <= modelMAE) {
-                    score = 75 + ((priceDifferenceAbs - modelMAE / 2) / (modelMAE / 2)) * 15;
-                } else if (priceDifferenceAbs <= modelMAE * 1.5) {
-                    score = 90 + ((priceDifferenceAbs - modelMAE) / (modelMAE * 0.5)) * 8;
-                } else {
-                    score = 98 + Math.min(2, (priceDifferenceAbs - modelMAE * 1.5) / (modelMAE * 2));
-                }
-            } else {
-                if (priceDifferenceAbs <= modelMAE / 2) {
-                    score = 50 - (priceDifferenceAbs / (modelMAE / 2)) * 25;
-                } else if (priceDifferenceAbs <= modelMAE) {
-                    score = 25 - ((priceDifferenceAbs - modelMAE / 2) / (modelMAE / 2)) * 15;
-                } else if (priceDifferenceAbs <= modelMAE * 1.5) {
-                    score = 10 - ((priceDifferenceAbs - modelMAE) / (modelMAE * 0.5)) * 8;
-                } else {
-                    score = Math.max(0, 2 - ((priceDifferenceAbs - modelMAE * 1.5) / (modelMAE * 2)));
-                }
-            }
+            const differenceMultiplier = Math.sign(priceDifference);
+            const ratio = Math.min(priceDifferenceAbs / (modelMAE * 2), 1);
+            score = 50 + differenceMultiplier * Math.pow(ratio, 0.7);
+
+            score = Math.max(0, Math.min(100, score));
 
             score = Math.max(0, Math.min(100, Math.round(score)));
 

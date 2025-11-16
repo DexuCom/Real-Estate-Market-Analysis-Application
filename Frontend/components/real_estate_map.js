@@ -366,11 +366,11 @@ function populatePropertyDetails(offerDetails, offer, pricePerSqm) {
     document.getElementById('propertyStreet').textContent = offerDetails.street || 'Brak danych';
     document.getElementById('currentPrice').textContent = (offerDetails.pricePln ? offerDetails.pricePln.toLocaleString() + ' PLN' : 'Brak danych');
     document.getElementById('propertySize').textContent = offerDetails.sizeM2 ? offerDetails.sizeM2 + ' m²' : 'Brak danych';
-    document.getElementById('propertyRooms').textContent = offerDetails.rooms || 'Brak danych';
+    document.getElementById('propertyRooms').textContent = `Liczba pokojów: ${offerDetails.rooms}` || 'Brak danych';
     document.getElementById('propertyFloor').textContent = offerDetails.floor ? `${offerDetails.floor} piętro` : 'Brak danych';
-    document.getElementById('propertyYear').textContent = offerDetails.yearBuilt ? offerDetails.yearBuilt + ' r.' : 'Brak danych';
+    document.getElementById('propertyYear').textContent = offerDetails.yearBuilt ? `Rok budowy: ${offerDetails.yearBuilt} r.` : 'Brak danych';
     document.getElementById('propertyMarket').textContent = offerDetails.market ? `Rynek ${offerDetails.market}` : 'Brak danych';
-    document.getElementById('propertyHeating').textContent = (offerDetails.heating && offerDetails.heating !== -1) ? offerDetails.heating : 'Brak danych';
+    document.getElementById('propertyHeating').textContent = (offerDetails.heating > -1) ? `Ogrzewanie: ${offerDetails.heating}` : 'Ogrzewanie: Brak danych';
     document.getElementById('propertyTotalFloors').textContent = offerDetails.totalFloors ? `Budynek ${offerDetails.totalFloors}-piętrowy` : 'Brak danych';
 
     let apiPricePerSqm = pricePerSqm;
