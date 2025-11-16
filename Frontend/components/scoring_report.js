@@ -188,8 +188,6 @@ function calculatePredictedPriceAndScore(offerDetails) {
             const ratio = Math.min(priceDifferenceAbs / (modelMAE * 2), 1);
             score = 50 + differenceMultiplier * Math.pow(ratio, 0.7);
 
-            score = Math.max(0, Math.min(100, score));
-
             score = Math.max(0, Math.min(100, Math.round(score)));
 
             drawGauge(score, actualPrice, predictedPrice);
