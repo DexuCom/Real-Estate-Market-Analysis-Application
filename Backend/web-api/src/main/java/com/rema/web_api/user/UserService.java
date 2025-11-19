@@ -94,7 +94,7 @@ public class UserService {
         
         User user = userOptional.get();
 
-        if (user.getEnabled() == false || !user.getEnabled()) {
+        if (user.getEnabled() == false) {
             throw new IllegalStateException("Konto użytkownika nie jest aktywowane");
         }
 

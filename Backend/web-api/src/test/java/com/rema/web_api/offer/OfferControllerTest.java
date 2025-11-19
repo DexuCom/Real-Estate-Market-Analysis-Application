@@ -1,7 +1,6 @@
 package com.rema.web_api.offer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rema.web_api.offer.dto.OfferDTO;
 import com.rema.web_api.offer.dto.OfferMapPointDTO;
 import com.rema.web_api.offer.dto.OfferPricePredictionResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -21,7 +19,6 @@ import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -52,15 +49,14 @@ class OfferControllerTest {
                 .setValidator(new LocalValidatorFactoryBean())
                 .build();
 
-        // Setup test offer with correct field types
         testOffer = Offer.builder()
                 .id(1)
                 .city("Gdańsk")
                 .street("Testowa")
                 .pricePln(500000)
                 .sizeM2(50.0f)
-                .rooms("2")  // Changed to String as per Offer.java
-                .floor("3")  // Changed to String as per Offer.java
+                .rooms("2")
+                .floor("3")
                 .imageUrl("http://test.com/image/1")
                 .detailUrl("http://test.com/offer/1")
                 .yearBuilt(2020)
@@ -87,9 +83,8 @@ class OfferControllerTest {
                 .pm2(10000.0f)
                 .build();
 
-        // Updated to match OfferPricePredictionResponse.java
         testPrediction = OfferPricePredictionResponse.builder()
-                .predictedPricePln(520000.0f)  // Changed to match the actual field name
+                .predictedPricePln(520000.0f)
                 .build();
     }
 

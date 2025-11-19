@@ -1,33 +1,24 @@
 package com.rema.web_api.watch_list;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rema.web_api.global.GlobalErrorHandler;
-import com.rema.web_api.watch_list.dto.WatchListDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 @EnableWebMvc
@@ -40,8 +31,6 @@ class WatchListControllerTest {
 
     @InjectMocks
     private WatchListController watchListController;
-
-    private ObjectMapper objectMapper = new ObjectMapper();
 
     private UUID userId;
     private String offerId;
