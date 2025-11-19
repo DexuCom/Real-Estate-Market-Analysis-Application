@@ -1,0 +1,23 @@
+{
+    "name": "real-estate-playwright-tests",
+    "version": "1.0.0",
+    "description": "Playwright E2E tests for Real Estate Market Analysis Application",
+    "scripts": {
+        "test": "playwright test",
+        "test:headed": "playwright test --headed",
+        "test:ui": "playwright test --ui",
+        "test:debug": "playwright test --debug",
+        "test:report": "playwright show-report",
+        "test:codegen": "playwright codegen"
+    },
+    "keywords": [
+        "playwright",
+        "e2e",
+        "testing"
+    ],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@playwright/test": "^1.40.0"
+    }
+}

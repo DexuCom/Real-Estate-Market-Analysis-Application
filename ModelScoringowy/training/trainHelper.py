@@ -17,21 +17,22 @@ def trainModel(pipeline, CONFIG, FINISHED_MODEL_PATH, K, RANDOM_SEED):
     X = dataframe.drop(TARGET_COLUMN, axis='columns')
 
     # TODO think of a better place to put this
-    dtype_to_pytype = {
-        "int64": "int",
-        "float64": "float",
-        "object": "str",
-        "category": "str",
-        "bool": "bool"
-    }
-    feature_file = "../models/features.json"
-    feature_info = {
-        col: dtype_to_pytype.get(str(dtype), "str")
-        for col, dtype in zip(X.columns, X.dtypes)
-    }
-    with open(feature_file, "w") as f:
-        json.dump(feature_info, f, indent=2)
-    print(f"Saved feature infos to {feature_file}")
+    # currently unused because it was a semi-good idea for dev, and terrible later down the line
+    # dtype_to_pytype = {
+    #     "int64": "int",
+    #     "float64": "float",
+    #     "object": "str",
+    #     "category": "str",
+    #     "bool": "bool"
+    # }
+    # feature_file = "../models/features.json"
+    # feature_info = {
+    #     col: dtype_to_pytype.get(str(dtype), "str")
+    #     for col, dtype in zip(X.columns, X.dtypes)
+    # }
+    # with open(feature_file, "w") as f:
+    #     json.dump(feature_info, f, indent=2)
+    # print(f"Saved feature infos to {feature_file}")
 
     kfold = KFold(n_splits=K, shuffle=True, random_state=RANDOM_SEED)
 

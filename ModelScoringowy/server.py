@@ -5,9 +5,13 @@ from enum import Enum
 import pandas as pd
 
 import joblib
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
 from pydantic import create_model
 from typing import Optional
+from dataPreparator import prepareDataAfterLoad
+from fastapi.responses import JSONResponse
+import logging
 
 MODELS = {}
 MODEL_PATHS = {
@@ -42,6 +46,8 @@ DynamicPredictionInput = create_model(
 )
 
 
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Loading models...")
@@ -61,7 +67,18 @@ async def lifespan(app: FastAPI):
     yield
     print("Cleanup")
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 app = FastAPI(lifespan=lifespan)
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    error_details = exc.errors()
+    logger.error(f"Validation error for request to {request.url}: {error_details}")
+    return JSONResponse(
+        status_code=422,
+        content={"detail": error_details},
+    )
 
 @app.post("/predict/{model}")
 async def predict(model: ModelName, request: DynamicPredictionInput):
@@ -85,9 +102,8 @@ async def predict(model: ModelName, request: DynamicPredictionInput):
 
     try:
         input_dataframe = pd.DataFrame([data])
-        input_dataframe_encoded = pd.get_dummies(input_dataframe)
-        final_dataframe = input_dataframe_encoded.reindex(columns=FEATURES_WITH_TYPES.keys(), fill_value=0)
 
+        final_dataframe = prepareDataAfterLoad(input_dataframe)
         model_pipeline = MODELS[model.value]
         result = model_pipeline.predict(final_dataframe)
 

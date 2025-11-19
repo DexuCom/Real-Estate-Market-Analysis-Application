@@ -13,7 +13,7 @@ OSM_FILE_PATH = "GIS_data/poland_amenities.osm.pbf"
 # DESIRED_AMENITIES = {"police", "place_of_worship", "kindergarten", "clothes", "parking",
 #                      "restaurant", "townhall", "grocery", "school", "shop", "pharmacy", "prison"}
 
-DESIRED_AMENITIES = {"kindergarten", "parking", "school", "pharmacy"}
+DESIRED_AMENITIES = {'pharmacy', 'parking', 'restaurant', 'school', 'police', 'shop', 'kindergarten', 'clothes', 'grocery', 'place_of_worship', 'townhall', 'prison'}
 
 CACHE_FILE = "amenities_cache.pkl"
 
@@ -75,11 +75,15 @@ def init():
         print(f"Processing finished in {time.perf_counter() - start_time:.2f} seconds")
 
     print("Creating k-d trees...")
+    amenity_types = set()
     for amenity_type, coords_list in amenities_by_type.items():
+        amenity_types.add(amenity_type)
         if coords_list:
             coords_array = np.array(coords_list)
             kdtree_by_type[amenity_type] = cKDTree(coords_array)
     print("KD-Trees ready")
+
+    print(amenity_types)
 
 def find_nearest_amenity(lat, lon, type):
     if type not in kdtree_by_type:
@@ -95,15 +99,15 @@ def find_nearest_amenity(lat, lon, type):
 if __name__ == "__main__":
     init()
     df = pd.read_csv(INPUT_CSV)
-    for amenity_type in DESIRED_AMENITIES:
-        df[f"distance_to_{amenity_type}"] = -1
-
-    for idx, row in df.iterrows():
-        lat = row['latitude']
-        lon = row['longitude']
-        for amenity_type in DESIRED_AMENITIES:
-            coords, dist_km = find_nearest_amenity(lat, lon, amenity_type)
-            df.at[idx, f"distance_to_{amenity_type}"] = dist_km
+    # for amenity_type in DESIRED_AMENITIES:
+    #     df[f"distance_to_{amenity_type}"] = -1
+    #
+    # for idx, row in df.iterrows():
+    #     lat = row['latitude']
+    #     lon = row['longitude']
+    #     for amenity_type in DESIRED_AMENITIES:
+    #         coords, dist_km = find_nearest_amenity(lat, lon, amenity_type)
+    #         df.at[idx, f"distance_to_{amenity_type}"] = dist_km
 
     df.to_csv(OUTPUT_CSV, index=False)
     print(f"Saved to {OUTPUT_CSV}")
