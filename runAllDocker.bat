@@ -1,1 +1,1 @@
-docker-compose -f docker-compose.yaml -f docker-compose.docker.yaml --env-file realEstate.env up --build
+docker-compose -f docker-compose.yaml -f docker-compose.docker.yaml up --build
