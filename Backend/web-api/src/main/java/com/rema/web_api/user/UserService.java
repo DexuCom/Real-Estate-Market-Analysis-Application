@@ -97,6 +97,10 @@ public class UserService {
         
         User user = userOptional.get();
 
+        if (user.getEnabled() == false) {
+            throw new IllegalStateException("Konto użytkownika nie jest aktywowane");
+        }
+
         if(BCrypt.checkpw(userLoginRequestDTO.password(), user.getPasswordHash()))
         {
             String jwtToken = jwtService.generateToken(user);
