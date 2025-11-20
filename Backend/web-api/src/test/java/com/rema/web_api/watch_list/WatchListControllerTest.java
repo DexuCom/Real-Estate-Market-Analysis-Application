@@ -68,12 +68,10 @@ class WatchListControllerTest {
 
     @Test
     void addToWatchlist_Failure() throws Exception {
-        // Given
         String errorMessage = "Użytkownik już ma taką ofertę zapisaną na liście obserwowanych";
         when(watchListService.addWatchList(any(UUID.class), anyString()))
                 .thenThrow(new IllegalStateException(errorMessage));
 
-        // When & Then
         mockMvc.perform(post("/api/watchLists/add")
                         .param("userId", userId.toString())
                         .param("offerId", offerId))

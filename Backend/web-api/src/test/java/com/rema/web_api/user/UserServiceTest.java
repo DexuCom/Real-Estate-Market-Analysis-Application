@@ -100,6 +100,7 @@ class UserServiceTest {
         User user = User.builder()
                 .username("testuser")
                 .passwordHash("$2a$10$7q8y9z2yF6E5k6g0sQ0U1eRrGZ3uL.zLkD2nPnI7eN/dM9C6vA1bK")
+                .enabled(true)
                 .build();
 
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
@@ -130,6 +131,7 @@ class UserServiceTest {
         User user = User.builder()
                 .username("testuser")
                 .passwordHash("$2a$10$7q8y9z2yF6E5k6g0sQ0U1eRrGZ3uL.zLkD2nPnI7eN/dM9C6vA1bK")
+                .enabled(true)
                 .build();
 
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
