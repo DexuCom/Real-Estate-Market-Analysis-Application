@@ -1,1 +1,1 @@
-Changed login button to submit-type, fixed pricePerSqm bug
+Fixed scraper, removed old .csv files

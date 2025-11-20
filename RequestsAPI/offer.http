@@ -6,3 +6,6 @@ GET http://localhost:8080/api/offer/map-points
 
 ### Show offer details
 GET http://localhost:8080/api/offer/show?offerId=686
+
+### Get prediction
+GET http://localhost:8080/api/offer/predict-price/1

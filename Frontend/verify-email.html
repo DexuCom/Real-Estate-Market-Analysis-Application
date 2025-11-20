@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weryfikacja email - EstateScout</title>
+    <link rel="icon" type="image/png" href="assets/icon.png">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="components/reset_password.css">
+    <script src="config.js"></script>
+</head>
+
+<body>
+    <div class="reset-password-container">
+        <div class="reset-password-form">
+            <div class="logo-container" style="margin-bottom: 2rem;">
+                <img src="assets/logo.png" alt="EstateScout Logo" style="max-width: 200px; height: auto;">
+            </div>
+
+            <h2 class="reset-password-title">Weryfikacja konta</h2>
+            <p class="reset-password-subtitle">Trwa weryfikacja Twojego konta...</p>
+
+            <div id="message-container" style="margin-top: 2rem;">
+                <div style="text-align: center;">
+                    <p>Proszę czekać...</p>
+                </div>
+            </div>
+
+            <div class="reset-password-footer" id="footer-links" style="display: none;">
+                <a href="index.html" id="homeLink">Przejdź do strony głównej</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get verification token from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const verificationToken = urlParams.get('verification_token');
+
+        if (!verificationToken) {
+            showMessage('Brak tokenu weryfikacyjnego. Link jest nieprawidłowy.', 'error');
+        } else {
+            verifyEmailAccount(verificationToken);
+        }
+
+        async function verifyEmailAccount(token) {
+            try {
+                const response = await fetch(`${API_CONFIG.baseUrl}/api/users/verify?token=${encodeURIComponent(token)}`, {
+                    method: 'GET'
+                });
+
+                if (response.ok) {
+                    showMessage('✅ Konto zostało pomyślnie zweryfikowane! Za chwilę zostaniesz przekierowany do strony logowania...', 'success');
+
+                    // Redirect to home page after 3 seconds
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 3000);
+                } else {
+                    const error = await response.json();
+                    const errorMessage = error.message || 'Wystąpił błąd podczas weryfikacji konta.';
+                    showMessage('❌ Błąd weryfikacji: ' + errorMessage, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('❌ Błąd połączenia z serwerem podczas weryfikacji konta.', 'error');
+            }
+
+            // Show footer links
+            document.getElementById('footer-links').style.display = 'block';
+        }
+
+        function showMessage(message, type) {
+            const messageContainer = document.getElementById('message-container');
+            messageContainer.innerHTML = '';
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
+            messageDiv.textContent = message;
+
+            messageContainer.appendChild(messageDiv);
+        }
+    </script>
+</body>
+
+</html>
