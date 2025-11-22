@@ -1,1 +1,1 @@
-Fixed scraper, removed old .csv files
+Integrated search filters with frontend, changed main page images
