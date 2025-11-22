@@ -135,6 +135,56 @@ function setupEventListeners() {
             }
         });
     }
+
+    const applyFiltersBtn = document.getElementById('applyFilters');
+    if (applyFiltersBtn) {
+        applyFiltersBtn.addEventListener('click', function () {
+            const filters = {};
+
+            const market = document.getElementById('filterMarket').value;
+            if (market && market !== 'dowolny') {
+                filters.market = market;
+            }
+
+            const priceFrom = document.getElementById('filterPriceFrom').value;
+            if (priceFrom) filters.pricePlnFrom = parseFloat(priceFrom);
+
+            const priceTo = document.getElementById('filterPriceTo').value;
+            if (priceTo) filters.pricePlnTo = parseFloat(priceTo);
+
+            const priceM2From = document.getElementById('filterPriceM2From').value;
+            if (priceM2From) filters.pm2From = parseFloat(priceM2From);
+
+            const priceM2To = document.getElementById('filterPriceM2To').value;
+            if (priceM2To) filters.pm2To = parseFloat(priceM2To);
+
+            const roomsFrom = document.getElementById('filterRoomsFrom').value;
+            if (roomsFrom) filters.roomsFrom = parseInt(roomsFrom);
+
+            const roomsTo = document.getElementById('filterRoomsTo').value;
+            if (roomsTo) filters.roomsTo = parseInt(roomsTo);
+
+            const floorFrom = document.getElementById('filterFloorFrom').value;
+            if (floorFrom) filters.floorsFrom = parseInt(floorFrom);
+
+            const floorTo = document.getElementById('filterFloorTo').value;
+            if (floorTo) filters.floorsTo = parseInt(floorTo);
+
+            const sizeFrom = document.getElementById('filterSizeFrom').value;
+            if (sizeFrom) filters.sizeM2From = parseFloat(sizeFrom);
+
+            const sizeTo = document.getElementById('filterSizeTo').value;
+            if (sizeTo) filters.sizeM2To = parseFloat(sizeTo);
+
+            const yearFrom = document.getElementById('filterYearFrom').value;
+            if (yearFrom) filters.yearBuiltFrom = parseInt(yearFrom);
+
+            const yearTo = document.getElementById('filterYearTo').value;
+            if (yearTo) filters.yearBuiltTo = parseInt(yearTo);
+
+            loadPropertyData(filters);
+        });
+    }
 }
 
 
@@ -216,8 +266,8 @@ function toggleHeatmap() {
     }
 }
 
-function loadPropertyData() {
-    console.log('Loading property data from API...');
+function loadPropertyData(filters = {}) {
+    console.log('Loading property data from API...', filters);
 
     if (markerClusterGroup) {
         markerClusterGroup.clearLayers();
@@ -226,7 +276,13 @@ function loadPropertyData() {
     heatmapData = [];
     allOffers = [];
 
-    fetch(`${API_CONFIG.baseUrl}/api/offer/map-points`)
+    fetch(`${API_CONFIG.baseUrl}/api/offer/map-points`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(filters)
+    })
         .then(response => {
             console.log('Fetch response status:', response.status);
             if (!response.ok) {
