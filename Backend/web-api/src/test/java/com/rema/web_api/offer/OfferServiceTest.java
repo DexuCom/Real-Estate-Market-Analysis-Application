@@ -1,14 +1,20 @@
 package com.rema.web_api.offer;
 
 import com.rema.web_api.offer.dto.OfferMapPointDTO;
+import com.rema.web_api.offer.dto.OfferMapPointRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.data.jpa.domain.Specification;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 class OfferServiceTest {
 
@@ -55,9 +61,9 @@ class OfferServiceTest {
                 .longitude(21.0f)
                 .build();
 
-        when(offerRepository.findAll()).thenReturn(List.of(offer));
+        when(offerRepository.findAll(any(Specification.class))).thenReturn(List.of(offer));
 
-        List<OfferMapPointDTO> result = offerService.getAllMapPoints();
+        List<OfferMapPointDTO> result = offerService.getAllMapPoints(OfferMapPointRequest.builder().build());
 
         assertEquals(1, result.size());
         assertEquals(21.0f, result.get(0).getX());

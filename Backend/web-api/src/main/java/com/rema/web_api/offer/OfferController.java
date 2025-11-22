@@ -3,6 +3,7 @@ package com.rema.web_api.offer;
 import com.rema.web_api.global.dto.ErrorDTO;
 import com.rema.web_api.offer.dto.OfferDTO;
 import com.rema.web_api.offer.dto.OfferMapPointDTO;
+import com.rema.web_api.offer.dto.OfferMapPointRequest;
 import com.rema.web_api.offer.dto.OfferPricePredictionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -85,15 +86,28 @@ public class OfferController {
         return ResponseEntity.ok(offerDTO);
     }
 
-    @GetMapping("/map-points")
-    public ResponseEntity<List<OfferMapPointDTO>> getAllMapPoints() {
+    @PostMapping("/map-points")
+    public ResponseEntity<?> getAllMapPoints(@RequestBody OfferMapPointRequest request) {
         try {
-            List<OfferMapPointDTO> offerMapPointDTOList = offerService.getAllMapPoints();
+            List<OfferMapPointDTO> offerMapPointDTOList = offerService.getAllMapPoints(request);
             return ResponseEntity.ok(offerMapPointDTOList);
+        } catch (Exception ex) {
+            ErrorDTO errorDTO = new ErrorDTO(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(errorDTO);
+        }
+    }
+
+    @GetMapping("/offer-filter-ranges")
+    public ResponseEntity<OfferFilterRanges> getOfferFilterRanges() {
+        try {
+            OfferFilterRanges offerFilterRanges = offerService.getOfferFilterRanges();
+            return ResponseEntity.ok(offerFilterRanges);
         } catch (Exception ex) {
             return ResponseEntity.internalServerError().build();
         }
-
     }
 
     @GetMapping("/predict-price/{id}")
