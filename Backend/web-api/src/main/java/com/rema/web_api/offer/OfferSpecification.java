@@ -26,8 +26,16 @@ public class OfferSpecification {
                 ).as(Float.class);
                 addRange(predicates, cb, pricePerM2, req.getPm2From(), req.getPm2To());
             }
-            addRange(predicates, cb, root.get("rooms"), req.getRoomsFrom(), req.getRoomsTo());
-            addRange(predicates, cb, root.get("floor"), req.getFloorsFrom(), req.getFloorsTo());
+            addRange(predicates, cb, root.get("rooms").as(Integer.class), req.getRoomsFrom(), req.getRoomsTo());
+            addRange(predicates, cb, root.get("floor").as(Integer.class), req.getFloorsFrom(), req.getFloorsTo());
+
+//            Expression<Integer> floorNumeric = safeParseToInt(cb, root.get("floor"));
+//
+//            addRange(predicates, cb,
+//                    floorNumeric,
+//                    req.getFloorsFrom(),
+//                    req.getFloorsTo());
+
             addRange(predicates, cb, root.get("sizeM2"), req.getSizeM2From(), req.getSizeM2To());
             addRange(predicates, cb, root.get("yearBuilt"), req.getYearBuiltFrom(), req.getYearBuiltTo());
 
@@ -35,6 +43,20 @@ public class OfferSpecification {
         };
     }
 
+    private static Expression<Integer> safeParseToInt(CriteriaBuilder cb, Expression<String> stringField) {
+        Expression<String> regexPattern = cb.literal("(-?\\d+)");
+
+        Expression<String> extractedNumber = cb.function(
+                "substring",
+                String.class,
+                stringField,
+                regexPattern
+        );
+
+        Expression<String> cleanNumber = cb.coalesce(extractedNumber, "0");
+
+        return cleanNumber.as(Integer.class);
+    }
 
     private static <Y extends Comparable<? super Y>> void addRange(
             List<Predicate> predicates,

@@ -20,10 +20,10 @@ public class OfferCsv {
     private Float size_m2;
 
     @CsvBindByName(column = "rooms")
-    private String rooms;
+    private Integer rooms;
 
     @CsvBindByName(column = "floor")
-    private String floor;
+    private Integer floor;
 
     @CsvBindByName(column = "image_url")
     private String imageUrl;
