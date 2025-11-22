@@ -3,10 +3,12 @@ package com.rema.web_api.offer;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.rema.web_api.offer.dto.OfferMapPointDTO;
+import com.rema.web_api.offer.dto.OfferMapPointRequest;
 import com.rema.web_api.offer.dto.OfferPricePredictionResponse;
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.io.input.BOMInputStream;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -43,7 +45,7 @@ public class OfferService {
     public Optional<Offer> getOffer(Integer offerId) {
         return offerRepository.findById(offerId);
     }
-          
+
     @Transactional
     public List<Offer> registerOffers() throws IOException {
 
@@ -99,11 +101,17 @@ public class OfferService {
     }
 
 
-    public List<OfferMapPointDTO> getAllMapPoints() {
-        List<Offer> offers = offerRepository.findAll();
+    public List<OfferMapPointDTO> getAllMapPoints(OfferMapPointRequest request) {
+        Specification<Offer> spec = OfferSpecification.offerFilters(request);
+        List<Offer> offers = offerRepository.findAll(spec);
         return offers.stream().map(OfferMappers::mapToOfferMapPointDTO).toList();
 
     }
+
+    public OfferFilterRanges getOfferFilterRanges() {
+        return offerRepository.getOfferFilterRanges();
+    }
+
 
     public OfferPricePredictionResponse predictPriceForOfferById(Integer id, String model) {
         Optional<Offer> offer = offerRepository.findById(id);

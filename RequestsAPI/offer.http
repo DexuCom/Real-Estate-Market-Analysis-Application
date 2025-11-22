@@ -1,8 +1,29 @@
 ### Add offers from csv to database
 POST http://localhost:8080/api/offer/add
 
-### Get map points
-GET http://localhost:8080/api/offer/map-points
+### Get map points with filters
+POST http://localhost:8080/api/offer/map-points
+Content-Type: application/json
+
+{
+  "market": "pierwotny",
+  "pricePlnFrom": 0,
+  "pricePlnTo": 1300000,
+  "sizeM2From": 1.0,
+  "sizeM2To": 1000.0,
+  "roomsFrom": 1,
+  "roomsTo": 1000,
+  "yearBuiltFrom": 1870,
+  "pm2To": 150000.0
+}
+
+### Get map points without filters
+POST http://localhost:8080/api/offer/map-points
+Content-Type: application/json
+{}
+
+### Get filter ranges
+GET http://localhost:8080/api/offer/offer-filter-ranges
 
 ### Show offer details
 GET http://localhost:8080/api/offer/show?offerId=686

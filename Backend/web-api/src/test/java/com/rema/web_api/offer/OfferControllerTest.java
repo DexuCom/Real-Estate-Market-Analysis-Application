@@ -2,6 +2,7 @@ package com.rema.web_api.offer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rema.web_api.offer.dto.OfferMapPointDTO;
+import com.rema.web_api.offer.dto.OfferMapPointRequest;
 import com.rema.web_api.offer.dto.OfferPricePredictionResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -19,8 +21,11 @@ import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -140,22 +145,28 @@ class OfferControllerTest {
 
     @Test
     void getAllMapPoints_Success() throws Exception {
-        when(offerService.getAllMapPoints()).thenReturn(Arrays.asList(testMapPoint));
+        when(offerService.getAllMapPoints(any(OfferMapPointRequest.class)))
+                .thenReturn(Arrays.asList(testMapPoint));
 
-        mockMvc.perform(get("/api/offer/map-points"))
+        mockMvc.perform(post("/api/offer/map-points")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].x").value(18.638306))
                 .andExpect(jsonPath("$[0].y").value(54.372158))
                 .andExpect(jsonPath("$[0].pm2").value(10000.0));
+
     }
 
     @Test
     void getAllMapPoints_Failure() throws Exception {
-        when(offerService.getAllMapPoints()).thenThrow(new RuntimeException("Database error"));
+        when(offerService.getAllMapPoints(any(OfferMapPointRequest.class))).thenThrow(new RuntimeException("Database error"));
 
-        mockMvc.perform(get("/api/offer/map-points"))
+        mockMvc.perform(post("/api/offer/map-points")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
                 .andDo(print())
                 .andExpect(status().isInternalServerError());
     }
