@@ -15,7 +15,7 @@ class HomePage {
         this.heroImage = page.locator('#hero-image');
 
         this.heatmapTabButton = page.locator('button.hero-tab-btn').filter({ hasText: 'Mapa ciepła' });
-        this.searchTabButton = page.locator('button.hero-tab-btn').filter({ hasText: 'Wyszukiwarka' });
+        this.searchTabButton = page.locator('button.hero-tab-btn').filter({ hasText: 'Konto użytkownika' });
         this.aiTabButton = page.locator('button.hero-tab-btn').filter({ hasText: 'Model scoringowy AI' });
 
         this.homePlaceholder = page.locator('#home-placeholder');

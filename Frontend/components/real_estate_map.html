@@ -27,105 +27,86 @@
     <div id="filterPanel" class="filter-panel active">
         <div class="filter-content">
             <div class="filter-section">
-                <label class="filter-label">Typ nieruchomości</label>
-                <div class="filter-row">
-                    <select class="filter-select">
-                        <option value="mieszkanie">Mieszkanie</option>
-                        <option value="dom">Dom</option>
-                        <option value="dzialka">Działka</option>
-                    </select>
-                    <div class="checkbox-container">
-                        <input type="checkbox" id="lowerPrices" class="filter-checkbox">
-                        <label for="lowerPrices">Polecane przez Model Scoringowy</label>
-                        <i class="material-icons">diamond</i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="filter-section">
-                <div class="filter-row">
-                    <div class="slider-group">
-                        <label class="filter-label">Liczba pokoi</label>
-                        <div class="slider-container">
-                            <span class="slider-label">Dowolna</span>
-                            <input type="range" class="filter-slider" min="1" max="10" value="1">
-                            <span class="slider-label">Dowolna</span>
-                        </div>
-                    </div>
-                    <div class="slider-group">
-                        <label class="filter-label">Powierzchnia</label>
-                        <div class="slider-container">
-                            <span class="slider-label">Dowolna</span>
-                            <input type="range" class="filter-slider" min="20" max="200" value="20">
-                            <span class="slider-label">Dowolna</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="filter-section">
-                <div class="filter-row">
-                    <div class="slider-group">
-                        <label class="filter-label">Cena</label>
-                        <div class="slider-container">
-                            <span class="slider-label">Dowolna</span>
-                            <input type="range" class="filter-slider" min="100000" max="5000000" value="100000">
-                            <span class="slider-label">Dowolna</span>
-                        </div>
-                    </div>
-                    <div class="slider-group">
-                        <label class="filter-label">Cena za m²</label>
-                        <div class="slider-container">
-                            <span class="slider-label">Dowolna</span>
-                            <input type="range" class="filter-slider" min="3000" max="25000" value="3000">
-                            <span class="slider-label">Dowolna</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="filter-section">
                 <div class="filter-row">
                     <div class="select-group">
                         <label class="filter-label">Rynek</label>
-                        <select class="filter-select">
+                        <select id="filterMarket" class="filter-select">
                             <option value="dowolny">Dowolny</option>
                             <option value="pierwotny">Pierwotny</option>
                             <option value="wtorny">Wtórny</option>
                         </select>
                     </div>
-                    <div class="select-group">
-                        <label class="filter-label">Dodatkowe opcje</label>
-                        <select class="filter-select">
-                            <option value="">Np. ogródek, garaż...</option>
-                            <option value="ogrodek">Ogródek</option>
-                            <option value="garaz">Garaż</option>
-                            <option value="balkon">Balkon</option>
-                            <option value="taras">Taras</option>
-                        </select>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-row">
+                    <div class="range-group">
+                        <label class="filter-label">Cena</label>
+                        <div class="range-inputs">
+                            <input id="filterPriceFrom" type="number" class="filter-input" placeholder="Od" min="0">
+                            <span class="range-separator">-</span>
+                            <input id="filterPriceTo" type="number" class="filter-input" placeholder="Do" min="0">
+                        </div>
+                    </div>
+                    <div class="range-group">
+                        <label class="filter-label">Cena za m²</label>
+                        <div class="range-inputs">
+                            <input id="filterPriceM2From" type="number" class="filter-input" placeholder="Od" min="0">
+                            <span class="range-separator">-</span>
+                            <input id="filterPriceM2To" type="number" class="filter-input" placeholder="Do" min="0">
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="filter-section">
                 <div class="filter-row">
-                    <div class="slider-group">
-                        <label class="filter-label">Rok budowy</label>
-                        <div class="slider-container">
-                            <span class="slider-label">Dowolna</span>
-                            <input type="range" class="filter-slider" min="1950" max="2024" value="1950">
-                            <span class="slider-label">Dowolna</span>
+                    <div class="range-group">
+                        <label class="filter-label">Liczba pokoi</label>
+                        <div class="range-inputs">
+                            <input id="filterRoomsFrom" type="number" class="filter-input" placeholder="Od" min="0">
+                            <span class="range-separator">-</span>
+                            <input id="filterRoomsTo" type="number" class="filter-input" placeholder="Do" min="0">
                         </div>
                     </div>
-                    <div class="slider-group">
+                    <div class="range-group">
                         <label class="filter-label">Piętro</label>
-                        <div class="slider-container">
-                            <span class="slider-label">Dowolna</span>
-                            <input type="range" class="filter-slider" min="0" max="20" value="0">
-                            <span class="slider-label">Dowolna</span>
+                        <div class="range-inputs">
+                            <input id="filterFloorFrom" type="number" class="filter-input" placeholder="Od" min="0">
+                            <span class="range-separator">-</span>
+                            <input id="filterFloorTo" type="number" class="filter-input" placeholder="Do" min="0">
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-row">
+                    <div class="range-group">
+                        <label class="filter-label">Powierzchnia (m²)</label>
+                        <div class="range-inputs">
+                            <input id="filterSizeFrom" type="number" class="filter-input" placeholder="Od" min="0">
+                            <span class="range-separator">-</span>
+                            <input id="filterSizeTo" type="number" class="filter-input" placeholder="Do" min="0">
+                        </div>
+                    </div>
+                    <div class="range-group">
+                        <label class="filter-label">Rok budowy</label>
+                        <div class="range-inputs">
+                            <input id="filterYearFrom" type="number" class="filter-input" placeholder="Od" min="1800">
+                            <span class="range-separator">-</span>
+                            <input id="filterYearTo" type="number" class="filter-input" placeholder="Do" min="1800">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <button id="applyFilters" class="apply-filters-btn">
+                    <span>Filtruj</span>
+                    <i class="material-icons">search</i>
+                </button>
             </div>
         </div>
     </div>

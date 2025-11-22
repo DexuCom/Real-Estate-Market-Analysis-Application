@@ -146,11 +146,15 @@ html {
 }
 
 .filter-content {
-    padding: 24px;
+    padding: 24px 24px 12px;
 }
 
 .filter-section {
-    margin-bottom: 24px;
+    margin-bottom: 16px;
+}
+
+.filter-section:last-child {
+    margin-bottom: 8px;
 }
 
 .filter-label {
@@ -175,20 +179,9 @@ html {
     font-size: 16px;
     background: white;
     color: #333;
-    min-width: 150px;
-}
-
-.checkbox-container {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-left: auto;
-}
-
-.filter-checkbox {
-    width: 18px;
-    height: 18px;
-    accent-color: #8b5cf6;
+    min-width: 200px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .checkbox-container label {
@@ -205,6 +198,44 @@ html {
 
 .slider-group {
     flex: 1;
+}
+
+.range-group {
+    flex: 1;
+}
+
+.range-inputs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 6px;
+    font-family: 'Outfit', Arial, sans-serif;
+    font-size: 14px;
+    background: white;
+    color: #333;
+    transition: border-color 0.2s ease;
+    width: 10px;
+}
+
+.filter-input:focus {
+    outline: none;
+    border-color: #8b5cf6;
+}
+
+.filter-input::placeholder {
+    color: #9ca3af;
+}
+
+.range-separator {
+    color: #6b7280;
+    font-weight: 500;
+    font-size: 14px;
 }
 
 .slider-container {
@@ -252,11 +283,46 @@ html {
 }
 
 .select-group {
-    flex: 1;
+    flex: 0 0 33%;
+    max-width: 33%;
+    min-width: 160px;
 }
 
 .select-group .filter-select {
     width: 100%;
+}
+
+.apply-filters-btn {
+    width: 100%;
+    background: #8b5cf6;
+    color: white;
+    border: none;
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-family: 'Outfit', Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+    transition: all 0.2s ease;
+}
+
+.apply-filters-btn:hover {
+    background: #7c3aed;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+.apply-filters-btn:active {
+    transform: translateY(0);
+}
+
+.apply-filters-btn .material-icons {
+    font-size: 20px;
 }
 
 .map-container {
