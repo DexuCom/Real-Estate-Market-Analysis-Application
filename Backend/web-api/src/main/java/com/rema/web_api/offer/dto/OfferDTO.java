@@ -14,8 +14,8 @@ public class OfferDTO {
     private String street;
     private Integer pricePln;
     private Float sizeM2;
-    private String rooms;
-    private String floor;
+    private Integer rooms;
+    private Integer floor;
 
     private String imageUrl;
     private String detailUrl;
