@@ -14,15 +14,15 @@ function switchTab(tab, button) {
 
             switch (tab) {
                 case 'heatmap':
-                    newSrc = 'assets/1.png';
+                    newSrc = 'assets/1.jpg';
                     newAlt = 'Mapa ciepła cen';
                     break;
                 case 'user-account':
-                    newSrc = 'assets/2.png';
+                    newSrc = 'assets/2.jpg';
                     newAlt = 'Konto użytkownika';
                     break;
                 case 'ai':
-                    newSrc = 'assets/3.png';
+                    newSrc = 'assets/3.jpg';
                     newAlt = 'Model scoringowy AI';
                     break;
             }
@@ -109,13 +109,13 @@ function setInitialImage() {
         const onclick = activeButton.getAttribute('onclick');
 
         if (onclick.includes("'heatmap'")) {
-            heroImage.src = 'assets/1.png';
+            heroImage.src = 'assets/1.jpg';
             heroImage.alt = 'Mapa ciepła cen';
         } else if (onclick.includes("'search'")) {
-            heroImage.src = 'assets/2.png';
+            heroImage.src = 'assets/2.jpg';
             heroImage.alt = 'Konto użytkownika';
         } else if (onclick.includes("'ai'")) {
-            heroImage.src = 'assets/3.png';
+            heroImage.src = 'assets/3.jpg';
             heroImage.alt = 'Model scoringowy AI';
         }
     }
@@ -123,9 +123,9 @@ function setInitialImage() {
 
 function preloadImages() {
     const imageSources = [
-        'assets/1.png',
-        'assets/2.png',
-        'assets/3.png'
+        'assets/1.jpg',
+        'assets/2.jpg',
+        'assets/3.jpg'
     ];
 
     imageSources.forEach(src => {

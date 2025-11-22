@@ -34,12 +34,29 @@ runLocalDev.bat
 ```
 and then turn on the applications you need.
 
-##### scoring model
+##### Scoring model
 In the ModelScoringowy folder: 
 ```bash
 uvicorn server:app --reload
 ```
 Swagger is available here: http://127.0.0.1:8000/docs
+
+### 3. Launch Frontend on local server
+
+Visual Studio Code Live Server Extension is recommended:
+
+https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer
+
+**Frontend** -> **Index.html** -> **Go Live**
+
+### 4. Import real estate data from .csv to database
+
+Run POST request:
+```bash
+### Add offers from csv to database
+POST http://localhost:8080/api/offer/add
+```
+> **Note:** You can find this request in `RequestsAPI/offer.http`
 
 ## 🗄️ Database Access via pgAdmin
 
@@ -69,3 +86,6 @@ Open your browser and navigate to: **http://localhost:8090**
 
 
 > **Note:** Make sure your Docker containers are running before attempting to connect to the database.
+
+<br>
+<img width="70%" src="https://i.imgur.com/eFvJDLJ.png"  />

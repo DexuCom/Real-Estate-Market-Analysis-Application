@@ -1,1 +1,1 @@
-Integrated search filters with frontend, changed main page images
+Page loading optimization - compressed images
