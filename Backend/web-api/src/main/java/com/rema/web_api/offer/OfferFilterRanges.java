@@ -13,6 +13,14 @@ public interface OfferFilterRanges {
 
     Integer getMaxYearBuilt();
 
+    Integer getMinRooms();
+
+    Integer getMaxRooms();
+
+    Integer getMinFloor();
+
+    Integer getMaxFloor();
+
     Float getMinPm2();
 
     Float getMaxPm2();
